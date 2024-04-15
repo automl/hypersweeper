@@ -4,7 +4,6 @@
 
 import pytest
 
-
 from hypersweeper import hypersweeper
 
 

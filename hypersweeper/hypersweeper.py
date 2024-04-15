@@ -1,34 +1,29 @@
-# Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
+from __future__ import annotations
+
+import json
 import logging
 import os
-import math
 import time
-import json
-import pickle
-import wandb
+
 import numpy as np
-from ConfigSpace.hyperparameters import (
-    CategoricalHyperparameter,
-    NormalIntegerHyperparameter,
-    OrdinalHyperparameter,
-    UniformIntegerHyperparameter,
-)
+import wandb
+from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
+                                         OrdinalHyperparameter)
 from hydra.utils import to_absolute_path
-#from deepcave import Recorder, Objective
 from omegaconf import OmegaConf
-from smac import HyperparameterOptimizationFacade, Scenario
-from smac.intensifier.hyperband import Hyperband
-from smac.runhistory.dataclasses import TrialValue, TrialInfo
+from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
 log = logging.getLogger(__name__)
 
 
-class HydraSMAC:
+class Hypersweeper:
     def __init__(
         self,
         global_config,
         global_overrides,
         launcher,
+        make_optimizer,
+        optimizer_kwargs,
         budget_arg_name,
         save_arg_name,
         n_trials,
@@ -38,18 +33,16 @@ class HydraSMAC:
         slurm_timeout=10,
         max_parallelization=0.1,
         job_array_size_limit=100,
-        intensifier="HB",
         max_budget=None,
         deterministic=True,
         base_dir=False,
         min_budget=None,
         wandb_project=False,
         wandb_entity=False,
-        wandb_tags=["smac"],
+        wandb_tags=None,
         maximize=False,
     ):
-        """
-        Classic PBT Implementation.
+        """Classic PBT Implementation.
 
         Parameters
         ----------
@@ -90,10 +83,13 @@ class HydraSMAC:
             Whether categorical hyperparameters are ignored or optimized jointly.
         categorical_prob: float
             Probability of categorical values being resampled.
-        Returns
+
+        Returns:
         -------
         None
         """
+        if wandb_tags is None:
+            wandb_tags = ["hypersweeper"]
         self.global_overrides = global_overrides
         self.launcher = launcher
         self.budget_arg_name = budget_arg_name
@@ -129,25 +125,7 @@ class HydraSMAC:
         self.deterministic = deterministic
         self.max_budget = max_budget
 
-        self.scenario = Scenario(self.configspace, deterministic=deterministic, n_trials=n_trials, min_budget=min_budget, max_budget=max_budget)
-        max_config_calls = len(self.seeds) if seeds and not deterministic else 1
-        if intensifier == "HB":
-            self.intensifier = Hyperband(self.scenario, incumbent_selection="highest_budget", n_seeds=max_config_calls)
-        else:
-            self.intensifier = HyperparameterOptimizationFacade.get_intensifier(
-                self.scenario,
-                max_config_calls=max_config_calls,
-            )
-
-        def dummy(arg, seed, budget):
-            pass
-
-        self.smac = HyperparameterOptimizationFacade(
-            self.scenario,
-            dummy,
-            intensifier=self.intensifier,
-            overwrite=True,
-        )
+        self.optimizer = make_optimizer(optimizer_kwargs)
 
         self.categorical_hps = [
             n
@@ -183,15 +161,14 @@ class HydraSMAC:
             )
 
     def run_configs(self, configs, budgets, seeds):
-        """
-        Run a set of overrides
+        """Run a set of overrides.
 
         Parameters
         ----------
         overrides: List[Tuple]
             A list of overrides to launch
 
-        Returns
+        Returns:
         -------
         List[float]
             The resulting performances.
@@ -201,7 +178,7 @@ class HydraSMAC:
         # Generate overrides
         overrides = []
         for i in range(len(configs)):
-            names = (list(configs[0].keys()) + [self.budget_arg_name] + [self.save_arg_name])
+            names = ([*list(configs[0].keys()), self.budget_arg_name, self.save_arg_name])
             if self.slurm:
                names += ["hydra.launcher.timeout_min"]
                optimized_timeout = (
@@ -213,27 +190,27 @@ class HydraSMAC:
                     save_path = os.path.join(
                             self.checkpoint_dir, f"iteration_{self.iteration}_id_{i}_s{s}.pt"
                         )
-                    values = list(configs[i].values()) + [budgets[i]] + [save_path]
+                    values = [*list(configs[i].values()), budgets[i], save_path]
                     if self.slurm:
                             values += [int(optimized_timeout)]
                     job_overrides = tuple(self.global_overrides) + tuple(
-                            f"{name}={val}" for name, val in zip(names + ["seed"], values + [s])
+                            f"{name}={val}" for name, val in zip([*names, "seed"], [*values, s])
                         )
                     overrides.append(job_overrides)
             elif not self.deterministic:
                 save_path = os.path.join(
                             self.checkpoint_dir, f"iteration_{self.iteration}_id_{i}_s{s}.pt"
                         )
-                values = list(configs[i].values()) + [budgets[i]] + [save_path]
+                values = [*list(configs[i].values()), budgets[i], save_path]
                 if self.slurm:
                             values += [int(optimized_timeout)]
                 job_overrides = tuple(self.global_overrides) + tuple(
-                            f"{name}={val}" for name, val in zip(names + ["seed"], values + [seeds[i]])
+                            f"{name}={val}" for name, val in zip([*names, "seed"], [*values, seeds[i]])
                         )
                 overrides.append(job_overrides)
             else:
                 save_path = os.path.join(self.checkpoint_dir, f"iteration_{self.iteration}_id_{i}.pt")
-                values = list(configs[i].values()) + [budgets[i]] + [save_path]
+                values = [*list(configs[i].values()), budgets[i], save_path]
                 if self.slurm:
                     values += [int(optimized_timeout)]
                 job_overrides = tuple(self.global_overrides) + tuple(
@@ -257,7 +234,7 @@ class HydraSMAC:
 
         performances = []
         if self.seeds and self.deterministic:
-            for j in range(0, self.population_size):
+            for j in range(self.population_size):
                 performances.append(np.mean([res[j * k + k].return_value for k in range(len(self.seeds))]))
         else:
             for j in range(len(overrides)):
@@ -267,10 +244,9 @@ class HydraSMAC:
         return performances, costs
 
     def get_incumbent(self):
-        """
-        Get the best sequence of configurations so far.
+        """Get the best sequence of configurations so far.
 
-        Returns
+        Returns:
         -------
         List[Configuration]
             Sequence of best hyperparameter configs
@@ -283,8 +259,7 @@ class HydraSMAC:
         return inc_config, inc_performance
 
     def record_iteration(self, performances, configs, budgets):
-        """
-        Add current iteration to history.
+        """Add current iteration to history.
 
         Parameters
         ----------
@@ -305,13 +280,12 @@ class HydraSMAC:
             stats["optimization_time"] = time.time() - self.start
             stats["incumbent_performance"] = -min(performances)
             best_config = configs[np.argmin(performances)]
-            for n in best_config.keys():
+            for n in best_config:
                 stats[f"incumbent_{n}"] = best_config.get(n)
             wandb.log(stats)
 
     def _save_incumbent(self, name=None):
-        """
-        Log current incumbent to file (as well as some additional info).
+        """Log current incumbent to file (as well as some additional info).
 
         Parameters
         ----------
@@ -320,7 +294,7 @@ class HydraSMAC:
         """
         if name is None:
             name = "incumbent.json"
-        res = dict()
+        res = {}
         incumbent, inc_performance = self.get_incumbent()
         res["config"] = incumbent.get_dictionary()
         res["score"] = float(inc_performance)
@@ -332,34 +306,36 @@ class HydraSMAC:
             f.write("\n")
 
     def run(self, verbose=False):
-        """
-        Actual optimization loop.
+        """Actual optimization loop.
         In each iteration:
         - get configs (either randomly upon init or through perturbation)
         - run current configs
-        - record performances
+        - record performances.
 
         Parameters
         ----------
         verbose: bool
             More logging info
 
-        Returns
+        Returns:
         -------
         List[Configuration]
             The incumbent configurations.
         """
         if verbose:
-            log.info("Starting SMAC Sweep")
+            log.info("Starting Sweep")
         self.start = time.time()
         while self.trials_run <= self.n_trials:
             opt_time_start = time.time()
             configs = []
             budgets = []
             seeds = []
-            for _ in range(self.max_parallel):
-                info = self.smac.ask()
+            t = 0
+            terminate = False
+            while t < self.max_parallel and not terminate:
+                info, terminate = self.optimizer.ask()
                 configs.append(info.config)
+                t += 1
                 if info.budget is not None:
                     budgets.append(info.budget)
                 else:
@@ -373,7 +349,7 @@ class HydraSMAC:
             for config, performance, budget, seed, cost in zip(configs, performances, budgets, seeds, costs):
                 info = TrialInfo(budget=budget, seed=seed, config=config)
                 value = TrialValue(cost=-performance if self.maximize else performance, time=cost)
-                self.smac.tell(info=info, value=value)
+                self.optimizer.tell(info=info, value=value)
             self.record_iteration(performances, configs, budgets)
             if verbose:
                 log.info(f"Finished Iteration {self.iteration}!")
@@ -385,7 +361,7 @@ class HydraSMAC:
         inc_config, inc_performance = self.get_incumbent()
         if verbose:
             log.info(
-                f"Finished SMAC Sweep! Total duration was {np.round(total_time, decimals=2)}s, \
+                f"Finished Sweep! Total duration was {np.round(total_time, decimals=2)}s, \
                     best agent had a performance of {np.round(inc_performance, decimals=2)}"
             )
             log.info(f"The incumbent configuration is {inc_config}")
