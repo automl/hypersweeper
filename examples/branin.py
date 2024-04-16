@@ -12,7 +12,7 @@ __copyright__ = "Copyright 2022, AutoML.org Freiburg-Hannover"
 __license__ = "3-clause BSD"
 
 
-@hydra.main(config_path="configs", config_name="branin", version_base="1.1")
+@hydra.main(config_path="configs", config_name="smac_bbo_branin", version_base="1.1")
 def branin(cfg: DictConfig):
     x0 = cfg.x0
     x1 = cfg.x1

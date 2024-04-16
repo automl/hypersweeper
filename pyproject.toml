@@ -5,19 +5,20 @@ dependencies = [
   "typing_extensions", # Better typing
   "tomli", 
   "pre-commit", 
-  
-  
-  
-  "pytest==6.2.4",
-  "coverage==4.5.4",
-  "ruff","hydra-core",
+  "pytest",
+  "coverage",
+  "ruff",
+  "hydra-core",
   "hydra-submitit-launcher",
   "hydra_colorlog",
   "mypy",
   "tox==3.14.0",
   "twine",
   "bump-my-version",
-  
+  "configspace",
+  "numpy",
+  "wandb",
+  "smac"
 ]
 
 requires-python = ">=3.10"
@@ -42,7 +43,7 @@ dev = ["HyperSweeper[doc, tooling, test, examples]"]
 tooling = ["commitizen", "pre-commit", "ruff"]
 
 test = ["pytest", "pytest-coverage", "pytest-cases", "HyperSweeper[examples]"]
-examples = []
+examples = ["scikit-learn"]
 doc = [
   "automl_sphinx_theme",
 ]
@@ -160,7 +161,11 @@ ignore = [
   "PTH123",
   "PTH109",
   "T201",
-  "ERA001"
+  "ERA001",
+  "FBT002",
+  "PLR0913",
+  "PLR0915",
+  "C901",
 ]
 
 exclude = [

@@ -47,10 +47,11 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
 ruff: ## run ruff as a formatter
-	python -m ruff --exit-zero hypersweeper
-	python -m ruff --silent --exit-zero --no-cache --fix hypersweeper
+	python -m ruff format hydra_plugins
+	python -m ruff --silent --exit-zero --no-cache --fix hydra_plugins
+	python -m ruff --exit-zero hydra_plugins
 isort:
-	python -m isort hypersweeper tests
+	python -m isort hydra_plugins tests
 
 test: ## run tests quickly with the default Python
 	python -m pytest tests
@@ -58,7 +59,7 @@ cov-report:
 	coverage html -d coverage_html
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source hypersweeper -m pytest
+	coverage run --source hydra_plugins -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
@@ -95,7 +96,10 @@ dist: clean ## builds source and wheel package
 	python setup.py bdist_wheel
 	ls -l dist
 install: clean ## install the package to the active Python's site-packages
-	pip install -e ".[dev]"
+	pip install -e .
+
+install-dev: clean ## install the package to the active Python's site-packages
+	pip install -e ".[dev,examples,doc]"
 
 check:
 	pre-commit run --all-files

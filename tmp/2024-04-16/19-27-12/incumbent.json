@@ -1,0 +1,11 @@
+{"config": {"x0": 6.92606792319566, "x1": 0.8785520168021321}, "score": 17.772455973422044, "total_training_steps": 1, "total_wallclock_time": -0.05816769599914551, "total_optimization_time": 0.0006139278411865234}
+{"config": {"x0": -3.682001158595085, "x1": 14.38045356888324}, "score": 2.3575556496119416, "total_training_steps": 2, "total_wallclock_time": -0.1136777400970459, "total_optimization_time": 0.002252817153930664}
+{"config": {"x0": -3.682001158595085, "x1": 14.38045356888324}, "score": 2.3575556496119416, "total_training_steps": 3, "total_wallclock_time": -0.16653990745544434, "total_optimization_time": 0.003459930419921875}
+{"config": {"x0": -3.682001158595085, "x1": 14.38045356888324}, "score": 2.3575556496119416, "total_training_steps": 4, "total_wallclock_time": -0.2179279327392578, "total_optimization_time": 0.0045588016510009766}
+{"config": {"x0": -3.682001158595085, "x1": 14.38045356888324}, "score": 2.3575556496119416, "total_training_steps": 5, "total_wallclock_time": -0.2695329189300537, "total_optimization_time": 0.005684852600097656}
+{"config": {"x0": -3.682001158595085, "x1": 14.38045356888324}, "score": 2.3575556496119416, "total_training_steps": 6, "total_wallclock_time": -0.3213539123535156, "total_optimization_time": 0.0068187713623046875}
+{"config": {"x0": -3.682001158595085, "x1": 14.38045356888324}, "score": 2.3575556496119416, "total_training_steps": 7, "total_wallclock_time": -0.3751218318939209, "total_optimization_time": 0.00795888900756836}
+{"config": {"x0": -3.682001158595085, "x1": 14.38045356888324}, "score": 2.3575556496119416, "total_training_steps": 8, "total_wallclock_time": -0.42786574363708496, "total_optimization_time": 0.009380102157592773}
+{"config": {"x0": -3.682001158595085, "x1": 14.38045356888324}, "score": 2.3575556496119416, "total_training_steps": 9, "total_wallclock_time": -0.4825868606567383, "total_optimization_time": 0.010683774948120117}
+{"config": {"x0": -3.682001158595085, "x1": 14.38045356888324}, "score": 2.3575556496119416, "total_training_steps": 10, "total_wallclock_time": -0.5347006320953369, "total_optimization_time": 0.011954784393310547}
+{"config": {"x0": -3.682001158595085, "x1": 14.38045356888324}, "score": 2.3575556496119416, "total_training_steps": 11, "total_wallclock_time": -0.621107816696167, "total_optimization_time": 0.013206005096435547}
