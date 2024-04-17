@@ -1,37 +1,44 @@
-"""Wrapper class for the HyperSMAC backend functionality."""
+"""HyperSMAC implementation."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from hydra.utils import get_class
+from omegaconf import OmegaConf
+from smac import Scenario
 
-from hydra.plugins.sweeper import Sweeper
+from hydra_plugins.hypersweeper import Info
 
-if TYPE_CHECKING:
-    from hydra.types import HydraContext, TaskFunction
-    from omegaconf import DictConfig
+OmegaConf.register_new_resolver("get_class", get_class, replace=True)
 
 
-class HyperSMAC(Sweeper):
-    """This is basically just a wrapper class for the backend functionality."""
+class HyperSMACAdapter:
+    """Adapt SMAC ask/tell interface to HyperSweeper ask/tell interface."""
 
-    def __init__(self, *args: Any, **kwargs: dict[Any, Any]) -> None:
-        """Initialize the sweeper."""
-        from .hyper_smac_backend import HyperSMACBackend
+    def __init__(self, smac):
+        """Initialize the adapter."""
+        self.smac = smac
 
-        self.sweeper = HyperSMACBackend(*args, **kwargs)
+    def ask(self):
+        """Ask for the next configuration."""
+        smac_info = self.smac.ask()
+        info = Info(smac_info.config, smac_info.budget, None, smac_info.seed)
+        return info, False
 
-    def setup(
-        self,
-        *,
-        hydra_context: HydraContext,
-        task_function: TaskFunction,
-        config: DictConfig,
-    ) -> None:
-        """Setup the sweeper."""
-        self.sweeper.setup(
-            hydra_context=hydra_context, task_function=task_function, config=config
-        )
+    def tell(self, info, value):
+        """Tell the result of the configuration."""
+        self.smac.tell(info, value)
 
-    def sweep(self, arguments: list[str]) -> None:
-        """Perform the sweep."""
-        return self.sweeper.sweep(arguments)
+
+def make_smac(configspace, smac_args):
+    """Make a SMAC instance for optimization."""
+
+    def dummy_func(arg, seed, budget):  # noqa:ARG001
+        return 0.0
+
+    scenario = Scenario(configspace, **smac_args.pop("scenario"))
+    if "intensifier" in smac_args:
+        intensifier = smac_args["intensifier"](scenario)
+        smac = smac_args["smac_facade"](scenario, dummy_func, intensifier=intensifier)
+    else:
+        smac = smac_args["smac_facade"](scenario, dummy_func)
+    return HyperSMACAdapter(smac)

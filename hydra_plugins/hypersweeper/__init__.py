@@ -1,4 +1,5 @@
-from .hypersweeper import Hypersweeper, Info
+from .hypersweeper_sweeper import HypersweeperSweeper, Info
 from .hypersweeper_backend import HypersweeperBackend
+from .hypersweeper import Hypersweeper
 
-__all__ = ["Hypersweeper", "HypersweeperBackend", "Info"]
+__all__ = ["HypersweeperSweeper", "HypersweeperBackend", "Info", "Hypersweeper"]

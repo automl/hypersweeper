@@ -8,9 +8,10 @@ from functools import reduce
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from .hypersweeper_sweeper import HypersweeperSweeper
 from hydra.core.plugins import Plugins
 from hydra.plugins.sweeper import Sweeper
-from hydra.utils import get_class
+from hydra.utils import get_class, get_method
 from omegaconf import DictConfig, OmegaConf, open_dict
 from rich import print as printr
 
@@ -30,7 +31,7 @@ class HypersweeperBackend(Sweeper):
 
     def __init__(
         self,
-        opt_class,
+        opt_constructor: function,
         search_space: DictConfig,
         resume: str | None = None,
         budget: int | None = None,
@@ -70,7 +71,7 @@ class HypersweeperBackend(Sweeper):
         """
         if sweeper_kwargs is None:
             sweeper_kwargs = {}
-        self.opt_class = opt_class
+        self.opt_constructor = get_method(opt_constructor)
         self.search_space = search_space
         self.budget_variable = budget_variable
         self.loading_variable = loading_variable
@@ -139,7 +140,8 @@ class HypersweeperBackend(Sweeper):
 
         configspace = search_space_to_config_space(search_space=self.search_space)
 
-        optimizer = self.opt_class(
+        optimizer = HypersweeperSweeper(
+            make_optimizer=self.opt_constructor,
             global_config=self.config,
             global_overrides=arguments,
             launcher=self.launcher,

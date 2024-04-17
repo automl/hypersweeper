@@ -23,9 +23,11 @@ hydra:
       optimizer_kwargs:
         smac_facade: 
           _target_: smac.facade.multi_fidelity_facade.MultiFidelityFacade
-          intensifier: 
-            _target_: ${get_method:smac.facade.multi_fidelity_facade.MultiFidelityFacade.get_intensifier}
-            eta: 3
+          _partial_: true
+        intensifier: 
+          _target_: smac.facade.multi_fidelity_facade.MultiFidelityFacade.get_intensifier
+          _partial_: true
+          eta: 3
         scenario:
           n_trials: 45
           seed: ${seed}

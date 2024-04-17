@@ -12,7 +12,8 @@ from hydra.core.config_store import ConfigStore
 class HyperSMACConfig:
     """Config for HyperSMAC sweeper."""
 
-    _target_: str = "hydra_plugins.hyper_smac.hyper_smac.HyperSMAC"
+    _target_: str = "hydra_plugins.hypersweeper.hypersweeper.Hypersweeper"
+    opt_constructor: str = "hydra_plugins.hyper_smac.hyper_smac.make_smac"
     search_space: dict | None = field(default_factory=dict)
     resume: str | bool = False
     budget: Any | None = None
