@@ -96,7 +96,7 @@ dist: clean ## builds source and wheel package
 	python setup.py bdist_wheel
 	ls -l dist
 install: clean ## install the package to the active Python's site-packages
-	pip install -e .
+	pip install -e . --config-settings editable_mode=compat
 
 install-dev: clean ## install the package to the active Python's site-packages
 	pip install -e ".[dev,examples,doc]"
