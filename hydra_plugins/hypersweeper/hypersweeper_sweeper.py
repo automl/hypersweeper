@@ -38,12 +38,12 @@ class HypersweeperSweeper:
         global_overrides,
         launcher,
         make_optimizer,
-        optimizer_kwargs,
         budget_arg_name,
         load_arg_name,
         save_arg_name,
         n_trials,
         cs,
+        optimizer_kwargs={},
         seeds=False,
         slurm=False,
         slurm_timeout=10,
@@ -56,7 +56,7 @@ class HypersweeperSweeper:
         wandb_entity=False,
         wandb_tags=None,
         maximize=False,
-        deterministic=False,
+        deterministic=True,
     ):
         """Ask-Tell sweeper for hyperparameter optimization.
 
@@ -260,12 +260,11 @@ class HypersweeperSweeper:
                     overrides.append(job_overrides)
             elif not self.deterministic:
                 save_path = (
-                    Path(self.checkpoint_dir)
-                    / f"iteration_{self.iteration}_id_{i}.pt"
+                    Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{i}.pt"
                 )
                 values = [*list(configs[i].values())]
                 if self.budget_arg_name is not None:
-                        values += [budgets[i]]
+                    values += [budgets[i]]
                 if self.checkpoint_tf:
                     values += [save_path]
                 if self.load_tf and self.iteration > 0:
@@ -383,9 +382,9 @@ class HypersweeperSweeper:
         incumbent, inc_performance = self.get_incumbent()
         res["config"] = incumbent.get_dictionary()
         res["score"] = float(inc_performance)
-        if self.budget_arg_name is not None:
+        try:
             res["total_training_steps"] = sum(self.history["budgets"])
-        else:
+        except:
             res["total_training_steps"] = self.trials_run
         res["total_wallclock_time"] = self.start - time.time()
         res["total_optimization_time"] = self.opt_time

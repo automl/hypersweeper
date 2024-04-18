@@ -36,9 +36,39 @@ def make_smac(configspace, smac_args):
         return 0.0
 
     scenario = Scenario(configspace, **smac_args.pop("scenario"))
+    smac_kwargs = {}
+
+    if "callbacks" not in smac_args:
+        smac_kwargs["callbacks"] = []
+    elif (
+        "callbacks" in smac_args and type(smac_args["callbacks"]) == dict
+    ):
+        smac_kwargs["callbacks"] = list(smac_args["callbacks"].values())
+    elif (
+        "callbacks" in smac_args and type(smac_args["callbacks"]) == list
+    ):
+        smac_kwargs["callbacks"] = smac_args["callbacks"]
+
+    if "acquisition_function" in smac_args and "acquisition_maximizer" in smac_args:
+        smac_kwargs["acquisition_maximizer"] = smac_args["acquisition_maximizer"](
+            configspace=configspace,
+            acquisition_function=smac_args["acquisition_function"],
+        )
+        if hasattr(smac_args["acquisition_maximizer"], "selector") and hasattr(
+            smac_args["acquisition_maximizer"].selector, "expl2callback"
+        ):
+            smac_kwargs["callbacks"].append(
+                smac_args["acquisition_maximizer"].selector.expl2callback
+            )
+
+    if "config_selector" in smac_args:
+        smac_kwargs["config_selector"] = smac_args["config_selector"](scenario=scenario)
+
+    if "initial_design" in smac_args:
+        smac_kwargs["initial_design"] = smac_args["initial_design"](scenario=scenario)
+
     if "intensifier" in smac_args:
-        intensifier = smac_args["intensifier"](scenario)
-        smac = smac_args["smac_facade"](scenario, dummy_func, intensifier=intensifier)
-    else:
-        smac = smac_args["smac_facade"](scenario, dummy_func)
+        smac_kwargs["intensifier"] = smac_args["intensifier"](scenario)
+
+    smac = smac_args["smac_facade"](scenario, dummy_func, **smac_kwargs)
     return HyperSMACAdapter(smac)
