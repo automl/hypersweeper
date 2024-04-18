@@ -6,7 +6,7 @@ import numpy as np
 from ConfigSpace.hyperparameters import (NormalIntegerHyperparameter,
                                          UniformIntegerHyperparameter)
 
-from hydra_plugins.hypersweeper import HypersweeperSweeper, Info
+from hydra_plugins.hypersweeper import Info
 
 
 class PBT:
@@ -112,71 +112,4 @@ class PBT:
 
 def make_pbt(configspace, pbt_args):
     """Make a PBT instance for optimization."""
-    return PBT(**pbt_args)
-
-
-class HyperPBTSweeper(HypersweeperSweeper):
-    """Hydra Sweeper for PBT."""
-
-    def __init__(
-        self,
-        global_config,
-        global_overrides,
-        launcher,
-        optimizer_kwargs,
-        budget_arg_name,
-        save_arg_name,
-        load_arg_name,
-        n_trials,
-        cs,
-        seeds=False,
-        slurm=False,
-        slurm_timeout=10,
-        max_parallelization=0.1,
-        job_array_size_limit=100,
-        max_budget=None,
-        deterministic=True,
-        base_dir=False,
-        min_budget=None,
-        wandb_project=False,
-        wandb_entity=False,
-        wandb_tags=None,
-        maximize=False,
-    ):
-        """Initialize the Hypersweeper with PBT as the optimizer."""
-        if wandb_tags is None:
-            wandb_tags = ["pbt"]
-        super().__init__(
-            global_config=global_config,
-            global_overrides=global_overrides,
-            launcher=launcher,
-            make_optimizer=make_pbt,
-            optimizer_kwargs=optimizer_kwargs,
-            budget_arg_name=budget_arg_name,
-            save_arg_name=save_arg_name,
-            load_arg_name=load_arg_name,
-            n_trials=n_trials,
-            cs=cs,
-            seeds=seeds,
-            slurm=slurm,
-            slurm_timeout=slurm_timeout,
-            max_parallelization=max_parallelization,
-            job_array_size_limit=job_array_size_limit,
-            max_budget=max_budget,
-            deterministic=deterministic,
-            base_dir=base_dir,
-            min_budget=min_budget,
-            wandb_project=wandb_project,
-            wandb_entity=wandb_entity,
-            wandb_tags=wandb_tags,
-            maximize=maximize,
-        )
-        # Save and load target functions
-        self.checkpoint_tf = True
-        self.load_tf = True
-
-        # Provide HP info to PBT
-        self.optimizer.categorical_hps = self.categorical_hps
-        self.optimizer.continuous_hps = self.continuous_hps
-        self.optimizer.continuous_hps = self.continuous_hps
-        self.optimizer.hp_bounds = self.hp_bounds
+    return PBT(configspace, **pbt_args)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import operator
+from collections.abc import Callable
 from functools import reduce
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -32,7 +33,7 @@ class HypersweeperBackend(Sweeper):
 
     def __init__(
         self,
-        opt_constructor: function,
+        opt_constructor: Callable,
         search_space: DictConfig,
         resume: str | None = None,
         budget: int | None = None,

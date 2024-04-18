@@ -43,7 +43,7 @@ class HypersweeperSweeper:
         save_arg_name,
         n_trials,
         cs,
-        optimizer_kwargs={},
+        optimizer_kwargs=None,
         seeds=False,
         slurm=False,
         slurm_timeout=10,
@@ -57,6 +57,8 @@ class HypersweeperSweeper:
         wandb_tags=None,
         maximize=False,
         deterministic=True,
+        checkpoint_tf=False,
+        load_tf=False,
     ):
         """Ask-Tell sweeper for hyperparameter optimization.
 
@@ -114,6 +116,8 @@ class HypersweeperSweeper:
         -------
         None
         """
+        if optimizer_kwargs is None:
+            optimizer_kwargs = {}
         if wandb_tags is None:
             wandb_tags = ["hypersweeper"]
         self.global_overrides = global_overrides
@@ -121,8 +125,8 @@ class HypersweeperSweeper:
         self.budget_arg_name = budget_arg_name
         self.save_arg_name = save_arg_name
         self.load_arg_name = load_arg_name
-        self.checkpoint_tf = False
-        self.load_tf = False
+        self.checkpoint_tf = checkpoint_tf
+        self.load_tf = load_tf
 
         self.configspace = cs
         self.output_dir = Path(
@@ -217,6 +221,13 @@ class HypersweeperSweeper:
         List[float]
             The incurred costs.
         """
+        if self.load_tf:
+            assert not any(
+                p is None for p in load_paths
+            ), """Load paths must be provided for all configurations
+            when working with checkpoints. If your optimizer does not support this,
+            set the 'load_tf' parameter of the sweeper to False."""
+
         # Generate overrides
         overrides = []
         for i in range(len(configs)):
@@ -235,7 +246,7 @@ class HypersweeperSweeper:
                     + 0.1 * self.slurm_timeout
                 )
 
-            if self.seeds and self.deterministic:
+            if self.seeds:
                 for s in self.seeds:
                     save_path = (
                         Path(self.checkpoint_dir)
@@ -259,6 +270,11 @@ class HypersweeperSweeper:
                     )
                     overrides.append(job_overrides)
             elif not self.deterministic:
+                assert not any(
+                    s is None for s in seeds
+                ), """For non-deterministic target functions, seeds must be provided.
+                If the optimizer you chose does not support this,
+                manually set the 'seeds' parameter of the sweeper to a list of seeds."""
                 save_path = (
                     Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{i}.pt"
                 )
@@ -384,7 +400,7 @@ class HypersweeperSweeper:
         res["score"] = float(inc_performance)
         try:
             res["total_training_steps"] = sum(self.history["budgets"])
-        except:
+        except:  # noqa:E722
             res["total_training_steps"] = self.trials_run
         res["total_wallclock_time"] = self.start - time.time()
         res["total_optimization_time"] = self.opt_time

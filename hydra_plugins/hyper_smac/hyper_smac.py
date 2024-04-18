@@ -40,13 +40,9 @@ def make_smac(configspace, smac_args):
 
     if "callbacks" not in smac_args:
         smac_kwargs["callbacks"] = []
-    elif (
-        "callbacks" in smac_args and type(smac_args["callbacks"]) == dict
-    ):
+    elif "callbacks" in smac_args and isinstance(smac_args["callbacks"], dict):
         smac_kwargs["callbacks"] = list(smac_args["callbacks"].values())
-    elif (
-        "callbacks" in smac_args and type(smac_args["callbacks"]) == list
-    ):
+    elif "callbacks" in smac_args and isinstance(smac_args["callbacks"], list):
         smac_kwargs["callbacks"] = smac_args["callbacks"]
 
     if "acquisition_function" in smac_args and "acquisition_maximizer" in smac_args:

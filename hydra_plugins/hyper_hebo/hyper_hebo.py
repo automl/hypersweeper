@@ -1,31 +1,44 @@
-from collections import abc
-import pandas as pd
-import numpy as np
+"""HEBO in Hypersweeper."""
 
-from hebo.optimizers.hebo import HEBO
-from hebo.design_space.design_space import DesignSpace
+from __future__ import annotations
+
+from collections import abc
+
+import numpy as np
+import pandas as pd
 from ConfigSpace import Configuration, ConfigurationSpace
 from ConfigSpace.hyperparameters import (CategoricalHyperparameter, Constant,
                                          FloatHyperparameter, Hyperparameter,
                                          IntegerHyperparameter,
                                          OrdinalHyperparameter)
+from hebo.design_space.design_space import DesignSpace
+from hebo.optimizers.hebo import HEBO
+
 from hydra_plugins.hypersweeper import Info
 
+
 class HyperHEBOAdapter:
+    """HEBO optimizer."""
+
     def __init__(self, hebo, configspace, design_space):
+        """Initialize the optimizer."""
         self.hebo = hebo
         self.configspace = configspace
         self.design_space = design_space
 
     def ask(self):
+        """Ask for the next configuration."""
         hebo_info = self.hebo.suggest(1)
         config = HEBOcfg2ConfigSpacecfg(
-            hebo_suggestion=hebo_info, design_space=self.design_space, config_space=self.configspace
+            hebo_suggestion=hebo_info,
+            design_space=self.design_space,
+            config_space=self.configspace,
         )
         info = Info(config, None, None, None)
         return info, False
-    
+
     def tell(self, info, value):
+        """Tell the result of the configuration."""
         cost = value.cost
         suggestion = ConfigSpacecfg2HEBOcfg(info.config)
 
@@ -38,6 +51,7 @@ class HyperHEBOAdapter:
 
 
 def make_hebo(configspace, hebo_args):
+    """Make a HEBO instance for optimization."""
     hps_hebo = []
     for _, v in configspace.items():
         hps_hebo.append(configspaceHP2HEBOHP(v))
@@ -45,21 +59,22 @@ def make_hebo(configspace, hebo_args):
     hebo = HEBO(space=design_space, **hebo_args)
     return HyperHEBOAdapter(hebo, configspace, design_space)
 
+
 # These functions were taken from the CARP-S project here: https://github.com/automl/CARP-S/blob/main/carps/optimizers/hebo.py#L23
-def configspaceHP2HEBOHP(hp: Hyperparameter) -> dict:
-    """Convert ConfigSpace hyperparameter to HEBO hyperparameter
+def configspaceHP2HEBOHP(hp: Hyperparameter) -> dict:  # noqa: PLR0911, N802
+    """Convert ConfigSpace hyperparameter to HEBO hyperparameter.
 
     Parameters
     ----------
     hp : Hyperparameter
         ConfigSpace hyperparameter
 
-    Returns
+    Returns:
     -------
     dict
         HEBO hyperparameter
 
-    Raises
+    Raises:
     ------
     NotImplementedError
         If ConfigSpace hyperparameter is anything else than
@@ -69,13 +84,11 @@ def configspaceHP2HEBOHP(hp: Hyperparameter) -> dict:
     if isinstance(hp, IntegerHyperparameter):
         if hp.log:
             return {"name": hp.name, "type": "pow_int", "lb": hp.lower, "ub": hp.upper}
-        else:
-            return {"name": hp.name, "type": "int", "lb": hp.lower, "ub": hp.upper}
-    elif isinstance(hp, FloatHyperparameter):
+        return {"name": hp.name, "type": "int", "lb": hp.lower, "ub": hp.upper}
+    elif isinstance(hp, FloatHyperparameter):  # noqa: RET505
         if hp.log:
             return {"name": hp.name, "type": "pow", "lb": hp.lower, "ub": hp.upper}
-        else:
-            return {"name": hp.name, "type": "num", "lb": hp.lower, "ub": hp.upper}
+        return {"name": hp.name, "type": "num", "lb": hp.lower, "ub": hp.upper}
     elif isinstance(hp, CategoricalHyperparameter):
         return {"name": hp.name, "type": "cat", "categories": hp.choices}
     elif isinstance(hp, OrdinalHyperparameter):
@@ -89,12 +102,17 @@ def configspaceHP2HEBOHP(hp: Hyperparameter) -> dict:
     elif isinstance(hp, Constant):
         return {"name": hp.name, "type": "cat", "categories": [hp.value]}
     else:
-        raise NotImplementedError(f"Unknown hyperparameter type: {hp.__class__.__name__}")
-    
-def HEBOcfg2ConfigSpacecfg(
-    hebo_suggestion: pd.DataFrame, design_space: DesignSpace, config_space: ConfigurationSpace
+        raise NotImplementedError(
+            f"Unknown hyperparameter type: {hp.__class__.__name__}"
+        )
+
+
+def HEBOcfg2ConfigSpacecfg(  # noqa: N802
+    hebo_suggestion: pd.DataFrame,
+    design_space: DesignSpace,
+    config_space: ConfigurationSpace,
 ) -> Configuration:
-    """Convert HEBO config to ConfigSpace config
+    """Convert HEBO config to ConfigSpace config.
 
     Parameters
     ----------
@@ -105,12 +123,12 @@ def HEBOcfg2ConfigSpacecfg(
     config_space : ConfigurationSpace
         ConfigSpace configuration space
 
-    Returns
+    Returns:
     -------
     Configuration
         Config in ConfigSpace format
 
-    Raises
+    Raises:
     ------
     ValueError
         If HEBO config is more than 1
@@ -128,15 +146,16 @@ def HEBOcfg2ConfigSpacecfg(
                 hyp[k] = hp_k.sequence[hyp[k]]
     return Configuration(configuration_space=config_space, values=hyp)
 
-def ConfigSpacecfg2HEBOcfg(config: Configuration) -> pd.DataFrame:
-    """Convert ConfigSpace config to HEBO suggestion
+
+def ConfigSpacecfg2HEBOcfg(config: Configuration) -> pd.DataFrame:  # noqa: N802
+    """Convert ConfigSpace config to HEBO suggestion.
 
     Parameters
     ----------
     config : Configuration
         Configuration
 
-    Returns
+    Returns:
     -------
     pd.DataFrame
         Configuration in HEBO format, e.g.
@@ -144,5 +163,4 @@ def ConfigSpacecfg2HEBOcfg(config: Configuration) -> pd.DataFrame:
         0  2.817594  0.336420
     """
     config_dict = dict(config)
-    rec = pd.DataFrame(config_dict, index=[0])
-    return rec
+    return pd.DataFrame(config_dict, index=[0])
