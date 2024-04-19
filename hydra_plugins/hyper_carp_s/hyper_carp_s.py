@@ -22,12 +22,13 @@ class HyperCARPSAdapter:
 
     def tell(self, info, value):
         """Tell the result of the configuration."""
-        self.smac.tell(info, value)
+        self.carps.tell(info, value)
 
 
 def make_carp_s(configspace, carps_args):
     """Make a CARP-S instance for optimization."""
     problem = DummyProblem()
     problem._configspace = configspace
-    optimizer = carps_args["optimizer"](problem)
+    optimizer = carps_args(problem)
+    optimizer.solver = optimizer._setup_optimizer()
     return HyperCARPSAdapter(optimizer)
