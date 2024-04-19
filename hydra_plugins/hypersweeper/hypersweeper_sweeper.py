@@ -10,8 +10,6 @@ from pathlib import Path
 
 import numpy as np
 import wandb
-from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
-                                         OrdinalHyperparameter)
 from hydra.utils import to_absolute_path
 from omegaconf import OmegaConf
 from smac.runhistory.dataclasses import TrialInfo, TrialValue
@@ -41,8 +39,9 @@ class HypersweeperSweeper:
         budget_arg_name,
         load_arg_name,
         save_arg_name,
-        n_trials,
         cs,
+        budget=1e6,
+        n_trials=1e6,
         optimizer_kwargs=None,
         seeds=False,
         slurm=False,
@@ -148,10 +147,14 @@ class HypersweeperSweeper:
         self.maximize = maximize
         self.slurm = slurm
         self.slurm_timeout = slurm_timeout
-        self.max_parallel = min(
-            job_array_size_limit, max(1, int(max_parallelization * n_trials))
-        )
+        if n_trials is not None:
+            self.max_parallel = min(
+                job_array_size_limit, max(1, int(max_parallelization * n_trials))
+            )
+        else:
+            self.max_parallel = job_array_size_limit
 
+        self.budget = budget
         self.min_budget = min_budget
         self.trials_run = 0
         self.n_trials = n_trials
@@ -166,32 +169,6 @@ class HypersweeperSweeper:
         self.max_budget = max_budget
 
         self.optimizer = make_optimizer(self.configspace, optimizer_kwargs)
-
-        self.categorical_hps = [
-            n
-            for n in list(self.configspace.keys())
-            if isinstance(
-                self.configspace.get_hyperparameter(n), CategoricalHyperparameter
-            )
-        ]
-        self.categorical_hps += [
-            n
-            for n in list(self.configspace.keys())
-            if isinstance(self.configspace.get_hyperparameter(n), OrdinalHyperparameter)
-        ]
-        self.continuous_hps = [
-            n for n in list(self.configspace.keys()) if n not in self.categorical_hps
-        ]
-        self.hp_bounds = np.array(
-            [
-                [
-                    self.configspace.get_hyperparameter(n).lower,
-                    self.configspace.get_hyperparameter(n).upper,
-                ]
-                for n in list(self.configspace.keys())
-                if n not in self.categorical_hps
-            ]
-        )
 
         self.wandb_project = wandb_project
         if self.wandb_project:
@@ -231,12 +208,12 @@ class HypersweeperSweeper:
         # Generate overrides
         overrides = []
         for i in range(len(configs)):
-            names = [*list(configs[0].keys())]
+            names = [*list(configs[i].keys())]
             if self.budget_arg_name is not None:
                 names += [self.budget_arg_name]
             if self.checkpoint_tf:
                 names += [self.save_arg_name]
-            if self.load_tf and self.iteration > 0:
+            if self.load_tf and len(load_paths) > 0:
                 names += [self.load_arg_name]
 
             if self.slurm:
@@ -257,7 +234,7 @@ class HypersweeperSweeper:
                         values += [budgets[i]]
                     if self.checkpoint_tf:
                         values += [save_path]
-                    if self.load_tf and self.iteration > 0:
+                    if self.load_tf and len(load_paths) > 0:
                         values += [load_paths[i]]
 
                     if self.slurm:
@@ -283,7 +260,7 @@ class HypersweeperSweeper:
                     values += [budgets[i]]
                 if self.checkpoint_tf:
                     values += [save_path]
-                if self.load_tf and self.iteration > 0:
+                if self.load_tf and len(load_paths) > 0:
                     values += [load_paths[i]]
 
                 if self.slurm:
@@ -304,7 +281,7 @@ class HypersweeperSweeper:
                     values += [budgets[i]]
                 if self.checkpoint_tf:
                     values += [save_path]
-                if self.load_tf and self.iteration > 0:
+                if self.load_tf and len(load_paths) > 0:
                     values += [Path(self.checkpoint_dir) / load_paths[i]]
 
                 if self.slurm:
@@ -428,7 +405,16 @@ class HypersweeperSweeper:
         if verbose:
             log.info("Starting Sweep")
         self.start = time.time()
-        while self.trials_run <= self.n_trials:
+        trial_termination = False
+        budget_termination = False
+        while not (budget_termination or trial_termination):
+            if (
+                not any(b is None for b in self.history["budgets"])
+                and self.budget is not None
+            ):
+                budget_termination = sum(self.history["budgets"]) >= self.budget
+            if self.n_trials is not None:
+                trial_termination = self.trials_run >= self.n_trials
             opt_time_start = time.time()
             configs = []
             budgets = []
@@ -466,7 +452,7 @@ class HypersweeperSweeper:
                 log.info(f"Finished Iteration {self.iteration}!")
                 _, inc_performance = self.get_incumbent()
                 log.info(
-                    f"Current incumbent currently has a performance of {np.round(inc_performance, decimals=2)}."  # noqa:E501
+                    f"Current incumbent has a performance of {np.round(inc_performance, decimals=2)}."  # noqa:E501
                 )
             self._save_incumbent()
             self.opt_time += time.time() - opt_time_start

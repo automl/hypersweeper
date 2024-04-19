@@ -1,6 +1,6 @@
 import json
 import os
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 
 def get_other_requirements():
@@ -13,5 +13,5 @@ def get_other_requirements():
         
 setup(
     version="0.1.0",
-    packages=find_packages(exclude=['tests']),
+    packages=find_namespace_packages(include=["hydra_plugins.*"]),
 )

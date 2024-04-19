@@ -37,6 +37,7 @@ class HypersweeperBackend(Sweeper):
         search_space: DictConfig,
         resume: str | None = None,
         budget: int | None = None,
+        n_trials: int | None = None,
         budget_variable: str | None = None,
         loading_variable: str | None = None,
         saving_variable: str | None = None,
@@ -79,7 +80,11 @@ class HypersweeperBackend(Sweeper):
         self.loading_variable = loading_variable
         self.saving_variable = saving_variable
         self.sweeper_kwargs = sweeper_kwargs
-        self.budget = int(budget)
+        self.budget = int(budget) if budget is not None else None
+        self.n_trials = int(n_trials) if n_trials is not None else None
+        assert (
+            self.budget is not None or self.n_trials is not None
+        ), "Either budget or n_trials must be given."
         self.resume = resume
 
         self.task_function: TaskFunction | None = None
@@ -150,7 +155,8 @@ class HypersweeperBackend(Sweeper):
             budget_arg_name=self.budget_variable,
             save_arg_name=self.saving_variable,
             load_arg_name=self.loading_variable,
-            n_trials=self.budget,
+            budget=self.budget,
+            n_trials=self.n_trials,
             base_dir=self.sweep_dir,
             cs=configspace,
             **self.sweeper_kwargs,

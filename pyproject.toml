@@ -5,7 +5,7 @@ dependencies = [
   "typing_extensions", # Better typing
   "tomli", 
   "pre-commit", 
-  "pytest",
+  "pytest>=7.0",
   "coverage",
   "ruff",
   "hydra-core",
@@ -43,7 +43,7 @@ dev = ["HyperSweeper[doc, tooling, test, examples]"]
 tooling = ["commitizen", "pre-commit", "ruff"]
 
 test = ["pytest", "pytest-coverage", "pytest-cases", "HyperSweeper[examples]"]
-examples = ["scikit-learn"]
+examples = ["scikit-learn", "stable-baselines3"]
 doc = [
   "automl_sphinx_theme",
 ]

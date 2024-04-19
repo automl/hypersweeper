@@ -17,6 +17,7 @@ class HyperRSConfig:
     search_space: dict | None = field(default_factory=dict)
     resume: str | bool = False
     budget: Any | None = None
+    n_trials: int | None = None
     budget_variable: str | None = None
     loading_variable: str | None = None
     saving_variable: str | None = None
