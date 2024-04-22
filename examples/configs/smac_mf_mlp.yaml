@@ -29,7 +29,7 @@ hydra:
           _partial_: true
           eta: 3
         scenario:
-          n_trials: 45
+          n_trials: ${hydra.sweeper.n_trials}
           seed: ${seed}
           min_budget: 5
           max_budget: 50

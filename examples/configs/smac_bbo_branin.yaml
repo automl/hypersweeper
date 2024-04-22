@@ -15,7 +15,7 @@ hydra:
           logging_level: 20  # 10 DEBUG, 20 INFO
         scenario:
           seed: 42
-          n_trials: 100
+          n_trials: ${hydra.sweeper.n_trials}
           deterministic: true
           n_workers: 4
     search_space:
