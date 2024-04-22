@@ -13,19 +13,30 @@ Hydra sweeper integration of our favorite optimization packages, utilizing ask-a
 - Documentation: https://hypersweeper.readthedocs.io.
 
 ## Installation 
+We recommend installing hypersweeper in a fresh conda environment:
 
 ```bash
-# Install for dev
+conda create -n hypersweeper python=3.10
 make install
 ```
 
-## Features
+## Basic Usage
 
-- TODO
+To use the sweeper, you need to specify a target function with a hydra interface (see our examples). 
+Then you can add one of the Hypersweeper variations as a sweeper and run with the '-m' flag to start the optimization.
+This will start a sequential run of your selected optimizer.
+If you want to use Hypersweeper on a cluster, you should additionally add a launcher, e.g. the submitit launcher for slurm.
 
-## Credits
+As an example, take black-box optimization for Branin using SMAC. Simply run:
+```bash
+python examples/branin.py -m
+```
+You should see the launched configurations in the terminal. 
+The results are located in 'tmp', including a record of each run, the final config and a full runhistory.
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+## Current Sweeper Integrations
+- Random Search
+- SMAC
+- HEBO
+- PBT
+- CARP-S
