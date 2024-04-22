@@ -39,7 +39,7 @@ class HyperHEBOAdapter:
 
     def tell(self, info, value):
         """Tell the result of the configuration."""
-        cost = value.cost
+        cost = value.performance
         suggestion = ConfigSpacecfg2HEBOcfg(info.config)
 
         if not isinstance(cost, abc.Sequence):

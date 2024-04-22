@@ -5,6 +5,7 @@ from __future__ import annotations
 from hydra.utils import get_class
 from omegaconf import OmegaConf
 from smac import Scenario
+from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
 from hydra_plugins.hypersweeper import Info
 
@@ -26,7 +27,9 @@ class HyperSMACAdapter:
 
     def tell(self, info, value):
         """Tell the result of the configuration."""
-        self.smac.tell(info, value)
+        smac_info = TrialInfo(info.config, seed=info.seed, budget=info.budget)
+        smac_value = TrialValue(time=value.cost, cost=value.performance)
+        self.smac.tell(smac_info, smac_value)
 
 
 def make_smac(configspace, smac_args):

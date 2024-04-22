@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from carps.benchmarks.dummy_problem import DummyProblem
+from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
 from hydra_plugins.hypersweeper import Info
 
@@ -22,7 +23,9 @@ class HyperCARPSAdapter:
 
     def tell(self, info, value):
         """Tell the result of the configuration."""
-        self.carps.tell(info, value)
+        smac_info = TrialInfo(info.config, seed=info.seed, budget=info.budget)
+        smac_value = TrialValue(time=value.cost, cost=value.performance)
+        self.carps.tell(smac_info, smac_value)
 
 
 def make_carp_s(configspace, carps_args):

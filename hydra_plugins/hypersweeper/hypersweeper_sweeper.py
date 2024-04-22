@@ -12,7 +12,6 @@ import numpy as np
 import wandb
 from hydra.utils import to_absolute_path
 from omegaconf import OmegaConf
-from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
 log = logging.getLogger(__name__)
 
@@ -23,9 +22,16 @@ class Info:
 
     config: dict
     budget: float
-    load_path: str
+    load_path: str = None
     seed: int = None
 
+@dataclass
+class Result:
+    """Evaluation result for the optimizer."""
+
+    info: Info = None
+    performance: float = None
+    cost: float = None
 
 class HypersweeperSweeper:
     """Base class for ask-tell sweepers."""
@@ -385,6 +391,16 @@ class HypersweeperSweeper:
             json.dump(res, f)
             f.write("\n")
 
+    def write_history(self):
+        """Write the history to a file."""
+        res = {}
+        res["configs"] = [c.get_dictionary() for c in self.history["configs"]]
+        res["performances"] = self.history["performances"]
+        res["budgets"] = self.history["budgets"]
+        with open(Path(self.output_dir) / "runhistory.json", "a+") as f:
+            json.dump(res, f)
+            f.write("\n")
+
     def run(self, verbose=False):
         """Actual optimization loop.
         In each iteration:
@@ -422,7 +438,7 @@ class HypersweeperSweeper:
             loading_paths = []
             t = 0
             terminate = False
-            while t < self.max_parallel and not terminate:
+            while t <= self.max_parallel and not terminate:
                 info, terminate = self.optimizer.ask()
                 configs.append(info.config)
                 t += 1
@@ -444,8 +460,8 @@ class HypersweeperSweeper:
                 configs, performances, budgets, seeds, costs, strict=True
             ):
                 logged_performance = -performance if self.maximize else performance
-                info = TrialInfo(budget=budget, seed=seed, config=config)
-                value = TrialValue(cost=logged_performance, time=cost)
+                info = Info(budget=budget, seed=seed, config=config)
+                value = Result(performance=logged_performance, cost=cost)
                 self.optimizer.tell(info=info, value=value)
             self.record_iteration(performances, configs, budgets)
             if verbose:
@@ -457,6 +473,7 @@ class HypersweeperSweeper:
             self._save_incumbent()
             self.opt_time += time.time() - opt_time_start
         total_time = time.time() - self.start
+        self.write_history()
         inc_config, inc_performance = self.get_incumbent()
         if verbose:
             log.info(
