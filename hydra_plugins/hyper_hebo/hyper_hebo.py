@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 from collections import abc
 
 import numpy as np
@@ -11,8 +12,10 @@ from ConfigSpace.hyperparameters import (CategoricalHyperparameter, Constant,
                                          FloatHyperparameter, Hyperparameter,
                                          IntegerHyperparameter,
                                          OrdinalHyperparameter)
-from hebo.design_space.design_space import DesignSpace
-from hebo.optimizers.hebo import HEBO
+
+if (spec := importlib.util.find_spec("hebo")) is not None:
+    from hebo.design_space.design_space import DesignSpace
+    from hebo.optimizers.hebo import HEBO
 
 from hydra_plugins.hypersweeper import Info
 

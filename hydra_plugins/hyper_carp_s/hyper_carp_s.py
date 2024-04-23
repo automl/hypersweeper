@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from carps.benchmarks.dummy_problem import DummyProblem
+import importlib
+
+if (spec := importlib.util.find_spec("carps")) is not None:
+    from carps.benchmarks.dummy_problem import DummyProblem
+
 from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
 from hydra_plugins.hypersweeper import Info

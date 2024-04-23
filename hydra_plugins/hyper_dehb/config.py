@@ -1,4 +1,4 @@
-"""Config for HyperCARPS sweeper."""
+"""Config for HyperRS sweeper."""
 
 from __future__ import annotations
 
@@ -8,14 +8,16 @@ from typing import Any
 
 from hydra.core.config_store import ConfigStore
 
-if (spec := importlib.util.find_spec("carps")) is not None:
+if (spec := importlib.util.find_spec("dehb")) is None:
+    print("Couldn't import DEHB, the DEHB Hypersweeper will not be available.")
+else:
 
     @dataclass
-    class HyperCARPSConfig:
-        """Config for HyperCARPS sweeper."""
+    class HyperDEHBConfig:
+        """Config for HyperRS sweeper."""
 
         _target_: str = "hydra_plugins.hypersweeper.hypersweeper.Hypersweeper"
-        opt_constructor: str = "hydra_plugins.hyper_carp_s.hyper_carp_s.make_carp_s"
+        opt_constructor: str = "hydra_plugins.hyper_dehb.hyper_dehb.make_dehb"
         search_space: dict | None = field(default_factory=dict)
         resume: str | bool = False
         budget: Any | None = None
@@ -27,9 +29,7 @@ if (spec := importlib.util.find_spec("carps")) is not None:
 
     ConfigStore.instance().store(
         group="hydra/sweeper",
-        name="HyperCARPS",
-        node=HyperCARPSConfig,
+        name="HyperDEHB",
+        node=HyperDEHBConfig,
         provider="hypersweeper",
     )
-else:
-    print("Couldn't import CARP-S, the CARP-S Hypersweeper will not be available.")
