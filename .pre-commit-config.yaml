@@ -32,10 +32,6 @@ repos:
       - id: check-github-workflows
         files: '^github/workflows/.*\.ya?ml$'
         types: ["yaml"]
-  - repo: https://github.com/commitizen-tools/commitizen
-    rev: 3.12.0
-    hooks:
-      - id: commitizen
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.1.5
     hooks:

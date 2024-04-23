@@ -25,6 +25,7 @@ class Info:
     load_path: str = None
     seed: int = None
 
+
 @dataclass
 class Result:
     """Evaluation result for the optimizer."""
@@ -32,6 +33,7 @@ class Result:
     info: Info = None
     performance: float = None
     cost: float = None
+
 
 class HypersweeperSweeper:
     """Base class for ask-tell sweepers."""
@@ -393,13 +395,20 @@ class HypersweeperSweeper:
 
     def write_history(self):
         """Write the history to a file."""
-        res = {}
-        res["configs"] = [c.get_dictionary() for c in self.history["configs"]]
-        res["performances"] = self.history["performances"]
-        res["budgets"] = self.history["budgets"]
-        with open(Path(self.output_dir) / "runhistory.json", "a+") as f:
-            json.dump(res, f)
-            f.write("\n")
+        configs = [c.get_dictionary() for c in self.history["configs"]]
+        performances = self.history["performances"]
+        budgets = self.history["budgets"]
+        keywords = ",".join(
+            ["run_id", "budget", "performance"] + [str(k) for k in configs[0]]
+        )
+        with open(Path(self.output_dir) / "runhistory.csv", "a+") as f:
+            f.write(f"{keywords}\n")
+            for i in range(len(configs)):
+                current_config = configs[i]
+                config_str = ",".join(
+                    [str(current_config[k]) for k in current_config]
+                )
+                f.write(f"{i},{budgets[i]},{performances[i]},{config_str}\n")
 
     def run(self, verbose=False):
         """Actual optimization loop.
