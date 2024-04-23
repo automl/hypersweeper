@@ -52,8 +52,7 @@ jobs:
         branch_name=${GITHUB_REF##*/}
         cd ../gh-pages
         rm -rf $branch_name
-        ls
-        cp -r ../docs/build/html $branch_name
+        cp -r ../hypersweeper/docs/build/html $branch_name
 
     - name: Push to gh-pages
       if: (contains(github.ref, 'development') || contains(github.ref, 'main'))
