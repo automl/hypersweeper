@@ -14,7 +14,7 @@ on:
       - development
 
 env:
-  package-name: "HyperSweeper"
+  package-name: "Hypersweeper"
   test-dir: tests
   extra-requires: "[dev]"  # "" for no extra_requires
 
