@@ -26,7 +26,7 @@ BROWSER := python -c "$$BROWSER_PYSCRIPT"
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test clean-docs## remove all build, test, coverage and Python artifacts
 
 clean-build: ## remove build artifacts
 	rm -fr build/
@@ -46,6 +46,10 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
+
+clean-docs: ## remove docs artifacts
+	cd docs && make clean
+
 ruff: ## run ruff as a formatter
 	python -m ruff format hydra_plugins
 	python -m ruff --silent --exit-zero --no-cache --fix hydra_plugins
@@ -67,10 +71,10 @@ coverage: ## check code coverage quickly with the default Python
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/hypersweeper.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ hypersweeper
+	sphinx-apidoc -o docs/ hydra_plugins
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
+
 bump-version: ## bump the version -- add current version number and kind of upgrade (minor, major, patch) as arguments
 	bump-my-version bump --current-version
 

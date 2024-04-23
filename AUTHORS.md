@@ -3,7 +3,7 @@
 
 ## Development Lead
 
-AutoML Hannover <automl@ai.uni-hannover.de>
+Theresa Eimer <t.eimer@ai.uni-hannover.de>
 
 ## Contributors
 
