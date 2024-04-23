@@ -191,7 +191,7 @@ class HypersweeperSweeper:
                 config=wandb_config,
             )
 
-    def run_configs(self, configs, budgets, seeds, load_paths):  # noqa: PLR0912
+    def run_configs(self, infos):#configs, budgets, seeds, load_paths):  # noqa: PLR0912
         """Run a set of overrides.
 
         Parameters
@@ -208,28 +208,36 @@ class HypersweeperSweeper:
         """
         if self.load_tf:
             assert not any(
-                p is None for p in load_paths
+                p.load_path is None for p in infos
             ), """Load paths must be provided for all configurations
             when working with checkpoints. If your optimizer does not support this,
             set the 'load_tf' parameter of the sweeper to False."""
 
         # Generate overrides
         overrides = []
-        for i in range(len(configs)):
-            names = [*list(configs[i].keys())]
+        for i in range(len(infos)):
+            names = [*list(infos[i].config.keys())]
             if self.budget_arg_name is not None:
                 names += [self.budget_arg_name]
             if self.checkpoint_tf:
                 names += [self.save_arg_name]
-            if self.load_tf and len(load_paths) > 0:
+            if self.load_tf:
                 names += [self.load_arg_name]
+
+            values = [*list(infos[i].config.values())]
+            if self.budget_arg_name is not None:
+                values += [infos[i].budget]
+            if self.load_tf:
+                values += [Path(self.checkpoint_dir) / infos[i].load_path]
+
 
             if self.slurm:
                 names += ["hydra.launcher.timeout_min"]
                 optimized_timeout = (
-                    self.slurm_timeout * 1 / (self.total_budget // budgets[i])
+                    self.slurm_timeout * 1 / (self.total_budget // infos[i].budget)
                     + 0.1 * self.slurm_timeout
                 )
+                values += [int(optimized_timeout)]
 
             if self.seeds:
                 for s in self.seeds:
@@ -237,16 +245,9 @@ class HypersweeperSweeper:
                         Path(self.checkpoint_dir)
                         / f"iteration_{self.iteration}_id_{i}_s{s}.pt"
                     )
-                    values = [*list(configs[i].values())]
-                    if self.budget_arg_name is not None:
-                        values += [budgets[i]]
                     if self.checkpoint_tf:
                         values += [save_path]
-                    if self.load_tf and len(load_paths) > 0:
-                        values += [load_paths[i]]
 
-                    if self.slurm:
-                        values += [int(optimized_timeout)]
                     job_overrides = tuple(self.global_overrides) + tuple(
                         f"{name}={val}"
                         for name, val in zip(
@@ -256,27 +257,18 @@ class HypersweeperSweeper:
                     overrides.append(job_overrides)
             elif not self.deterministic:
                 assert not any(
-                    s is None for s in seeds
+                    s.seed is None for s in infos
                 ), """For non-deterministic target functions, seeds must be provided.
                 If the optimizer you chose does not support this,
                 manually set the 'seeds' parameter of the sweeper to a list of seeds."""
                 save_path = (
                     Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{i}.pt"
                 )
-                values = [*list(configs[i].values())]
-                if self.budget_arg_name is not None:
-                    values += [budgets[i]]
-                if self.checkpoint_tf:
-                    values += [save_path]
-                if self.load_tf and len(load_paths) > 0:
-                    values += [load_paths[i]]
 
-                if self.slurm:
-                    values += [int(optimized_timeout)]
                 job_overrides = tuple(self.global_overrides) + tuple(
                     f"{name}={val}"
                     for name, val in zip(
-                        [*names, "seed"], [*values, seeds[i]], strict=True
+                        [*names, "seed"], [*values, infos[i].seed], strict=True
                     )
                 )
                 overrides.append(job_overrides)
@@ -284,16 +276,9 @@ class HypersweeperSweeper:
                 save_path = (
                     Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{i}.pt"
                 )
-                values = [*list(configs[i].values())]
-                if self.budget_arg_name is not None:
-                    values += [budgets[i]]
                 if self.checkpoint_tf:
                     values += [save_path]
-                if self.load_tf and len(load_paths) > 0:
-                    values += [Path(self.checkpoint_dir) / load_paths[i]]
 
-                if self.slurm:
-                    values += [int(optimized_timeout)]
                 job_overrides = tuple(self.global_overrides) + tuple(
                     f"{name}={val}" for name, val in zip(names, values, strict=True)
                 )
@@ -302,7 +287,7 @@ class HypersweeperSweeper:
         # Run overrides
         res = self.launcher.launch(overrides, initial_job_idx=self.job_idx)
         self.job_idx += len(overrides)
-        costs = [budgets[i] for i in range(len(res))]
+        costs = [infos[i].budget for i in range(len(res))]
         done = False
         while not done:
             for j in range(len(overrides)):
@@ -445,6 +430,7 @@ class HypersweeperSweeper:
             budgets = []
             seeds = []
             loading_paths = []
+            infos = []
             t = 0
             terminate = False
             while t <= self.max_parallel and not terminate:
@@ -458,18 +444,20 @@ class HypersweeperSweeper:
                 seeds.append(info.seed)
                 if info.load_path is not None:
                     loading_paths.append(info.load_path)
+                infos.append(info)
             self.opt_time += time.time() - opt_time_start
-            performances, costs = self.run_configs(
-                configs, budgets, seeds, loading_paths
+            performances, costs = self.run_configs(infos
+                #configs, budgets, seeds, loading_paths
             )
             opt_time_start = time.time()
             if self.seeds and self.deterministic:
                 seeds = np.zeros(len(performances))
-            for config, performance, budget, seed, cost in zip(
-                configs, performances, budgets, seeds, costs, strict=True
-            ):
+            #for config, performance, budget, seed, cost in zip(
+            for info, performance, cost in zip(infos, performances, costs, strict=True):
+            #    configs, performances, budgets, seeds, costs, strict=True
+            #):
                 logged_performance = -performance if self.maximize else performance
-                info = Info(budget=budget, seed=seed, config=config)
+                #info = Info(budget=budget, seed=seed, config=config)
                 value = Result(performance=logged_performance, cost=cost)
                 self.optimizer.tell(info=info, value=value)
             self.record_iteration(performances, configs, budgets)
