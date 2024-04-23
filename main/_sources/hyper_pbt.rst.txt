@@ -1,0 +1,29 @@
+hyper\_pbt package
+==================
+
+Submodules
+----------
+
+hyper\_pbt.config module
+------------------------
+
+.. automodule:: hyper_pbt.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_pbt.hyper\_pbt module
+----------------------------
+
+.. automodule:: hyper_pbt.hyper_pbt
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: hyper_pbt
+   :members:
+   :undoc-members:
+   :show-inheritance:

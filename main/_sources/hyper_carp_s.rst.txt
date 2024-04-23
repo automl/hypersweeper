@@ -1,0 +1,29 @@
+hyper\_carp\_s package
+======================
+
+Submodules
+----------
+
+hyper\_carp\_s.config module
+----------------------------
+
+.. automodule:: hyper_carp_s.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_carp\_s.hyper\_carp\_s module
+------------------------------------
+
+.. automodule:: hyper_carp_s.hyper_carp_s
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: hyper_carp_s
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,29 @@
+hyper\_nevergrad package
+========================
+
+Submodules
+----------
+
+hyper\_nevergrad.config module
+------------------------------
+
+.. automodule:: hyper_nevergrad.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_nevergrad.hyper\_nevergrad module
+----------------------------------------
+
+.. automodule:: hyper_nevergrad.hyper_nevergrad
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: hyper_nevergrad
+   :members:
+   :undoc-members:
+   :show-inheritance:
