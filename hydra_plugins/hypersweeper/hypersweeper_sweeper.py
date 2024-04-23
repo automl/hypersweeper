@@ -191,7 +191,7 @@ class HypersweeperSweeper:
                 config=wandb_config,
             )
 
-    def run_configs(self, infos):#configs, budgets, seeds, load_paths):  # noqa: PLR0912
+    def run_configs(self, infos):  # noqa: PLR0912
         """Run a set of overrides.
 
         Parameters
@@ -229,7 +229,6 @@ class HypersweeperSweeper:
                 values += [infos[i].budget]
             if self.load_tf:
                 values += [Path(self.checkpoint_dir) / infos[i].load_path]
-
 
             if self.slurm:
                 names += ["hydra.launcher.timeout_min"]
@@ -390,9 +389,7 @@ class HypersweeperSweeper:
             f.write(f"{keywords}\n")
             for i in range(len(configs)):
                 current_config = configs[i]
-                config_str = ",".join(
-                    [str(current_config[k]) for k in current_config]
-                )
+                config_str = ",".join([str(current_config[k]) for k in current_config])
                 f.write(f"{i},{budgets[i]},{performances[i]},{config_str}\n")
 
     def run(self, verbose=False):
@@ -446,18 +443,15 @@ class HypersweeperSweeper:
                     loading_paths.append(info.load_path)
                 infos.append(info)
             self.opt_time += time.time() - opt_time_start
-            performances, costs = self.run_configs(infos
-                #configs, budgets, seeds, loading_paths
+            performances, costs = self.run_configs(
+                infos
+                # configs, budgets, seeds, loading_paths
             )
             opt_time_start = time.time()
             if self.seeds and self.deterministic:
                 seeds = np.zeros(len(performances))
-            #for config, performance, budget, seed, cost in zip(
             for info, performance, cost in zip(infos, performances, costs, strict=True):
-            #    configs, performances, budgets, seeds, costs, strict=True
-            #):
                 logged_performance = -performance if self.maximize else performance
-                #info = Info(budget=budget, seed=seed, config=config)
                 value = Result(performance=logged_performance, cost=cost)
                 self.optimizer.tell(info=info, value=value)
             self.record_iteration(performances, configs, budgets)
