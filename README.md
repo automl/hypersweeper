@@ -4,7 +4,6 @@
 [![Test](https://github.com/automl-private/hypersweeper/actions/workflows/pytest.yml/badge.svg)](https://github.com/automl-private/hypersweeper/actions/workflows/pytest.yml)
 [![Doc Status](https://github.com/automl-private/hypersweeper/actions/workflows/docs.yml/badge.svg)](https://github.com/automl-private/hypersweeper/actions/workflows/docs.yml)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
 
 
 Hydra sweeper integration of our favorite optimization packages, utilizing ask-and-tell interfaces.
