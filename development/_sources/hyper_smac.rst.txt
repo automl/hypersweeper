@@ -1,0 +1,29 @@
+hyper\_smac package
+===================
+
+Submodules
+----------
+
+hyper\_smac.config module
+-------------------------
+
+.. automodule:: hyper_smac.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_smac.hyper\_smac module
+------------------------------
+
+.. automodule:: hyper_smac.hyper_smac
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: hyper_smac
+   :members:
+   :undoc-members:
+   :show-inheritance:

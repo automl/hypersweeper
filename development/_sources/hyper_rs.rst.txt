@@ -1,0 +1,29 @@
+hyper\_rs package
+=================
+
+Submodules
+----------
+
+hyper\_rs.config module
+-----------------------
+
+.. automodule:: hyper_rs.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_rs.hyper\_rs module
+--------------------------
+
+.. automodule:: hyper_rs.hyper_rs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: hyper_rs
+   :members:
+   :undoc-members:
+   :show-inheritance:

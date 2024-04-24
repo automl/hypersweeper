@@ -1,0 +1,29 @@
+hyper\_hebo package
+===================
+
+Submodules
+----------
+
+hyper\_hebo.config module
+-------------------------
+
+.. automodule:: hyper_hebo.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_hebo.hyper\_hebo module
+------------------------------
+
+.. automodule:: hyper_hebo.hyper_hebo
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: hyper_hebo
+   :members:
+   :undoc-members:
+   :show-inheritance:

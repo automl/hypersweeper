@@ -1,0 +1,29 @@
+hyper\_dehb package
+===================
+
+Submodules
+----------
+
+hyper\_dehb.config module
+-------------------------
+
+.. automodule:: hyper_dehb.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_dehb.hyper\_dehb module
+------------------------------
+
+.. automodule:: hyper_dehb.hyper_dehb
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: hyper_dehb
+   :members:
+   :undoc-members:
+   :show-inheritance:

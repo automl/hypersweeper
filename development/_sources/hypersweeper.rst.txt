@@ -1,0 +1,45 @@
+hypersweeper package
+====================
+
+Submodules
+----------
+
+hypersweeper.hypersweeper module
+--------------------------------
+
+.. automodule:: hypersweeper.hypersweeper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hypersweeper.hypersweeper\_backend module
+-----------------------------------------
+
+.. automodule:: hypersweeper.hypersweeper_backend
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hypersweeper.hypersweeper\_sweeper module
+-----------------------------------------
+
+.. automodule:: hypersweeper.hypersweeper_sweeper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hypersweeper.search\_space\_encoding module
+-------------------------------------------
+
+.. automodule:: hypersweeper.search_space_encoding
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: hypersweeper
+   :members:
+   :undoc-members:
+   :show-inheritance:
