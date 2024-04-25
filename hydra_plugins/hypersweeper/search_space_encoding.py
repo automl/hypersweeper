@@ -96,7 +96,6 @@ def search_space_to_config_space(
     -------
     ConfigurationSpace
     """
-    print(search_space.seed)
     if isinstance(search_space, str):
         with open(search_space) as f:
             jason_string = f.read()
