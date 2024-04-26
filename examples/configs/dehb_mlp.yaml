@@ -19,7 +19,7 @@ hydra:
     n_trials: 50
     budget_variable: epochs
     sweeper_kwargs:
-      max_parallelization: 0.4
+      max_parallelization: 0.1
       optimizer_kwargs:
           _target_: dehb.DEHB
           _partial_: true

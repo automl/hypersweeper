@@ -28,7 +28,7 @@ description = "Hydra sweeper integration of our favorite optimization packages, 
 classifiers = [
   'Intended Audience :: Science/Research',
   'Intended Audience :: Developers',
-  'License :: OSI Approved :: BSD license',
+  'License :: OSI Approved :: BSD License',
   'Programming Language :: Python',
   'Topic :: Software Development',
   'Topic :: Scientific/Engineering',
