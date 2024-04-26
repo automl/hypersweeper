@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import operator
+import pdb
 from collections.abc import Callable
 from functools import reduce
 from pathlib import Path
@@ -112,6 +113,8 @@ class HypersweeperBackend(Sweeper):
         """
         self.config = config
         self.hydra_context = hydra_context
+        pdb.set_trace()
+        breakpoint()
         self.launcher = Plugins.instance().instantiate_launcher(
             config=config, hydra_context=hydra_context, task_function=task_function
         )
