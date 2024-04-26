@@ -113,8 +113,6 @@ class HypersweeperBackend(Sweeper):
         """
         self.config = config
         self.hydra_context = hydra_context
-        pdb.set_trace()
-        breakpoint()
         self.launcher = Plugins.instance().instantiate_launcher(
             config=config, hydra_context=hydra_context, task_function=task_function
         )
