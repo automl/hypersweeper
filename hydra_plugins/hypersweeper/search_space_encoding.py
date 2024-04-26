@@ -33,9 +33,7 @@ class JSONCfgEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def search_space_to_config_space(
-    search_space: str | DictConfig
-) -> ConfigurationSpace:
+def search_space_to_config_space(search_space: str | DictConfig) -> ConfigurationSpace:
     """Convert hydra search space to SMAC's configuration space.
 
     See the [ConfigSpace docs](https://automl.github.io/ConfigSpace/master/API-Doc.html#)
@@ -129,6 +127,6 @@ def search_space_to_config_space(
             f"search_space must be of type str or DictConfig. Got {type(search_space)}."
         )
 
-    if "seed" in search_space.keys():
+    if "seed" in search_space:
         cs.seed(seed=search_space.seed)
     return cs

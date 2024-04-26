@@ -1,54 +1,69 @@
-from copy import deepcopy
+from __future__ import annotations
 
 from ConfigSpace import Categorical, ConfigurationSpace, Float, Integer
-from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
-from hydra_plugins.hyper_smac.hyper_smac import make_smac
-from hydra_plugins.hypersweeper.hypersweeper_sweeper import Info, Result
-
 BBO_CONFIG = {
-    "smac_facade": OmegaConf.create({
-          "_target_": "smac.facade.blackbox_facade.BlackBoxFacade",
-          "_partial_": True,
-          "logging_level": 20}),
+    "smac_facade": OmegaConf.create(
+        {
+            "_target_": "smac.facade.blackbox_facade.BlackBoxFacade",
+            "_partial_": True,
+            "logging_level": 20,
+        }
+    ),
     "scenario": {
-          "seed": 42,
-          "n_trials": 10,
-          "deterministic": True,
-          "n_workers": 4,
-          "name": "bb_test"}
+        "seed": 42,
+        "n_trials": 10,
+        "deterministic": True,
+        "n_workers": 4,
+        "name": "bb_test",
+    },
 }
 
 MF_CONFIG = {
-    "smac_facade": OmegaConf.create({
-          "_target_": "smac.facade.multi_fidelity_facade.MultiFidelityFacade",
-          "_partial_": True,
-          "logging_level": 20}),
-    "intensifier": OmegaConf.create({
-          "_target_": "smac.facade.multi_fidelity_facade.MultiFidelityFacade.get_intensifier",
-          "_partial_": True,
-          "eta": 3}),
+    "smac_facade": OmegaConf.create(
+        {
+            "_target_": "smac.facade.multi_fidelity_facade.MultiFidelityFacade",
+            "_partial_": True,
+            "logging_level": 20,
+        }
+    ),
+    "intensifier": OmegaConf.create(
+        {
+            "_target_": "smac.facade.multi_fidelity_facade.MultiFidelityFacade.get_intensifier",  # noqa: E501
+            "_partial_": True,
+            "eta": 3,
+        }
+    ),
     "scenario": {
-          "seed": 42,
-          "n_trials": 10,
-          "deterministic": True,
-          "n_workers": 1,
-          "min_budget": 5,
-          "max_budget": 50,
-          "name": "mf_test"}
+        "seed": 42,
+        "n_trials": 10,
+        "deterministic": True,
+        "n_workers": 1,
+        "min_budget": 5,
+        "max_budget": 50,
+        "name": "mf_test",
+    },
 }
 
-DEFAULT_CONFIG_SPACE = ConfigurationSpace({Float("a", bounds=[0.0,1.0]), Integer("b", bounds=[1,10]), Categorical("c", ["a", "b", "c"])})
+DEFAULT_CONFIG_SPACE = ConfigurationSpace(
+    {
+        Float("a", bounds=[0.0, 1.0]),
+        Integer("b", bounds=[1, 10]),
+        Categorical("c", ["a", "b", "c"]),
+    }
+)
 
-# ISSUE HERE: scenario saving doesn't work for some reason with this config. Not sure why and if this is a SMAC issue or not.
+# ISSUE HERE: scenario saving doesn't work for some reason with this config.
+# Not sure why and if this is a SMAC issue or not.
 
 
 # class TestHyperSMAC:
 #     def setup(self, mf=False):
 #         configspace = DEFAULT_CONFIG_SPACE
 #         hyper_smac_args = deepcopy(BBO_CONFIG) if not mf else deepcopy(MF_CONFIG)
-#         hyper_smac_args["intensifier"] = instantiate(hyper_smac_args["intensifier"]) if mf else None
+#         hyper_smac_args["intensifier"] =
+#                instantiate(hyper_smac_args["intensifier"]) if mf else None
 #         hyper_smac_args["smac_facade"] = instantiate(hyper_smac_args["smac_facade"])
 #         return make_smac(configspace, hyper_smac_args)
 
@@ -65,7 +80,7 @@ DEFAULT_CONFIG_SPACE = ConfigurationSpace({Float("a", bounds=[0.0,1.0]), Integer
 #         assert info.config is not None, "Configuration is not generated"
 #         assert isinstance(info, Info), "Return value is not an Info object"
 #         assert info.budget is not None, "Budget is not generated"
-#         assert info.load_path is None, "Load path is set even though SMAC does not reload"
+#         assert info.load_path is None, "Load path is set"
 
 #     def tell(self):
 #         hyper_smac = self.setup()
@@ -77,4 +92,3 @@ DEFAULT_CONFIG_SPACE = ConfigurationSpace({Float("a", bounds=[0.0,1.0]), Integer
 #         info, _ = hyper_smac.ask()
 #         result = Result(0.0, 0.0)
 #         hyper_smac.tell(info, result)
-
