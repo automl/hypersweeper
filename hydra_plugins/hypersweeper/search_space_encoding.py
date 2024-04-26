@@ -129,6 +129,6 @@ def search_space_to_config_space(
             f"search_space must be of type str or DictConfig. Got {type(search_space)}."
         )
 
-    if search_space.seed is not None:
+    if "seed" in search_space.keys():
         cs.seed(seed=search_space.seed)
     return cs

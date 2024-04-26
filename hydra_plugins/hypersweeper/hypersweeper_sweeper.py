@@ -368,9 +368,9 @@ class HypersweeperSweeper:
         res["config"] = incumbent.get_dictionary()
         res["score"] = float(inc_performance)
         try:
-            res["total_training_steps"] = sum(self.history["budgets"])
+            res["budget_used"] = sum(self.history["budgets"])
         except:  # noqa:E722
-            res["total_training_steps"] = self.trials_run
+            res["budget_used"] = self.trials_run
         res["total_wallclock_time"] = self.start - time.time()
         res["total_optimization_time"] = self.opt_time
         with open(Path(self.output_dir) / name, "a+") as f:
