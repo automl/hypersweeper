@@ -415,20 +415,14 @@ class HypersweeperSweeper:
         trial_termination = False
         budget_termination = False
         while not (budget_termination or trial_termination):
-            if (
-                not any(b is None for b in self.history["budgets"])
-                and self.budget is not None
-            ):
-                budget_termination = sum(self.history["budgets"]) >= self.budget
-            if self.n_trials is not None:
-                trial_termination = self.trials_run >= self.n_trials
+
             opt_time_start = time.time()
             configs = []
             budgets = []
             seeds = []
             loading_paths = []
             infos = []
-            t = 0
+            t = 1
             terminate = False
             while t <= self.max_parallel and not terminate:
                 info, terminate = self.optimizer.ask()
@@ -463,6 +457,15 @@ class HypersweeperSweeper:
                 )
             self._save_incumbent()
             self.opt_time += time.time() - opt_time_start
+
+            if (
+                not any(b is None for b in self.history["budgets"])
+                and self.budget is not None
+            ):
+                budget_termination = sum(self.history["budgets"]) >= self.budget
+            if self.n_trials is not None:
+                trial_termination = self.trials_run >= self.n_trials
+
         total_time = time.time() - self.start
         self.write_history()
         inc_config, inc_performance = self.get_incumbent()
@@ -472,4 +475,4 @@ class HypersweeperSweeper:
                     incumbent had a performance of {np.round(inc_performance, decimals=2)}"  # noqa:E501
             )
             log.info(f"The incumbent configuration is {inc_config}")
-        return self.incumbent
+        return [inc_config] # self.incumbent

@@ -170,7 +170,10 @@ class HypersweeperBackend(Sweeper):
         for a in arguments:
             n, v = a.split("=")
             key_parts = n.split(".")
-            reduce(operator.getitem, key_parts[:-1], final_config)[key_parts[-1]] = v
+            try:
+                reduce(operator.getitem, key_parts[:-1], final_config)[key_parts[-1]] = v
+            except KeyError:
+                log.warning(f"Argument {n} not found in config, skipping.")
         schedules = {}
         for i in range(len(incumbent)):
             for k, v in incumbent[i].items():
