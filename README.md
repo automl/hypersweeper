@@ -9,7 +9,7 @@
 Hydra sweeper integration of our favorite optimization packages, utilizing ask-and-tell interfaces.
 
 - Free software: BSD license
-- Documentation: https://automl.github.io/hypersweeper/main/
+- Documentation: https://automl.github.io/hypersweeper
 
 ## Installation 
 We recommend installing hypersweeper in a fresh conda environment:
