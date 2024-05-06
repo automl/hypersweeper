@@ -160,7 +160,7 @@ class PBT:
     def tell(self, info, value):
         """Report the result."""
         self.config_history.append(info.config)
-        self.performance_history.append(value.performace)
+        self.performance_history.append(value.performance)
         self.population_evaluated += 1
         if self.population_evaluated == self.population_size:
             self.population_evaluated = 0
