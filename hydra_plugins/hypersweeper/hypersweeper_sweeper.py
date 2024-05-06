@@ -206,7 +206,7 @@ class HypersweeperSweeper:
         List[float]
             The incurred costs.
         """
-        if self.load_tf:
+        if self.load_tf and self.iteration > 0:
             assert not any(
                 p.load_path is None for p in infos
             ), """Load paths must be provided for all configurations
@@ -221,13 +221,13 @@ class HypersweeperSweeper:
                 names += [self.budget_arg_name]
             if self.checkpoint_tf:
                 names += [self.save_arg_name]
-            if self.load_tf:
+            if self.load_tf and self.iteration > 0:
                 names += [self.load_arg_name]
 
             values = [*list(infos[i].config.values())]
             if self.budget_arg_name is not None:
                 values += [infos[i].budget]
-            if self.load_tf:
+            if self.load_tf and self.iteration > 0:
                 values += [Path(self.checkpoint_dir) / infos[i].load_path]
 
             if self.slurm:
