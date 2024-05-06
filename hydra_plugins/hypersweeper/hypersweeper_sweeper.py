@@ -66,6 +66,7 @@ class HypersweeperSweeper:
         deterministic=True,
         checkpoint_tf=False,
         load_tf=False,
+        checkpoint_path_typing=".pt"
     ):
         """Ask-Tell sweeper for hyperparameter optimization.
 
@@ -175,6 +176,7 @@ class HypersweeperSweeper:
         self.history["budgets"] = []
         self.deterministic = deterministic
         self.max_budget = max_budget
+        self.checkpoint_path_typing = checkpoint_path_typing
 
         self.optimizer = make_optimizer(self.configspace, optimizer_kwargs)
 
@@ -242,7 +244,7 @@ class HypersweeperSweeper:
                 for s in self.seeds:
                     save_path = (
                         Path(self.checkpoint_dir)
-                        / f"iteration_{self.iteration}_id_{i}_s{s}.pt"
+                        / f"iteration_{self.iteration}_id_{i}_s{s}{self.checkpoint_path_typing}"
                     )
                     if self.checkpoint_tf:
                         values += [save_path]
@@ -261,7 +263,7 @@ class HypersweeperSweeper:
                 If the optimizer you chose does not support this,
                 manually set the 'seeds' parameter of the sweeper to a list of seeds."""
                 save_path = (
-                    Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{i}.pt"
+                    Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{i}{self.checkpoint_path_typing}"
                 )
 
                 job_overrides = tuple(self.global_overrides) + tuple(
@@ -273,7 +275,7 @@ class HypersweeperSweeper:
                 overrides.append(job_overrides)
             else:
                 save_path = (
-                    Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{i}.pt"
+                    Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{i}{self.checkpoint_path_typing}"
                 )
                 if self.checkpoint_tf:
                     values += [save_path]
