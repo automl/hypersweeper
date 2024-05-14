@@ -443,7 +443,7 @@ class HypersweeperSweeper:
                 ):
                     budget_termination = sum(self.history["budgets"]) >= self.budget
                 if self.n_trials is not None:
-                    trial_termination = self.trials_run +len(configs) >= self.n_trials
+                    trial_termination = self.trials_run + len(configs) >= self.n_trials
             self.opt_time += time.time() - opt_time_start
             performances, costs = self.run_configs(
                 infos
