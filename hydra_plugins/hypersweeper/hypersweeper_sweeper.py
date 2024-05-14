@@ -289,15 +289,9 @@ class HypersweeperSweeper:
         res = self.launcher.launch(overrides, initial_job_idx=self.job_idx)
         self.job_idx += len(overrides)
         costs = [infos[i].budget for i in range(len(res))]
-        done = False
-        while not done:
-            for j in range(len(overrides)):
-                try:
-                    res[j].return_value  # noqa:B018
-                    done = True
-                    self.trials_run += 1
-                except:  # noqa:E722
-                    done = False
+        for j in range(len(overrides)):
+            res[j].return_value  # noqa:B018
+            self.trials_run += 1
 
         performances = []
         if self.seeds and self.deterministic:
