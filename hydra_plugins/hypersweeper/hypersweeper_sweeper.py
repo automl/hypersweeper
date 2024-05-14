@@ -220,16 +220,16 @@ class HypersweeperSweeper:
             names = [*list(infos[i].config.keys())]
             if self.budget_arg_name is not None:
                 names += [self.budget_arg_name]
-            if self.checkpoint_tf:
-                names += [self.save_arg_name]
             if self.load_tf and self.iteration > 0:
                 names += [self.load_arg_name]
+            if self.checkpoint_tf:
+                names += [self.save_arg_name]
 
             values = [*list(infos[i].config.values())]
             if self.budget_arg_name is not None:
                 values += [infos[i].budget]
             if self.load_tf and self.iteration > 0:
-                values += [Path(self.checkpoint_dir) / infos[i].load_path]
+                values += [Path(self.checkpoint_dir) / f"{str(infos[i].load_path)}{self.checkpoint_path_typing}"]
 
             if self.slurm:
                 names += ["hydra.launcher.timeout_min"]
@@ -241,10 +241,7 @@ class HypersweeperSweeper:
 
             if self.seeds:
                 for s in self.seeds:
-                    save_path = (
-                        Path(self.checkpoint_dir)
-                        / f"iteration_{self.iteration}_id_{i}_s{s}{self.checkpoint_path_typing}"  # noqa:E501
-                    )
+                    save_path = self.get_save_path(i, s)
                     if self.checkpoint_tf:
                         values += [save_path]
 
@@ -260,11 +257,7 @@ class HypersweeperSweeper:
                 For non-deterministic target functions, seeds must be provided.
                 If the optimizer you chose does not support this,
                 manually set the 'seeds' parameter of the sweeper to a list of seeds."""
-                save_path = (
-                    Path(self.checkpoint_dir)
-                    / f"iteration_{self.iteration}_id_{i}{self.checkpoint_path_typing}"
-                )
-
+                save_path = self.get_save_path(i)
                 job_overrides = tuple(self.global_overrides) + tuple(
                     f"{name}={val}"
                     for name, val in zip(
@@ -273,10 +266,7 @@ class HypersweeperSweeper:
                 )
                 overrides.append(job_overrides)
             else:
-                save_path = (
-                    Path(self.checkpoint_dir)
-                    / f"iteration_{self.iteration}_id_{i}{self.checkpoint_path_typing}"
-                )
+                save_path = self.get_save_path(i)
                 if self.checkpoint_tf:
                     values += [save_path]
 
@@ -309,6 +299,28 @@ class HypersweeperSweeper:
         if self.maximize:
             performances = [-p for p in performances]
         return performances, costs
+
+    def get_save_path(self, id, seed=None):
+        """Get the save path for checkpoints.
+
+        Returns:
+        -------
+        Path
+            The save path
+        """
+        if self.seeds:
+            save_path = (
+                        Path(self.checkpoint_dir)
+                        / f"iteration_{self.iteration}_id_{id}_s{seed}{self.checkpoint_path_typing}"  # noqa:E501
+                    )
+        elif not self.deterministic:
+            save_path = (
+                    Path(self.checkpoint_dir)
+                    / f"iteration_{self.iteration}_id_{id}{self.checkpoint_path_typing}"
+                )
+        else:
+            save_path = Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{id}{self.checkpoint_path_typing}"
+        return save_path
 
     def get_incumbent(self):
         """Get the best sequence of configurations so far.
@@ -460,8 +472,6 @@ class HypersweeperSweeper:
                 self.optimizer.tell(info=info, value=value)
             self.record_iteration(performances, configs, budgets)
             if verbose:
-                log.info(f"{budget_termination} {trial_termination} {terminate}")
-                log.info(f"{self.budget} {sum(self.history['budgets'])}")
                 log.info(f"Finished Iteration {self.iteration}!")
                 _, inc_performance = self.get_incumbent()
                 log.info(

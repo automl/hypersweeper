@@ -129,7 +129,7 @@ class PBT:
         load_agent = population_id
         if population_id in worst_config_ids:
             load_agent = self.rng.choice(best_config_ids)
-        load_path = f"iteration_{self.iteration-1}_id_{load_agent}.pt"
+        load_path = f"iteration_{self.iteration-1}_id_{load_agent}"
         new_config = self.perturb_hps(last_config)
         return new_config, load_path
 
