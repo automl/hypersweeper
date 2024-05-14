@@ -8,6 +8,7 @@ hydra:
     n_trials: 10
     budget_variable: budget
     sweeper_kwargs:
+      seeds: [0, 1, 2]
       optimizer_kwargs:
         smac_facade: 
           _target_: smac.facade.blackbox_facade.BlackBoxFacade

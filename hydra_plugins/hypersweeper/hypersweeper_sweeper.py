@@ -288,22 +288,24 @@ class HypersweeperSweeper:
         # Run overrides
         res = self.launcher.launch(overrides, initial_job_idx=self.job_idx)
         self.job_idx += len(overrides)
-        costs = [infos[i].budget for i in range(len(res))]
-        for j in range(len(overrides)):
-            res[j].return_value  # noqa:B018
-            self.trials_run += 1
+        if self.seeds:
+            costs = [infos[i].budget for i in range(len(res)//len(self.seeds))]
+        else:
+            costs = [infos[i].budget for i in range(len(res))]
 
         performances = []
         if self.seeds and self.deterministic:
-            for j in range(self.population_size):
+            for j in range(len(overrides)//len(self.seeds)):
                 performances.append(
                     np.mean(
                         [res[j * k + k].return_value for k in range(len(self.seeds))]
                     )
                 )
+                self.trials_run += 1
         else:
             for j in range(len(overrides)):
                 performances.append(res[j].return_value)
+                self.trials_run += 1
         if self.maximize:
             performances = [-p for p in performances]
         return performances, costs
@@ -361,7 +363,7 @@ class HypersweeperSweeper:
             name = "incumbent.json"
         res = {}
         incumbent, inc_performance = self.get_incumbent()
-        res["config"] = OmegaConf.to_container(incumbent, resolve=True)
+        res["config"] = incumbent.get_dictionary()
         res["score"] = float(inc_performance)
         try:
             res["budget_used"] = sum(self.history["budgets"])
@@ -375,8 +377,7 @@ class HypersweeperSweeper:
 
     def write_history(self):
         """Write the history to a file."""
-        configs = [
-            OmegaConf.to_container(c, resolve=True) for c in self.history["configs"]
+        configs = [c.get_dictionary() for c in self.history["configs"]
         ]
         performances = self.history["performances"]
         budgets = self.history["budgets"]
