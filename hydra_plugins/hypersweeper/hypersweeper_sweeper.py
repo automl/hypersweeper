@@ -460,6 +460,8 @@ class HypersweeperSweeper:
                 self.optimizer.tell(info=info, value=value)
             self.record_iteration(performances, configs, budgets)
             if verbose:
+                log.info(f"{budget_termination} {trial_termination} {terminate}")
+                log.info(f"{self.budget} {sum(self.history['budgets'])}")
                 log.info(f"Finished Iteration {self.iteration}!")
                 _, inc_performance = self.get_incumbent()
                 log.info(
@@ -467,7 +469,7 @@ class HypersweeperSweeper:
                 )
             self._save_incumbent()
             self.opt_time += time.time() - opt_time_start
-            done = trial_termination or budget_termination or terminate
+            done = trial_termination or budget_termination
         total_time = time.time() - self.start
         self.write_history()
         inc_config, inc_performance = self.get_incumbent()
