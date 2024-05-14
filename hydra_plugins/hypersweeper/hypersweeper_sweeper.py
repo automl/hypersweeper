@@ -289,13 +289,13 @@ class HypersweeperSweeper:
         res = self.launcher.launch(overrides, initial_job_idx=self.job_idx)
         self.job_idx += len(overrides)
         if self.seeds:
-            costs = [infos[i].budget for i in range(len(res)//len(self.seeds))]
+            costs = [infos[i].budget for i in range(len(res) // len(self.seeds))]
         else:
             costs = [infos[i].budget for i in range(len(res))]
 
         performances = []
         if self.seeds and self.deterministic:
-            for j in range(len(overrides)//len(self.seeds)):
+            for j in range(len(overrides) // len(self.seeds)):
                 performances.append(
                     np.mean(
                         [res[j * k + k].return_value for k in range(len(self.seeds))]
@@ -377,8 +377,7 @@ class HypersweeperSweeper:
 
     def write_history(self):
         """Write the history to a file."""
-        configs = [c.get_dictionary() for c in self.history["configs"]
-        ]
+        configs = [c.get_dictionary() for c in self.history["configs"]]
         performances = self.history["performances"]
         budgets = self.history["budgets"]
         keywords = ",".join(

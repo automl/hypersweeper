@@ -1,7 +1,9 @@
 """HyperSMAC implementation."""
 
 from __future__ import annotations
+
 from pathlib import Path
+
 from hydra.utils import get_class
 from omegaconf import OmegaConf
 from smac import Scenario
@@ -39,7 +41,9 @@ def make_smac(configspace, smac_args):
         return 0.0
 
     if "output_directory" in smac_args["scenario"]:
-        smac_args["scenario"]["output_directory"] = Path(smac_args["scenario"]["output_directory"])
+        smac_args["scenario"]["output_directory"] = Path(
+            smac_args["scenario"]["output_directory"]
+        )
     scenario = Scenario(configspace, **smac_args.pop("scenario"))
     smac_kwargs = {}
 
