@@ -168,9 +168,14 @@ class HypersweeperBackend(Sweeper):
         with open_dict(final_config):
             del final_config["hydra"]
         for a in arguments:
-            n, v = a.split("=")
-            key_parts = n.split(".")
-            reduce(operator.getitem, key_parts[:-1], final_config)[key_parts[-1]] = v
+            try:
+                n, v = a.split("=")
+                key_parts = n.split(".")
+                reduce(operator.getitem, key_parts[:-1], final_config)[
+                    key_parts[-1]
+                ] = v
+            except:  # noqa: E722
+                print(f"Could not parse argument {a}, skipping.")
         schedules = {}
         for i in range(len(incumbent)):
             for k, v in incumbent[i].items():
