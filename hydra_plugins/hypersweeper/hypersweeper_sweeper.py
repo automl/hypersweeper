@@ -66,7 +66,7 @@ class HypersweeperSweeper:
         deterministic=True,
         checkpoint_tf=False,
         load_tf=False,
-        checkpoint_path_typing=".pt"
+        checkpoint_path_typing=".pt",
     ):
         """Ask-Tell sweeper for hyperparameter optimization.
 
@@ -209,9 +209,8 @@ class HypersweeperSweeper:
             The incurred costs.
         """
         if self.load_tf and self.iteration > 0:
-            assert not any(
-                p.load_path is None for p in infos
-            ), """Load paths must be provided for all configurations
+            assert not any(p.load_path is None for p in infos), """
+            Load paths must be provided for all configurations
             when working with checkpoints. If your optimizer does not support this,
             set the 'load_tf' parameter of the sweeper to False."""
 
@@ -244,7 +243,7 @@ class HypersweeperSweeper:
                 for s in self.seeds:
                     save_path = (
                         Path(self.checkpoint_dir)
-                        / f"iteration_{self.iteration}_id_{i}_s{s}{self.checkpoint_path_typing}"
+                        / f"iteration_{self.iteration}_id_{i}_s{s}{self.checkpoint_path_typing}"  # noqa:E501
                     )
                     if self.checkpoint_tf:
                         values += [save_path]
@@ -257,13 +256,13 @@ class HypersweeperSweeper:
                     )
                     overrides.append(job_overrides)
             elif not self.deterministic:
-                assert not any(
-                    s.seed is None for s in infos
-                ), """For non-deterministic target functions, seeds must be provided.
+                assert not any(s.seed is None for s in infos), """
+                For non-deterministic target functions, seeds must be provided.
                 If the optimizer you chose does not support this,
                 manually set the 'seeds' parameter of the sweeper to a list of seeds."""
                 save_path = (
-                    Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{i}{self.checkpoint_path_typing}"
+                    Path(self.checkpoint_dir)
+                    / f"iteration_{self.iteration}_id_{i}{self.checkpoint_path_typing}"
                 )
 
                 job_overrides = tuple(self.global_overrides) + tuple(
@@ -275,7 +274,8 @@ class HypersweeperSweeper:
                 overrides.append(job_overrides)
             else:
                 save_path = (
-                    Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{i}{self.checkpoint_path_typing}"
+                    Path(self.checkpoint_dir)
+                    / f"iteration_{self.iteration}_id_{i}{self.checkpoint_path_typing}"
                 )
                 if self.checkpoint_tf:
                     values += [save_path]
@@ -416,14 +416,8 @@ class HypersweeperSweeper:
         self.start = time.time()
         trial_termination = False
         budget_termination = False
-        while not (budget_termination or trial_termination):
-            if (
-                not any(b is None for b in self.history["budgets"])
-                and self.budget is not None
-            ):
-                budget_termination = sum(self.history["budgets"]) >= self.budget
-            if self.n_trials is not None:
-                trial_termination = self.trials_run >= self.n_trials
+        done = False
+        while not done:
             opt_time_start = time.time()
             configs = []
             budgets = []
@@ -432,7 +426,12 @@ class HypersweeperSweeper:
             infos = []
             t = 0
             terminate = False
-            while t <= self.max_parallel and not terminate:
+            while (
+                t < self.max_parallel
+                and not terminate
+                and not trial_termination
+                and not budget_termination
+            ):
                 info, terminate = self.optimizer.ask()
                 configs.append(info.config)
                 t += 1
@@ -444,6 +443,13 @@ class HypersweeperSweeper:
                 if info.load_path is not None:
                     loading_paths.append(info.load_path)
                 infos.append(info)
+                if (
+                    not any(b is None for b in self.history["budgets"])
+                    and self.budget is not None
+                ):
+                    budget_termination = sum(self.history["budgets"]) >= self.budget
+                if self.n_trials is not None:
+                    trial_termination = self.trials_run +len(configs) >= self.n_trials
             self.opt_time += time.time() - opt_time_start
             performances, costs = self.run_configs(
                 infos
@@ -465,6 +471,7 @@ class HypersweeperSweeper:
                 )
             self._save_incumbent()
             self.opt_time += time.time() - opt_time_start
+            done = trial_termination or budget_termination or terminate
         total_time = time.time() - self.start
         self.write_history()
         inc_config, inc_performance = self.get_incumbent()

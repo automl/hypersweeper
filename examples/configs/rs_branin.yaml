@@ -6,6 +6,8 @@ defaults:
 hydra:
   sweeper:
     n_trials: 10
+    sweeper_kwargs:
+      max_parallelization: 0.8
     search_space:
       seed: 0
       hyperparameters:

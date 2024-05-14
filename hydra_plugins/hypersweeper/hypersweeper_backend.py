@@ -179,9 +179,9 @@ class HypersweeperBackend(Sweeper):
                 schedules[k].append(v)
         for k in schedules:
             key_parts = k.split(".")
-            reduce(operator.getitem, key_parts[:-1], final_config)[key_parts[-1]] = (
-                schedules[k]
-            )
+            reduce(operator.getitem, key_parts[:-1], final_config)[
+                key_parts[-1]
+            ] = schedules[k]
         with open(Path(optimizer.output_dir) / "final_config.yaml", "w+") as fp:
             OmegaConf.save(config=final_config, f=fp)
 
