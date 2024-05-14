@@ -18,6 +18,7 @@ hydra:
           n_trials: ${hydra.sweeper.n_trials}
           deterministic: true
           n_workers: 4
+          output_directory: ${hydra.sweep.dir}
     search_space:
       hyperparameters:
         x0:

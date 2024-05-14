@@ -26,6 +26,7 @@ hydra:
           n_workers: 1
           min_fidelity: 1
           max_fidelity: 10
+          output_path: ${hydra.sweep.dir}
     search_space:
       hyperparameters:
         n_layer:

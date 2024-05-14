@@ -35,6 +35,7 @@ hydra:
           max_budget: 50
           deterministic: true
           n_workers: 1
+          output_directory: ${hydra.sweep.dir}
     search_space:
       hyperparameters:
         n_layer:
