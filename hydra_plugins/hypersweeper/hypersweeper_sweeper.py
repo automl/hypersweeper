@@ -361,7 +361,7 @@ class HypersweeperSweeper:
             name = "incumbent.json"
         res = {}
         incumbent, inc_performance = self.get_incumbent()
-        res["config"] = incumbent.get_dictionary()
+        res["config"] = OmegaConf.to_container(incumbent, resolve=True)
         res["score"] = float(inc_performance)
         try:
             res["budget_used"] = sum(self.history["budgets"])
@@ -375,7 +375,9 @@ class HypersweeperSweeper:
 
     def write_history(self):
         """Write the history to a file."""
-        configs = [c.get_dictionary() for c in self.history["configs"]]
+        configs = [
+            OmegaConf.to_container(c, resolve=True) for c in self.history["configs"]
+        ]
         performances = self.history["performances"]
         budgets = self.history["budgets"]
         keywords = ",".join(
