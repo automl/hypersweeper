@@ -70,14 +70,14 @@ def convert_to_configuration(x: pd.Series, configspace: ConfigurationSpace) -> C
     return Configuration(configuration_space=configspace, values=hp_config)
 
 
-def read_additional_configs(initial_design_fn: str, search_space: DictConfig = None) -> list[Configuration]:
+def read_additional_configs(initial_design_fn: str, search_space: DictConfig) -> list[Configuration]:
     """Read configurations from csv-logfile.
 
     Parameters
     ----------
-    initial_design_fn : str, optional
+    initial_design_fn : str
         The path to the log file.
-    search_space : DictConfig, optional
+    search_space : DictConfig
         The search space which will be converted to a ConfigSpace.ConfigurationSpace, by default None.
         The search space can be loaded via `search_space = OmegaConf.load(search_space_fn)`.
 
