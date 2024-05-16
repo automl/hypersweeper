@@ -350,7 +350,10 @@ class HypersweeperSweeper:
         for i in range(len(configs)):
             self.history["configs"].append(configs[i])
             self.history["performances"].append(performances[i])
-            self.history["budgets"].append(budgets[i])
+            if budgets[i] is not None:
+                self.history["budgets"].append(budgets[i])
+            else:
+                self.history["budgets"].append(self.max_budget)
         self.iteration += 1
 
         if self.wandb_project:
@@ -392,14 +395,20 @@ class HypersweeperSweeper:
         configs = [c.get_dictionary() for c in self.history["configs"]]
         performances = self.history["performances"]
         budgets = self.history["budgets"]
-        keywords = ",".join(
-            ["run_id", "budget", "performance"] + [str(k) for k in configs[0]]
-        )
+        keywords = ["run_id", "budget", "performance"] + [str(k) for k in self.configspace.get_hyperparameter_names()]
         with open(Path(self.output_dir) / "runhistory.csv", "a+") as f:
-            f.write(f"{keywords}\n")
+            f.write(f"{','.join(keywords)}\n")
             for i in range(len(configs)):
                 current_config = configs[i]
-                config_str = ",".join([str(current_config[k]) for k in current_config])
+                line = []
+                for k in keywords[3:]:
+                    if k in current_config.keys():
+                        line.append(current_config[k])
+                    elif k in self.global_overrides:
+                        line.append(self.global_overrides[k])
+                    else:
+                        line.append("None")
+                config_str = ",".join([str(l) for l in line])
                 f.write(f"{i},{budgets[i]},{performances[i]},{config_str}\n")
 
     def run(self, verbose=False):
