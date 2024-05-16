@@ -350,7 +350,10 @@ class HypersweeperSweeper:
         for i in range(len(configs)):
             self.history["configs"].append(configs[i])
             self.history["performances"].append(performances[i])
-            self.history["budgets"].append(budgets[i])
+            if budgets[i] is not None:
+                self.history["budgets"].append(budgets[i])
+            else:
+                self.history["budgets"].append(self.max_budget)
         self.iteration += 1
 
         if self.wandb_project:
