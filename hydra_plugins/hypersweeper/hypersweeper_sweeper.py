@@ -67,6 +67,7 @@ class HypersweeperSweeper:
         checkpoint_tf=False,
         load_tf=False,
         checkpoint_path_typing=".pt",
+        warmstart_file=False,
     ):
         """Ask-Tell sweeper for hyperparameter optimization.
 
@@ -179,6 +180,12 @@ class HypersweeperSweeper:
         self.checkpoint_path_typing = checkpoint_path_typing
 
         self.optimizer = make_optimizer(self.configspace, optimizer_kwargs)
+
+        if warmstart_file:
+            self.warmstart = True
+            with open(warmstart_file, "r") as f:
+                # TODO: Implement me -> should be list of (info, value) tuples
+                pass
 
         self.wandb_project = wandb_project
         if self.wandb_project:
@@ -434,6 +441,9 @@ class HypersweeperSweeper:
         trial_termination = False
         budget_termination = False
         done = False
+        if self.warmstart:
+            for (info, value) in self.warmstart_data:
+                self.optimizer.tell(info=info, value=value)
         while not done:
             opt_time_start = time.time()
             configs = []
