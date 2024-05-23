@@ -6,7 +6,7 @@ import json
 
 from ConfigSpace import ConfigurationSpace
 from ConfigSpace.read_and_write import json as csjson
-from omegaconf import DictConfig, ListConfig
+from omegaconf import DictConfig, ListConfig, open_dict
 
 
 class JSONCfgEncoder(json.JSONEncoder):
@@ -100,23 +100,25 @@ def search_space_to_config_space(search_space: str | DictConfig) -> Configuratio
         cs = csjson.read(jason_string)
     elif isinstance(search_space, DictConfig):
         # reorder hyperparameters as List[Dict]
-        hyperparameters = []
-        for name, cfg in search_space.hyperparameters.items():
-            cfg["name"] = name
-            if "default" not in cfg:
-                cfg["default"] = None
-            if "log" not in cfg:
-                cfg["log"] = False
-            if "q" not in cfg:
-                cfg["q"] = None
-            hyperparameters.append(cfg)
-        search_space.hyperparameters = hyperparameters
+        with open_dict(search_space):
+            hyperparameters = []
+            for name, cfg in search_space.hyperparameters.items():
+                with open_dict(cfg):
+                    cfg["name"] = name
+                    if "default" not in cfg:
+                        cfg["default"] = None
+                    if "log" not in cfg:
+                        cfg["log"] = False
+                    if "q" not in cfg:
+                        cfg["q"] = None
+                hyperparameters.append(cfg)
+            search_space.hyperparameters = hyperparameters
 
-        if "conditions" not in search_space:
-            search_space["conditions"] = []
+            if "conditions" not in search_space:
+                search_space["conditions"] = []
 
-        if "forbiddens" not in search_space:
-            search_space["forbiddens"] = []
+            if "forbiddens" not in search_space:
+                search_space["forbiddens"] = []
 
         jason_string = json.dumps(search_space, cls=JSONCfgEncoder)
         cs = csjson.read(jason_string)
