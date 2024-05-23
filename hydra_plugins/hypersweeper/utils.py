@@ -64,12 +64,12 @@ def convert_to_configuration(x: pd.Series, configspace: ConfigurationSpace) -> C
     return Configuration(configuration_space=configspace, values=hp_config)
 
 
-def read_warmstart_data(initial_design_fn: str, search_space: DictConfig) -> list[tuple[Info, Result]]:
+def read_warmstart_data(warmstart_filename: str, search_space: DictConfig) -> list[tuple[Info, Result]]:
     """Read initial design / warmstart data from csv-logfile.
 
     Parameters
     ----------
-    initial_design_fn : str
+    warmstart_filename : str
         The path to the log file.
     search_space : DictConfig
         The search space which will be converted to a ConfigSpace.ConfigurationSpace, by default None.
@@ -81,7 +81,7 @@ def read_warmstart_data(initial_design_fn: str, search_space: DictConfig) -> lis
         The run data in hypersweeper format from the logs.
     """
     configspace = search_space_to_config_space(search_space=search_space)
-    initial_design = pd.read_csv(initial_design_fn)
+    initial_design = pd.read_csv(warmstart_filename)
     # Assuming the seed in the logs is the global seed, not for the the config
     configs = initial_design.apply(convert_to_configuration, args=(configspace,), axis=1).to_list()
     budgets = initial_design["budget"]
@@ -95,6 +95,6 @@ if __name__ == "__main__":
     from omegaconf import OmegaConf
     search_space = OmegaConf.load("/home/numina/Documents/repos/ARLBench/runscripts/configs/search_space/dqn_cc.yaml")
     read_warmstart_data(
-        initial_design_fn="/home/numina/Documents/repos/ARLBench/runscripts/configs/initial_design/cc_cartpole_dqn.csv",
+        warmstart_filename="/home/numina/Documents/repos/ARLBench/runscripts/configs/initial_design/cc_cartpole_dqn.csv",
         search_space=search_space
     )
