@@ -11,6 +11,7 @@ import pandas as pd
 from ConfigSpace import Configuration, ConfigurationSpace
 from hydra.utils import get_class
 from hydra_plugins.hypersweeper import Info
+from hydra_plugins.hypersweeper.utils import convert_to_configuration
 from hydra_plugins.hypersweeper.search_space_encoding import (
     search_space_to_config_space,
 )
@@ -19,55 +20,6 @@ from smac import Scenario
 from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
 
-def maybe_convert_types(k: str, v: Any, configspace: ConfigurationSpace) -> Any | None:
-    """Maybe convert types to match conditions and HP types.
-
-    Types come from pandas Dataframe.
-
-    Parameters
-    ----------
-    k : str
-        Hyperparameter name
-    v : Any
-        Hyperparameter value as read in by pandas from csv
-    configspace : ConfigurationSpace
-        Configuration space with information about HP type
-
-    Returns.
-    --------
-    Any | None
-        The hyperparameter value with correct type
-    """
-    if np.isnan(v):
-        v = None
-    elif isinstance(v, float) and \
-        isinstance(
-            configspace[k],
-            CS.UniformIntegerHyperparameter | CS.NormalIntegerHyperparameter | CS.BetaIntegerHyperparameter
-        ):
-        v = int(v)
-    return v
-
-def convert_to_configuration(x: pd.Series, configspace: ConfigurationSpace) -> Configuration:
-    """Convert configurations from run logs (csv) to ConfigSpace.Configuration.
-
-    Parameters
-    ----------
-    x : pd.Series
-        Row from runlogs.
-    configspace : ConfigurationSpace
-        Configuration space, necessary for conversion.
-
-    Returns.
-    --------
-    Configuration
-        The converted configuration.
-    """
-    x = dict(x)
-    hp_config = {
-        k: maybe_convert_types(k, v, configspace=configspace) for k,v in x.items() if k.startswith("hp_config")
-    }
-    return Configuration(configuration_space=configspace, values=hp_config)
 
 
 def read_additional_configs(initial_design_fn: str, search_space: DictConfig) -> list[Configuration]:
