@@ -36,6 +36,14 @@ hypersweeper.search\_space\_encoding module
    :undoc-members:
    :show-inheritance:
 
+hypersweeper.utils module
+-------------------------
+
+.. automodule:: hypersweeper.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
