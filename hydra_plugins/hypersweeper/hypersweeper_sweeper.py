@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 import wandb
 from hydra.utils import to_absolute_path
+from hydra_plugins.hypersweeper.utils import read_warmstart_data
 from omegaconf import OmegaConf
 
 log = logging.getLogger(__name__)
@@ -183,9 +184,7 @@ class HypersweeperSweeper:
 
         if warmstart_file:
             self.warmstart = True
-            with open(warmstart_file, "r") as f:
-                # TODO: Implement me -> should be list of (info, value) tuples
-                pass
+            self.warmstart_data = read_warmstart_data(warmstart_filename=warmstart_file)
 
         self.wandb_project = wandb_project
         if self.wandb_project:
