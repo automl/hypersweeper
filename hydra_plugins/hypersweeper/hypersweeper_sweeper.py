@@ -5,35 +5,15 @@ from __future__ import annotations
 import json
 import logging
 import time
-from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
 import wandb
 from hydra.utils import to_absolute_path
-from hydra_plugins.hypersweeper.utils import read_warmstart_data
+from hydra_plugins.hypersweeper.utils import read_warmstart_data, Result
 from omegaconf import OmegaConf
 
 log = logging.getLogger(__name__)
-
-
-@dataclass
-class Info:
-    """Information for the sweeper."""
-
-    config: dict
-    budget: float
-    load_path: str = None
-    seed: int = None
-
-
-@dataclass
-class Result:
-    """Evaluation result for the optimizer."""
-
-    info: Info = None
-    performance: float = None
-    cost: float = None
 
 
 class HypersweeperSweeper:
@@ -184,8 +164,10 @@ class HypersweeperSweeper:
 
         if warmstart_file:
             self.warmstart = True
-            self.warmstart_data = read_warmstart_data(warmstart_filename=warmstart_file)
-
+            self.warmstart_data = read_warmstart_data(warmstart_filename=warmstart_file, search_space=self.configspace)
+        else:
+            self.warmstart = False
+            
         self.wandb_project = wandb_project
         if self.wandb_project:
             wandb_config = OmegaConf.to_container(

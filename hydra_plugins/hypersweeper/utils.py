@@ -6,11 +6,30 @@ import ConfigSpace as CS  # noqa: N817
 import numpy as np
 import pandas as pd
 from ConfigSpace import Configuration, ConfigurationSpace
-from hydra_plugins.hypersweeper import Info, Result
 from hydra_plugins.hypersweeper.search_space_encoding import (
     search_space_to_config_space,
 )
 from omegaconf import DictConfig, OmegaConf
+from dataclasses import dataclass
+
+
+@dataclass
+class Info:
+    """Information for the sweeper."""
+
+    config: dict
+    budget: float
+    load_path: str = None
+    seed: int = None
+
+
+@dataclass
+class Result:
+    """Evaluation result for the optimizer."""
+
+    info: Info = None
+    performance: float = None
+    cost: float = None
 
 
 def maybe_convert_types(k: str, v: Any, configspace: ConfigurationSpace) -> Any | None:
@@ -80,14 +99,19 @@ def read_warmstart_data(warmstart_filename: str, search_space: DictConfig) -> li
     list[tuple[Info, Result]]
         The run data in hypersweeper format from the logs.
     """
-    configspace = search_space_to_config_space(search_space=search_space)
+    # configspace = search_space_to_config_space(search_space=search_space)
+    configspace = search_space
     initial_design = pd.read_csv(warmstart_filename)
-    # Assuming the seed in the logs is the global seed, not for the the config
+
+    # The seed in the log is the seed the config was run on
     configs = initial_design.apply(convert_to_configuration, args=(configspace,), axis=1).to_list()
     budgets = initial_design["budget"]
+    seeds = initial_design["seed"]
     logged_performances = initial_design["performance"].to_list()
-    infos = [Info(config=c, budget=b) for c, b in zip(configs, budgets)]
-    results = [Result(info=i, performance=p) for i,p in zip(infos, logged_performances)]
+    infos = [Info(config=c, budget=b, seed=s) for c, b, s in zip(configs, budgets, seeds)]
+    # the cost in hypersweeper is the runtime of the configuration
+    # cost is not tracked for initial design
+    results = [Result(info=i, performance=p, cost=0.) for i,p in zip(infos, logged_performances)]
     return list(zip(infos, results))
 
 
