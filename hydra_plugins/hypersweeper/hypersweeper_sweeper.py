@@ -229,14 +229,15 @@ class HypersweeperSweeper:
 
             if self.seeds:
                 for s in self.seeds:
+                    local_values = values.copy()
                     save_path = self.get_save_path(i, s)
                     if self.checkpoint_tf:
-                        values += [save_path]
+                        local_values += [save_path]
 
                     job_overrides = tuple(self.global_overrides) + tuple(
                         f"{name}={val}"
                         for name, val in zip(
-                            [*names, "seed"], [*values, s], strict=True
+                            [*names, "seed"], [*local_values, s], strict=True
                         )
                     )
                     overrides.append(job_overrides)
