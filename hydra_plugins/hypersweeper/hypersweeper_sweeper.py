@@ -10,8 +10,9 @@ from pathlib import Path
 import numpy as np
 import wandb
 from hydra.utils import to_absolute_path
-from hydra_plugins.hypersweeper.utils import read_warmstart_data, Result
 from omegaconf import OmegaConf
+
+from hydra_plugins.hypersweeper.utils import Result, read_warmstart_data
 
 log = logging.getLogger(__name__)
 
@@ -119,9 +120,7 @@ class HypersweeperSweeper:
         self.load_tf = load_tf
 
         self.configspace = cs
-        self.output_dir = Path(
-            to_absolute_path(base_dir) if base_dir else to_absolute_path("./")
-        )
+        self.output_dir = Path(to_absolute_path(base_dir) if base_dir else to_absolute_path("./"))
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.checkpoint_dir = Path(self.output_dir) / "checkpoints"
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -130,18 +129,14 @@ class HypersweeperSweeper:
         if (seeds or not deterministic) and len(self.global_overrides) > 0:
             for i in range(len(self.global_overrides)):
                 if self.global_overrides[i].split("=")[0] == "seed":
-                    self.global_overrides = (
-                        self.global_overrides[:i] + self.global_overrides[i + 1 :]
-                    )
+                    self.global_overrides = self.global_overrides[:i] + self.global_overrides[i + 1 :]
                     break
 
         self.maximize = maximize
         self.slurm = slurm
         self.slurm_timeout = slurm_timeout
         if n_trials is not None:
-            self.max_parallel = min(
-                job_array_size_limit, max(1, int(max_parallelization * n_trials))
-            )
+            self.max_parallel = min(job_array_size_limit, max(1, int(max_parallelization * n_trials)))
         else:
             self.max_parallel = job_array_size_limit
 
@@ -161,18 +156,18 @@ class HypersweeperSweeper:
         self.checkpoint_path_typing = checkpoint_path_typing
 
         self.optimizer = make_optimizer(self.configspace, optimizer_kwargs)
+        self.optimizer.checkpoint_dir = self.checkpoint_dir
+        self.optimizer.checkpoint_path_typing = self.checkpoint_path_typing
 
         if warmstart_file:
             self.warmstart = True
             self.warmstart_data = read_warmstart_data(warmstart_filename=warmstart_file, search_space=self.configspace)
         else:
             self.warmstart = False
-            
+
         self.wandb_project = wandb_project
         if self.wandb_project:
-            wandb_config = OmegaConf.to_container(
-                global_config, resolve=False, throw_on_missing=False
-            )
+            wandb_config = OmegaConf.to_container(global_config, resolve=False, throw_on_missing=False)
             assert wandb_entity, "Please provide an entity to log to W&B."
             wandb.init(
                 project=self.wandb_project,
@@ -217,13 +212,12 @@ class HypersweeperSweeper:
             if self.budget_arg_name is not None:
                 values += [infos[i].budget]
             if self.load_tf and self.iteration > 0:
-                values += [Path(self.checkpoint_dir) / f"{str(infos[i].load_path)}{self.checkpoint_path_typing}"]
+                values += [Path(self.checkpoint_dir) / f"{infos[i].load_path!s}{self.checkpoint_path_typing}"]
 
             if self.slurm:
                 names += ["hydra.launcher.timeout_min"]
                 optimized_timeout = (
-                    self.slurm_timeout * 1 / (self.total_budget // infos[i].budget)
-                    + 0.1 * self.slurm_timeout
+                    self.slurm_timeout * 1 / (self.total_budget // infos[i].budget) + 0.1 * self.slurm_timeout
                 )
                 values += [int(optimized_timeout)]
 
@@ -235,10 +229,7 @@ class HypersweeperSweeper:
                         local_values += [save_path]
 
                     job_overrides = tuple(self.global_overrides) + tuple(
-                        f"{name}={val}"
-                        for name, val in zip(
-                            [*names, "seed"], [*local_values, s], strict=True
-                        )
+                        f"{name}={val}" for name, val in zip([*names, "seed"], [*local_values, s], strict=True)
                     )
                     overrides.append(job_overrides)
             elif not self.deterministic:
@@ -248,10 +239,7 @@ class HypersweeperSweeper:
                 manually set the 'seeds' parameter of the sweeper to a list of seeds."""
                 save_path = self.get_save_path(i)
                 job_overrides = tuple(self.global_overrides) + tuple(
-                    f"{name}={val}"
-                    for name, val in zip(
-                        [*names, "seed"], [*values, infos[i].seed], strict=True
-                    )
+                    f"{name}={val}" for name, val in zip([*names, "seed"], [*values, infos[i].seed], strict=True)
                 )
                 overrides.append(job_overrides)
             else:
@@ -275,11 +263,7 @@ class HypersweeperSweeper:
         performances = []
         if self.seeds and self.deterministic:
             for j in range(len(overrides) // len(self.seeds)):
-                performances.append(
-                    np.mean(
-                        [res[j * k + k].return_value for k in range(len(self.seeds))]
-                    )
-                )
+                performances.append(np.mean([res[j * k + k].return_value for k in range(len(self.seeds))]))
                 self.trials_run += 1
         else:
             for j in range(len(overrides)):
@@ -289,7 +273,7 @@ class HypersweeperSweeper:
             performances = [-p for p in performances]
         return performances, costs
 
-    def get_save_path(self, id, seed=None):
+    def get_save_path(self, config_id, seed=None):
         """Get the save path for checkpoints.
 
         Returns:
@@ -299,16 +283,12 @@ class HypersweeperSweeper:
         """
         if self.seeds:
             save_path = (
-                        Path(self.checkpoint_dir)
-                        / f"iteration_{self.iteration}_id_{id}_s{seed}{self.checkpoint_path_typing}"  # noqa:E501
-                    )
+                Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{config_id}_s{seed}{self.checkpoint_path_typing}"
+            )
         elif not self.deterministic:
-            save_path = (
-                    Path(self.checkpoint_dir)
-                    / f"iteration_{self.iteration}_id_{id}{self.checkpoint_path_typing}"
-                )
+            save_path = Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{config_id}{self.checkpoint_path_typing}"
         else:
-            save_path = Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{id}{self.checkpoint_path_typing}"
+            save_path = Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{config_id}{self.checkpoint_path_typing}"
         return save_path
 
     def get_incumbent(self):
@@ -391,16 +371,16 @@ class HypersweeperSweeper:
                 current_config = configs[i]
                 line = []
                 for k in keywords[3:]:
-                    if k in current_config.keys():
+                    if k in current_config:
                         line.append(current_config[k])
                     elif k in self.global_overrides:
                         line.append(self.global_overrides[k])
                     else:
                         line.append("None")
-                config_str = ",".join([str(l) for l in line])
+                config_str = ",".join([str(l) for l in line])  # noqa: E741
                 f.write(f"{i},{budgets[i]},{performances[i]},{config_str}\n")
 
-    def run(self, verbose=False):
+    def run(self, verbose=False):  # noqa: PLR0912
         """Actual optimization loop.
         In each iteration:
         - get configs (either randomly upon init or through perturbation)
@@ -424,7 +404,7 @@ class HypersweeperSweeper:
         budget_termination = False
         done = False
         if self.warmstart:
-            for (info, value) in self.warmstart_data:
+            for info, value in self.warmstart_data:
                 self.optimizer.tell(info=info, value=value)
         while not done:
             opt_time_start = time.time()
@@ -435,12 +415,7 @@ class HypersweeperSweeper:
             infos = []
             t = 0
             terminate = False
-            while (
-                t < self.max_parallel
-                and not terminate
-                and not trial_termination
-                and not budget_termination
-            ):
+            while t < self.max_parallel and not terminate and not trial_termination and not budget_termination:
                 info, terminate = self.optimizer.ask()
                 configs.append(info.config)
                 t += 1
@@ -452,10 +427,7 @@ class HypersweeperSweeper:
                 if info.load_path is not None:
                     loading_paths.append(info.load_path)
                 infos.append(info)
-                if (
-                    not any(b is None for b in self.history["budgets"])
-                    and self.budget is not None
-                ):
+                if not any(b is None for b in self.history["budgets"]) and self.budget is not None:
                     budget_termination = sum(self.history["budgets"]) >= self.budget
                 if self.n_trials is not None:
                     trial_termination = self.trials_run + len(configs) >= self.n_trials
@@ -475,9 +447,7 @@ class HypersweeperSweeper:
             if verbose:
                 log.info(f"Finished Iteration {self.iteration}!")
                 _, inc_performance = self.get_incumbent()
-                log.info(
-                    f"Current incumbent has a performance of {np.round(inc_performance, decimals=2)}."  # noqa:E501
-                )
+                log.info(f"Current incumbent has a performance of {np.round(inc_performance, decimals=2)}.")
             self._save_incumbent()
             self.opt_time += time.time() - opt_time_start
             done = trial_termination or budget_termination
@@ -487,7 +457,7 @@ class HypersweeperSweeper:
         if verbose:
             log.info(
                 f"Finished Sweep! Total duration was {np.round(total_time, decimals=2)}s, \
-                    incumbent had a performance of {np.round(inc_performance, decimals=2)}"  # noqa:E501
+                    incumbent had a performance of {np.round(inc_performance, decimals=2)}"
             )
             log.info(f"The incumbent configuration is {inc_config}")
         return self.incumbent

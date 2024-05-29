@@ -45,10 +45,7 @@ class HyperHEBOAdapter:
         cost = value.performance
         suggestion = ConfigSpacecfg2HEBOcfg(info.config)
 
-        if not isinstance(cost, abc.Sequence):
-            cost = np.asarray([cost])
-        else:
-            cost = np.asarray(cost)
+        cost = np.asarray([cost]) if not isinstance(cost, abc.Sequence) else np.asarray(cost)
 
         self.hebo.observe(suggestion, cost)
 
@@ -105,9 +102,7 @@ def configspaceHP2HEBOHP(hp: Hyperparameter) -> dict:  # noqa: PLR0911, N802
     elif isinstance(hp, Constant):
         return {"name": hp.name, "type": "cat", "categories": [hp.value]}
     else:
-        raise NotImplementedError(
-            f"Unknown hyperparameter type: {hp.__class__.__name__}"
-        )
+        raise NotImplementedError(f"Unknown hyperparameter type: {hp.__class__.__name__}")
 
 
 def HEBOcfg2ConfigSpacecfg(  # noqa: N802

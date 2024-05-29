@@ -82,9 +82,7 @@ class HypersweeperBackend(Sweeper):
         self.sweeper_kwargs = sweeper_kwargs
         self.budget = int(budget) if budget is not None else None
         self.n_trials = int(n_trials) if n_trials is not None else None
-        assert (
-            self.budget is not None or self.n_trials is not None
-        ), "Either budget or n_trials must be given."
+        assert self.budget is not None or self.n_trials is not None, "Either budget or n_trials must be given."
         self.resume = resume
 
         self.task_function: TaskFunction | None = None
@@ -171,9 +169,7 @@ class HypersweeperBackend(Sweeper):
             try:
                 n, v = a.split("=")
                 key_parts = n.split(".")
-                reduce(operator.getitem, key_parts[:-1], final_config)[
-                    key_parts[-1]
-                ] = v
+                reduce(operator.getitem, key_parts[:-1], final_config)[key_parts[-1]] = v
             except:  # noqa: E722
                 print(f"Could not parse argument {a}, skipping.")
         schedules = {}
@@ -184,9 +180,7 @@ class HypersweeperBackend(Sweeper):
                 schedules[k].append(v)
         for k in schedules:
             key_parts = k.split(".")
-            reduce(operator.getitem, key_parts[:-1], final_config)[key_parts[-1]] = (
-                schedules[k]
-            )
+            reduce(operator.getitem, key_parts[:-1], final_config)[key_parts[-1]] = schedules[k]
         with open(Path(optimizer.output_dir) / "final_config.yaml", "w+") as fp:
             OmegaConf.save(config=final_config, f=fp)
 

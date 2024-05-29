@@ -1,16 +1,15 @@
+"""Utility functions for the hypersweeper plugin."""
+
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 import ConfigSpace as CS  # noqa: N817
 import numpy as np
 import pandas as pd
 from ConfigSpace import Configuration, ConfigurationSpace
-from hydra_plugins.hypersweeper.search_space_encoding import (
-    search_space_to_config_space,
-)
 from omegaconf import DictConfig, OmegaConf
-from dataclasses import dataclass
 
 
 @dataclass
@@ -53,13 +52,12 @@ def maybe_convert_types(k: str, v: Any, configspace: ConfigurationSpace) -> Any 
     """
     if np.isnan(v):
         v = None
-    elif isinstance(v, float) and \
-        isinstance(
-            configspace[k],
-            CS.UniformIntegerHyperparameter | CS.NormalIntegerHyperparameter | CS.BetaIntegerHyperparameter
-        ):
+    elif isinstance(v, float) and isinstance(
+        configspace[k], CS.UniformIntegerHyperparameter | CS.NormalIntegerHyperparameter | CS.BetaIntegerHyperparameter
+    ):
         v = int(v)
     return v
+
 
 def convert_to_configuration(x: pd.Series, configspace: ConfigurationSpace) -> Configuration:
     """Convert configurations from run logs (csv) to ConfigSpace.Configuration.
@@ -78,7 +76,7 @@ def convert_to_configuration(x: pd.Series, configspace: ConfigurationSpace) -> C
     """
     x = dict(x)
     hp_config = {
-        k: maybe_convert_types(k, v, configspace=configspace) for k,v in x.items() if k.startswith("hp_config")
+        k: maybe_convert_types(k, v, configspace=configspace) for k, v in x.items() if k.startswith("hp_config")
     }
     return Configuration(configuration_space=configspace, values=hp_config)
 
@@ -108,17 +106,18 @@ def read_warmstart_data(warmstart_filename: str, search_space: DictConfig) -> li
     budgets = initial_design["budget"]
     seeds = initial_design["seed"]
     logged_performances = initial_design["performance"].to_list()
-    infos = [Info(config=c, budget=b, seed=s) for c, b, s in zip(configs, budgets, seeds)]
+    infos = [Info(config=c, budget=b, seed=s) for c, b, s in zip(configs, budgets, seeds, strict=False)]
     # the cost in hypersweeper is the runtime of the configuration
     # cost is not tracked for initial design
-    results = [Result(info=i, performance=p, cost=0.) for i,p in zip(infos, logged_performances)]
-    return list(zip(infos, results))
+    results = [Result(info=i, performance=p, cost=0.0) for i, p in zip(infos, logged_performances, strict=False)]
+    return list(zip(infos, results, strict=False))
 
 
 if __name__ == "__main__":
     from omegaconf import OmegaConf
+
     search_space = OmegaConf.load("/home/numina/Documents/repos/ARLBench/runscripts/configs/search_space/dqn_cc.yaml")
     read_warmstart_data(
         warmstart_filename="/home/numina/Documents/repos/ARLBench/runscripts/configs/initial_design/cc_cartpole_dqn.csv",
-        search_space=search_space
+        search_space=search_space,
     )

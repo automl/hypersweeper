@@ -53,12 +53,8 @@ def get_instrum_from_configspace(configspace):
         param = configspace.get(k)
         if isinstance(param, NormalFloatHyperparameter | UniformFloatHyperparameter):
             params.append(ng.p.Scalar(upper=param.upper, lower=param.lower))
-        elif isinstance(
-            param, NormalIntegerHyperparameter | UniformIntegerHyperparameter
-        ):
-            params.append(
-                ng.p.Scalar(upper=param.upper, lower=param.lower).set_integer_casting()
-            )
+        elif isinstance(param, NormalIntegerHyperparameter | UniformIntegerHyperparameter):
+            params.append(ng.p.Scalar(upper=param.upper, lower=param.lower).set_integer_casting())
         elif isinstance(param, CategoricalHyperparameter):
             params.append(ng.p.Choice(param.choices))
     return ng.p.Instrumentation(*params)

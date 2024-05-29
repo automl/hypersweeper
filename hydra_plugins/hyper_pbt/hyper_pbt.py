@@ -25,6 +25,7 @@ class PBT:
         perturbation_factors=None,
         categorical_prob=0.1,
         categorical_fixed=False,
+        self_destruct=False,
     ):
         """Initialize the optimizer."""
         if perturbation_factors is None:
@@ -52,18 +53,14 @@ class PBT:
         self.categorical_hps = [
             n
             for n in list(self.configspace.keys())
-            if isinstance(
-                self.configspace.get_hyperparameter(n), CategoricalHyperparameter
-            )
+            if isinstance(self.configspace.get_hyperparameter(n), CategoricalHyperparameter)
         ]
         self.categorical_hps += [
             n
             for n in list(self.configspace.keys())
             if isinstance(self.configspace.get_hyperparameter(n), OrdinalHyperparameter)
         ]
-        self.continuous_hps = [
-            n for n in list(self.configspace.keys()) if n not in self.categorical_hps
-        ]
+        self.continuous_hps = [n for n in list(self.configspace.keys()) if n not in self.categorical_hps]
         self.hp_bounds = np.array(
             [
                 [
@@ -74,6 +71,7 @@ class PBT:
                 if n not in self.categorical_hps
             ]
         )
+        self.self_destruct = self_destruct
 
     def ask(self):
         """Ask for the next configuration."""
@@ -83,9 +81,7 @@ class PBT:
             self.population_id += 1
             if iteration_end:
                 self.iteration += 1
-            return Info(
-                config=config, budget=self.budget_per_run, load_path=None, seed=None
-            ), iteration_end
+            return Info(config=config, budget=self.budget_per_run, load_path=None, seed=None), iteration_end
         config, load_path = self.perturb_config(self.population_id)
         self.population_id += 1
         if iteration_end:
@@ -99,19 +95,11 @@ class PBT:
 
     def perturb_config(self, population_id):
         """Perturb existing configuration."""
-        last_iteration_configs = self.config_history[
-            -(self.population_size + self.population_evaluated) :
-        ]
-        last_iteration_performances = self.performance_history[
-            -(self.population_size + self.population_evaluated) :
-        ]
+        last_iteration_configs = self.config_history[-(self.population_size + self.population_evaluated) :]
+        last_iteration_performances = self.performance_history[-(self.population_size + self.population_evaluated) :]
         if self.population_evaluated > 0:
-            last_iteration_configs = last_iteration_configs[
-                : -self.population_evaluated
-            ]
-            last_iteration_performances = last_iteration_performances[
-                : -self.population_evaluated
-            ]
+            last_iteration_configs = last_iteration_configs[: -self.population_evaluated]
+            last_iteration_performances = last_iteration_performances[: -self.population_evaluated]
         last_config = last_iteration_configs[population_id]
         performance_quantiles = np.quantile(last_iteration_performances, self.quantiles)
         worst_config_ids = [
@@ -144,9 +132,7 @@ class PBT:
                 # Perturb
                 perturbation_factor = self.rng.choice(self.perturbation_factors)
                 perturbed_value = config[name] * perturbation_factor
-                if isinstance(
-                    hp, NormalIntegerHyperparameter | UniformIntegerHyperparameter
-                ):
+                if isinstance(hp, NormalIntegerHyperparameter | UniformIntegerHyperparameter):
                     perturbed_value = int(perturbed_value)
                 config[name] = max(min(perturbed_value, hp.upper), hp.lower)
 
@@ -166,6 +152,12 @@ class PBT:
             self.population_evaluated = 0
             self.population_id = 0
             self.init = False
+
+        if self.self_destruct:
+            import shutil
+
+            path = self.checkpoint_dir + f"/{info.load_path!s}{self.checkpoint_path_typing}"
+            shutil.rmtree(path)
 
 
 def make_pbt(configspace, pbt_args):

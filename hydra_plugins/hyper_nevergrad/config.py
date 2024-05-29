@@ -15,9 +15,7 @@ if (spec := importlib.util.find_spec("nevergrad")) is not None:
         """Config for HyperRS sweeper."""
 
         _target_: str = "hydra_plugins.hypersweeper.hypersweeper.Hypersweeper"
-        opt_constructor: str = (
-            "hydra_plugins.hyper_nevergrad.hyper_nevergrad.make_nevergrad"
-        )
+        opt_constructor: str = "hydra_plugins.hyper_nevergrad.hyper_nevergrad.make_nevergrad"
         search_space: dict | None = field(default_factory=dict)
         resume: str | bool = False
         budget: Any | None = None
@@ -34,6 +32,4 @@ if (spec := importlib.util.find_spec("nevergrad")) is not None:
         provider="hypersweeper",
     )
 else:
-    print(
-        "Couldn't import Nevergrad, the Nevergrad Hypersweeper will not be available."
-    )
+    print("Couldn't import Nevergrad, the Nevergrad Hypersweeper will not be available.")

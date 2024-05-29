@@ -3,23 +3,21 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING
 
-import ConfigSpace as CS  # noqa: N817
-import numpy as np
 import pandas as pd
-from ConfigSpace import Configuration, ConfigurationSpace
 from hydra.utils import get_class
-from hydra_plugins.hypersweeper import Info
-from hydra_plugins.hypersweeper.utils import convert_to_configuration
-from hydra_plugins.hypersweeper.search_space_encoding import (
-    search_space_to_config_space,
-)
 from omegaconf import DictConfig, OmegaConf
 from smac import Scenario
 from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
+from hydra_plugins.hypersweeper import Info
+from hydra_plugins.hypersweeper.search_space_encoding import \
+    search_space_to_config_space
+from hydra_plugins.hypersweeper.utils import convert_to_configuration
 
+if TYPE_CHECKING:
+    from ConfigSpace import Configuration
 
 
 def read_additional_configs(initial_design_fn: str, search_space: DictConfig) -> list[Configuration]:
@@ -74,9 +72,7 @@ def make_smac(configspace, smac_args):
         return 0.0
 
     if "output_directory" in smac_args["scenario"]:
-        smac_args["scenario"]["output_directory"] = Path(
-            smac_args["scenario"]["output_directory"]
-        )
+        smac_args["scenario"]["output_directory"] = Path(smac_args["scenario"]["output_directory"])
     scenario = Scenario(configspace, **smac_args.pop("scenario"))
     smac_kwargs = {}
 
@@ -95,9 +91,7 @@ def make_smac(configspace, smac_args):
         if hasattr(smac_args["acquisition_maximizer"], "selector") and hasattr(
             smac_args["acquisition_maximizer"].selector, "expl2callback"
         ):
-            smac_kwargs["callbacks"].append(
-                smac_args["acquisition_maximizer"].selector.expl2callback
-            )
+            smac_kwargs["callbacks"].append(smac_args["acquisition_maximizer"].selector.expl2callback)
 
     if "config_selector" in smac_args:
         smac_kwargs["config_selector"] = smac_args["config_selector"](scenario=scenario)
@@ -110,6 +104,7 @@ def make_smac(configspace, smac_args):
 
     smac = smac_args["smac_facade"](scenario, dummy_func, **smac_kwargs)
     return HyperSMACAdapter(smac)
+
 
 if __name__ == "__main__":
     read_additional_configs()

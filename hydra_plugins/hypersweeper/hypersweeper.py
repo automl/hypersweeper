@@ -28,9 +28,7 @@ class Hypersweeper(Sweeper):
         config: DictConfig,
     ) -> None:
         """Setup the sweeper."""
-        self.sweeper.setup(
-            hydra_context=hydra_context, task_function=task_function, config=config
-        )
+        self.sweeper.setup(hydra_context=hydra_context, task_function=task_function, config=config)
 
     def sweep(self, arguments: list[str]) -> None:
         """Perform the sweep."""

@@ -23,9 +23,7 @@ class HyperDEHB:
 
     def tell(self, info, value):
         """Return the performance."""
-        config_id = next(
-            k for k, v in self.storage.items() if v["config"] == info.config
-        )
+        config_id = next(k for k, v in self.storage.items() if v["config"] == info.config)
         job_info = self.storage[config_id]
         job_return = {"fitness": value.performance, "cost": value.cost}
         self.dehb.tell(job_info, job_return)
