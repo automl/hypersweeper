@@ -153,11 +153,16 @@ class PBT:
             self.population_id = 0
             self.init = False
 
-        if self.self_destruct:
+        if self.self_destruct and self.iteration > 1:
             import shutil
-
-            path = self.checkpoint_dir + f"/{info.load_path!s}{self.checkpoint_path_typing}"
-            shutil.rmtree(path)
+            print(info)
+            # Try to remove the checkpoint without seeds
+            path = self.checkpoint_dir / f"{info.load_path!s}{self.checkpoint_path_typing}"
+            shutil.rmtree(path, ignore_errors=True)
+            # Try to remove the checkpoint with seeds
+            for s in self.seeds:
+                path = self.checkpoint_dir / f"{info.load_path!s}_s{s}{self.checkpoint_path_typing}"
+                shutil.rmtree(path, ignore_errors=True)
 
 
 def make_pbt(configspace, pbt_args):

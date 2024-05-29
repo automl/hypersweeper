@@ -158,6 +158,7 @@ class HypersweeperSweeper:
         self.optimizer = make_optimizer(self.configspace, optimizer_kwargs)
         self.optimizer.checkpoint_dir = self.checkpoint_dir
         self.optimizer.checkpoint_path_typing = self.checkpoint_path_typing
+        self.optimizer.seeds = seeds
 
         if warmstart_file:
             self.warmstart = True
