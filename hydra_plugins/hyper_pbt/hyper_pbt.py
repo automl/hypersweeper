@@ -37,6 +37,7 @@ class PBT:
         self.performance_history = []
         self.init = True
         self.configspace = configspace
+        self.configspace.seed(seed)
 
         self.population_size = population_size
         self.budget_per_run = config_interval
