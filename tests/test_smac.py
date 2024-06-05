@@ -30,7 +30,7 @@ MF_CONFIG = {
     ),
     "intensifier": OmegaConf.create(
         {
-            "_target_": "smac.facade.multi_fidelity_facade.MultiFidelityFacade.get_intensifier",  # noqa: E501
+            "_target_": "smac.facade.multi_fidelity_facade.MultiFidelityFacade.get_intensifier",
             "_partial_": True,
             "eta": 3,
         }
