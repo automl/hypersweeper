@@ -9,6 +9,7 @@ from pathlib import Path
 
 import numpy as np
 import wandb
+from hydra.core.utils import JobStatus
 from hydra.utils import to_absolute_path
 from hydra_plugins.hypersweeper.utils import read_warmstart_data, Result
 from omegaconf import OmegaConf
@@ -167,7 +168,7 @@ class HypersweeperSweeper:
             self.warmstart_data = read_warmstart_data(warmstart_filename=warmstart_file, search_space=self.configspace)
         else:
             self.warmstart = False
-            
+
         self.wandb_project = wandb_project
         if self.wandb_project:
             wandb_config = OmegaConf.to_container(
@@ -271,18 +272,25 @@ class HypersweeperSweeper:
         else:
             costs = [infos[i].budget for i in range(len(res))]
 
+        if all(r.status == JobStatus.FAILED for r in res) and self.trials_run == 0:
+            log.error("All jobs in the first batch failed. Exiting.")
+            raise Exception("All jobs failed.")
+
         performances = []
         if self.seeds and self.deterministic:
             for j in range(len(overrides) // len(self.seeds)):
                 performances.append(
                     np.mean(
-                        [res[j * k + k].return_value for k in range(len(self.seeds))]
-                    )
+                        [res[j * k + k].return_value for k in range(len(self.seeds))
+                         if res[j*k+k] == JobStatus.COMPLETED]
+                    ) # fixme: this will need a fix for nan values and appropriate logging
                 )
                 self.trials_run += 1
         else:
             for j in range(len(overrides)):
-                performances.append(res[j].return_value)
+                performances.append(res[j].return_value if res[j] == JobStatus.COMPLETED else
+                                    float("nan"))
+
                 self.trials_run += 1
         if self.maximize:
             performances = [-p for p in performances]
