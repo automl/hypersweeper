@@ -284,12 +284,17 @@ class HypersweeperSweeper:
         """
         if self.seeds:
             save_path = (
-                Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{config_id}_s{seed}{self.checkpoint_path_typing}"
+                Path(self.checkpoint_dir)
+                / f"iteration_{self.iteration}_id_{config_id}_s{seed}{self.checkpoint_path_typing}"
             )
         elif not self.deterministic:
-            save_path = Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{config_id}{self.checkpoint_path_typing}"
+            save_path = (
+                Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{config_id}{self.checkpoint_path_typing}"
+            )
         else:
-            save_path = Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{config_id}{self.checkpoint_path_typing}"
+            save_path = (
+                Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{config_id}{self.checkpoint_path_typing}"
+            )
         return save_path
 
     def get_incumbent(self):

@@ -156,6 +156,7 @@ class PBT:
 
         if self.self_destruct and self.iteration > 1:
             import shutil
+
             print(info)
             # Try to remove the checkpoint without seeds
             path = self.checkpoint_dir / f"{info.load_path!s}{self.checkpoint_path_typing}"

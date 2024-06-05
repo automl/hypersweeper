@@ -114,8 +114,6 @@ def read_warmstart_data(warmstart_filename: str, search_space: DictConfig) -> li
 
 
 if __name__ == "__main__":
-    from omegaconf import OmegaConf
-
     search_space = OmegaConf.load("/home/numina/Documents/repos/ARLBench/runscripts/configs/search_space/dqn_cc.yaml")
     read_warmstart_data(
         warmstart_filename="/home/numina/Documents/repos/ARLBench/runscripts/configs/initial_design/cc_cartpole_dqn.csv",
