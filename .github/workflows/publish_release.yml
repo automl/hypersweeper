@@ -57,9 +57,9 @@ jobs:
         fi
 
         if [ ${{ matrix.code-cov }} ]; then
-          $PYTHON -m pytest ${{ env.pytest-args }} ${{ env.code-cov-args }} --ignore=test/local_only test
+          $PYTHON -m pytest ${{ env.pytest-args }} ${{ env.code-cov-args }} --ignore=test/local_only tests
         else
-          $PYTHON -m pytest ${{ env.pytest-args }} --ignore=test/local_only test
+          $PYTHON -m pytest ${{ env.pytest-args }} --ignore=test/local_only tests
         fi
   pypi-publish:
     name: Upload release to PyPI
