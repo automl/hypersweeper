@@ -273,6 +273,7 @@ class HypersweeperSweeper:
             costs = [infos[i].budget for i in range(len(res))]
 
         if all(r.status == JobStatus.FAILED for r in res) and self.trials_run == 0:
+            # TODO make this configurable as a fail fast option!
             log.error("All jobs in the first batch failed. Exiting.")
             raise Exception("All jobs failed.")
 
@@ -282,13 +283,13 @@ class HypersweeperSweeper:
                 performances.append(
                     np.mean(
                         [res[j * k + k].return_value for k in range(len(self.seeds))
-                         if res[j*k+k] == JobStatus.COMPLETED]
+                         if res[j * k + k].status == JobStatus.COMPLETED]
                     ) # fixme: this will need a fix for nan values and appropriate logging
                 )
                 self.trials_run += 1
         else:
             for j in range(len(overrides)):
-                performances.append(res[j].return_value if res[j] == JobStatus.COMPLETED else
+                performances.append(res[j].return_value if res[j].status == JobStatus.COMPLETED else
                                     float("nan"))
 
                 self.trials_run += 1
@@ -328,7 +329,7 @@ class HypersweeperSweeper:
         Float
             Best performance value
         """
-        best_current_id = np.argmin(self.history["performances"])
+        best_current_id = np.nanargmin(self.history["performances"])
         inc_performance = self.history["performances"][best_current_id]
         inc_config = self.history["configs"][best_current_id]
         return inc_config, inc_performance
