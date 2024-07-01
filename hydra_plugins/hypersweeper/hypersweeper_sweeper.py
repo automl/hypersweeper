@@ -393,7 +393,7 @@ class HypersweeperSweeper:
         performances = self.history["performances"]
         budgets = self.history["budgets"]
         keywords = ["run_id", "budget", "performance"] + [str(k) for k in self.configspace.get_hyperparameter_names()]
-        with open(Path(self.output_dir) / "runhistory.csv", "a+") as f:
+        with open(Path(self.output_dir) / "runhistory.csv", "w") as f:
             f.write(f"{','.join(keywords)}\n")
             for i in range(len(configs)):
                 current_config = configs[i]
@@ -487,6 +487,7 @@ class HypersweeperSweeper:
                     f"Current incumbent has a performance of {np.round(inc_performance, decimals=2)}."  # noqa:E501
                 )
             self._save_incumbent()
+            self.write_history()
             self.opt_time += time.time() - opt_time_start
             done = trial_termination or budget_termination
         total_time = time.time() - self.start
