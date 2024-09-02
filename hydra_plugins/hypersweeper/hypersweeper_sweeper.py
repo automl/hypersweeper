@@ -34,6 +34,7 @@ class HypersweeperSweeper:
         n_trials=1e6,
         optimizer_kwargs=None,
         seeds=False,
+        seed_keyword="seed",
         slurm=False,
         slurm_timeout=10,
         max_parallelization=0.1,
@@ -77,6 +78,8 @@ class HypersweeperSweeper:
             Configspace object containing the hyperparameter search space.
         seeds: List[int] | False
             If not False, optimization will be run and averaged across the given seeds.
+        seed_keyword: str = "seed"
+            Keyword for the seed argument
         slurm: bool
             Whether to use slurm for parallelization
         slurm_timeout: int
@@ -126,9 +129,10 @@ class HypersweeperSweeper:
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
         self.job_idx = 0
         self.seeds = seeds
+        self.seed_keyword = seed_keyword
         if (seeds or not deterministic) and len(self.global_overrides) > 0:
             for i in range(len(self.global_overrides)):
-                if self.global_overrides[i].split("=")[0] == "seed":
+                if self.global_overrides[i].split("=")[0] == self.seed_keyword:
                     self.global_overrides = self.global_overrides[:i] + self.global_overrides[i + 1 :]
                     break
 
@@ -230,7 +234,7 @@ class HypersweeperSweeper:
                         local_values += [save_path]
 
                     job_overrides = tuple(self.global_overrides) + tuple(
-                        f"{name}={val}" for name, val in zip([*names, "seed"], [*local_values, s], strict=True)
+                        f"{name}={val}" for name, val in zip([*names, self.seed_keyword], [*local_values, s], strict=True)
                     )
                     overrides.append(job_overrides)
             elif not self.deterministic:
@@ -240,7 +244,7 @@ class HypersweeperSweeper:
                 manually set the 'seeds' parameter of the sweeper to a list of seeds."""
                 save_path = self.get_save_path(i)
                 job_overrides = tuple(self.global_overrides) + tuple(
-                    f"{name}={val}" for name, val in zip([*names, "seed"], [*values, infos[i].seed], strict=True)
+                    f"{name}={val}" for name, val in zip([*names, self.seed_keyword], [*values, infos[i].seed], strict=True)
                 )
                 overrides.append(job_overrides)
             else:
