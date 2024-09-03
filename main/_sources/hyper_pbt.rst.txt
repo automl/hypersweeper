@@ -4,6 +4,14 @@ hyper\_pbt package
 Submodules
 ----------
 
+hyper\_pbt.bg\_pbt\_utils module
+--------------------------------
+
+.. automodule:: hyper_pbt.bg_pbt_utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 hyper\_pbt.config module
 ------------------------
 
@@ -12,10 +20,34 @@ hyper\_pbt.config module
    :undoc-members:
    :show-inheritance:
 
+hyper\_pbt.hyper\_bg\_pbt module
+--------------------------------
+
+.. automodule:: hyper_pbt.hyper_bg_pbt
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_pbt.hyper\_pb2 module
+----------------------------
+
+.. automodule:: hyper_pbt.hyper_pb2
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 hyper\_pbt.hyper\_pbt module
 ----------------------------
 
 .. automodule:: hyper_pbt.hyper_pbt
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_pbt.pb2\_utils module
+----------------------------
+
+.. automodule:: hyper_pbt.pb2_utils
    :members:
    :undoc-members:
    :show-inheritance:
