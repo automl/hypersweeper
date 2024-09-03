@@ -1,7 +1,13 @@
 from __future__ import annotations
 
+from copy import deepcopy
+
 from ConfigSpace import Categorical, ConfigurationSpace, Float, Integer
+from hydra.utils import instantiate
 from omegaconf import OmegaConf
+
+from hydra_plugins.hyper_smac.hyper_smac import make_smac
+from hydra_plugins.hypersweeper.utils import Info, Result
 
 BBO_CONFIG = {
     "smac_facade": OmegaConf.create(
@@ -62,8 +68,7 @@ DEFAULT_CONFIG_SPACE = ConfigurationSpace(
 #     def setup(self, mf=False):
 #         configspace = DEFAULT_CONFIG_SPACE
 #         hyper_smac_args = deepcopy(BBO_CONFIG) if not mf else deepcopy(MF_CONFIG)
-#         hyper_smac_args["intensifier"] =
-#                instantiate(hyper_smac_args["intensifier"]) if mf else None
+#         hyper_smac_args["intensifier"] = instantiate(hyper_smac_args["intensifier"]) if mf else None
 #         hyper_smac_args["smac_facade"] = instantiate(hyper_smac_args["smac_facade"])
 #         return make_smac(configspace, hyper_smac_args)
 

@@ -32,19 +32,23 @@ def train_sb3(cfg: DictConfig):
     else:
         model = agent_class(cfg.algorithm.policy_model, env, **cfg.algorithm.model_kwargs)
 
-    model.learn(total_timesteps=cfg.algorithm.total_timesteps, reset_num_timesteps=False)
+    try:
+        model.learn(total_timesteps=cfg.algorithm.total_timesteps, reset_num_timesteps=False)
 
-    if cfg.save:
-        model.save(cfg.save)
+        if cfg.save:
+            model.save(cfg.save)
 
-    mean_reward, std_reward = evaluate_policy(
-        model,
-        model.get_env(),
-        n_eval_episodes=cfg.algorithm.n_eval_episodes,
-    )
-    log.info(
-        f"Mean evaluation reward at the end of training across {cfg.algorithm.n_eval_episodes} episodes was {mean_reward}"
-    )
+        mean_reward, std_reward = evaluate_policy(
+            model,
+            model.get_env(),
+            n_eval_episodes=cfg.algorithm.n_eval_episodes,
+        )
+        log.info(
+            f"Mean evaluation reward at the end of training across {cfg.algorithm.n_eval_episodes} episodes was {mean_reward}"
+        )
+    except:
+        print("Error in training")
+        mean_reward = -1e6
     if cfg.reward_curves:
         episode_rewards = [-r for r in env.get_episode_rewards()]
         return episode_rewards

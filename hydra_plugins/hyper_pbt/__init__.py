@@ -1,3 +1,3 @@
-from .config import HyperPBTConfig
+from .config import HyperPB2Config, HyperPBTConfig
 
-__all__ = ["HyperPBTConfig"]
+__all__ = ["HyperPBTConfig", "HyperPB2Config"]

@@ -151,6 +151,7 @@ class HypersweeperSweeper:
         self.history["configs"] = []
         self.history["performances"] = []
         self.history["budgets"] = []
+        self.history["iteration"] = []
         self.deterministic = deterministic
         self.max_budget = max_budget
         self.checkpoint_path_typing = checkpoint_path_typing
@@ -177,7 +178,7 @@ class HypersweeperSweeper:
                 config=wandb_config,
             )
 
-    def run_configs(self, infos):  # noqa: PLR0912
+    def run_configs(self, infos):
         """Run a set of overrides.
 
         Parameters
@@ -325,6 +326,7 @@ class HypersweeperSweeper:
         for i in range(len(configs)):
             self.history["configs"].append(configs[i])
             self.history["performances"].append(performances[i])
+            self.history["iteration"].append(self.iteration)
             if budgets[i] is not None:
                 self.history["budgets"].append(budgets[i])
             else:
@@ -370,7 +372,8 @@ class HypersweeperSweeper:
         configs = [c.get_dictionary() for c in self.history["configs"]]
         performances = self.history["performances"]
         budgets = self.history["budgets"]
-        keywords = ["run_id", "budget", "performance"] + [str(k) for k in self.configspace.get_hyperparameter_names()]
+        iterations = self.history["iteration"]
+        keywords = ["run_id", "iteration", "budget", "performance"] + [str(k) for k in self.configspace.get_hyperparameter_names()]
         with open(Path(self.output_dir) / "runhistory.csv", "a+") as f:
             f.write(f"{','.join(keywords)}\n")
             for i in range(len(configs)):
@@ -384,9 +387,9 @@ class HypersweeperSweeper:
                     else:
                         line.append("None")
                 config_str = ",".join([str(l) for l in line])  # noqa: E741
-                f.write(f"{i},{budgets[i]},{performances[i]},{config_str}\n")
+                f.write(f"{i},{iterations[i]},{budgets[i]},{performances[i]},{config_str}\n")
 
-    def run(self, verbose=False):  # noqa: PLR0912
+    def run(self, verbose=False):
         """Actual optimization loop.
         In each iteration:
         - get configs (either randomly upon init or through perturbation)

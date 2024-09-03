@@ -1,0 +1,69 @@
+
+defaults:
+  - _self_
+  - override hydra/sweeper: HyperPB2
+
+env_name: MountainCarContinuous-v0
+load: false
+save: false
+reward_curves: false
+
+algorithm:
+  agent_class: SAC
+  total_timesteps: 1e5
+  n_eval_episodes: 5
+  policy_model: MlpPolicy
+  model_kwargs:
+    learning_rate: 0.0003
+    batch_size: 256
+    tau: 1.0
+    gamma: 0.99
+    learning_starts: 100
+    buffer_size: 1000000
+    train_freq: 1
+    gradient_steps: 1
+    use_sde: False
+    sde_sample_freq: -1
+
+hydra:
+  sweeper:
+    budget: ${algorithm.total_timesteps}
+    budget_variable: algorithm.total_timesteps
+    loading_variable: load
+    saving_variable: save
+    sweeper_kwargs:
+      optimizer_kwargs:
+        population_size: 2
+        config_interval: 1e4
+        categorical_mutation: "mix"
+      checkpoint_tf: true
+      load_tf: true
+    search_space:
+      hyperparameters:
+        algorithm.model_kwargs.learning_rate:
+          type: uniform_float
+          lower: 0.000001
+          upper: 0.01
+          log: true
+        algorithm.model_kwargs.batch_size:
+          type: categorical
+          choices: [64, 128, 256, 512]
+        algorithm.model_kwargs.gradient_steps:
+          type: uniform_int
+          lower: 1
+          upper: 10
+          log: false
+        algorithm.model_kwargs.learning_starts:
+          type: uniform_int
+          lower: 10
+          upper: 1e4
+          log: false
+        algorithm.model_kwargs.buffer_size:
+          type: uniform_int
+          lower: 5e3
+          upper: 5e7
+          log: false
+  run:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}

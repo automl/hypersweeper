@@ -18,7 +18,7 @@ dependencies = [
   "configspace",
   "numpy",
   "wandb==0.16.6",
-  "smac==2.0.2"
+  "smac>=2.1"
 ]
 
 requires-python = ">=3.10"
@@ -51,7 +51,9 @@ doc = [
 hebo = ["hebo==0.3.5"]
 nevergrad = ["nevergrad==1.0.2"]
 dehb = ["dehb==0.1.1"]
-all = ["HyperSweeper[hebo,nevergrad,dehb]"]
+pbt = ["GPy"]
+carps = ["carps[dehb,hebo,nevergrad,optuna,skopt,smac,synetune]"]
+all = ["HyperSweeper[hebo,nevergrad,dehb,pbt,carps]"]
 
 # https://docs.pytest.org/en/7.2.x/reference/reference.html#ini-options-ref
 [tool.pytest.ini_options]
@@ -169,7 +171,11 @@ lint.ignore = [
   "FBT002",
   "PLR0913",
   "PLR0915",
+  "PLR0912",
   "C901",
+  "PT018",
+  "N803",
+  "N802",
 ]
 
 exclude = [

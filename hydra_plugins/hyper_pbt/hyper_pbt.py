@@ -13,7 +13,6 @@ from hydra_plugins.hypersweeper import Info
 
 class PBT:
     """Population Based Training optimizer."""
-
     def __init__(
         self,
         configspace,
@@ -28,6 +27,7 @@ class PBT:
         self_destruct=False,
     ):
         """Initialize the optimizer."""
+        self.model_based = False
         if perturbation_factors is None:
             perturbation_factors = [0.8, 1.2]
         if quantiles is None:
@@ -102,6 +102,7 @@ class PBT:
             last_iteration_configs = last_iteration_configs[: -self.population_evaluated]
             last_iteration_performances = last_iteration_performances[: -self.population_evaluated]
         last_config = last_iteration_configs[population_id]
+        last_performance = last_iteration_performances[population_id]
         performance_quantiles = np.quantile(last_iteration_performances, self.quantiles)
         worst_config_ids = [
             i
@@ -119,10 +120,10 @@ class PBT:
         if population_id in worst_config_ids:
             load_agent = self.rng.choice(best_config_ids)
         load_path = f"iteration_{self.iteration-1}_id_{load_agent}"
-        new_config = self.perturb_hps(last_config)
+        new_config = self.perturb_hps(last_config, performance=last_performance, is_good=population_id in best_config_ids)
         return new_config, load_path
 
-    def perturb_hps(self, config):
+    def perturb_hps(self, config, performance=None, is_good=None):
         """Perturb the hyperparameters."""
         for name in self.continuous_hps:
             hp = self.configspace.get_hyperparameter(name)
@@ -153,6 +154,8 @@ class PBT:
             self.population_evaluated = 0
             self.population_id = 0
             self.init = False
+            if self.model_based:
+                self.fit_model(self.performance_history, self.config_history)
 
         if self.self_destruct and self.iteration > 1:
             import shutil

@@ -61,7 +61,7 @@ def make_hebo(configspace, hebo_args):
 
 
 # These functions were taken from the CARP-S project here: https://github.com/automl/CARP-S/blob/main/carps/optimizers/hebo.py#L23
-def configspaceHP2HEBOHP(hp: Hyperparameter) -> dict:  # noqa: PLR0911, N802
+def configspaceHP2HEBOHP(hp: Hyperparameter) -> dict:  # noqa: PLR0911
     """Convert ConfigSpace hyperparameter to HEBO hyperparameter.
 
     Parameters
@@ -105,7 +105,7 @@ def configspaceHP2HEBOHP(hp: Hyperparameter) -> dict:  # noqa: PLR0911, N802
         raise NotImplementedError(f"Unknown hyperparameter type: {hp.__class__.__name__}")
 
 
-def HEBOcfg2ConfigSpacecfg(  # noqa: N802
+def HEBOcfg2ConfigSpacecfg(
     hebo_suggestion: pd.DataFrame,
     design_space: DesignSpace,
     config_space: ConfigurationSpace,
@@ -145,7 +145,7 @@ def HEBOcfg2ConfigSpacecfg(  # noqa: N802
     return Configuration(configuration_space=config_space, values=hyp)
 
 
-def ConfigSpacecfg2HEBOcfg(config: Configuration) -> pd.DataFrame:  # noqa: N802
+def ConfigSpacecfg2HEBOcfg(config: Configuration) -> pd.DataFrame:
     """Convert ConfigSpace config to HEBO suggestion.
 
     Parameters
