@@ -1,0 +1,30 @@
+
+defaults:
+  - _self_
+  - carps_task: branin
+  - search_space: branin
+  - override hydra/sweeper: HyperCARPS
+  
+
+x0: 3
+x1: 4
+
+seed: None
+budget: None 
+
+spurious_var: 3.14
+
+hydra:
+  sweeper:
+    n_trials: ${carps_task.n_trials}
+    sweeper_kwargs:
+      optimizer_kwargs:
+        _target_: carps.optimizers.hebo.HEBOOptimizer
+        _partial_: true
+        task: ${carps_task}
+    search_space: ${search_space}
+
+  run:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}

@@ -1,0 +1,7 @@
+n_trials: 15
+n_objectives: 1
+time_budget: null
+n_workers: 1
+is_multifidelity: false
+min_budget: null
+max_budget: null

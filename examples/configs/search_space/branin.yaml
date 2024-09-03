@@ -1,0 +1,13 @@
+seed: 0
+hyperparameters:
+  x0:
+    type: uniform_float
+    lower: -5
+    upper: 10
+    log: false
+  x1:
+    type: uniform_float
+    lower: 0
+    upper: 15
+    log: false
+    default_value: 2
