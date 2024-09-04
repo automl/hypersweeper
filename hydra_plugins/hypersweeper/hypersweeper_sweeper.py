@@ -276,13 +276,13 @@ class HypersweeperSweeper:
             # TODO make this configurable as a fail fast option!
             log.error("All jobs in the first batch failed. Exiting.")
             for r in res:
-                log.error(f"Job {r.job_id} failed with exception: {r.return_value[1]}")
+                log.error(f"Job failed with exception: {r.return_value[1]}")
             raise Exception("All jobs failed.")
 
         elif any(isinstance(r.return_value, Exception) for r in res):
             failed = [r for r in res if isinstance(r.return_value[1], Exception)]
             for f in failed:
-                log.error(f"Job {f.job_id} failed with exception: {f.return_value[1]}")
+                log.error(f"Job failed with exception: {f.return_value[1]}")
 
 
         performances = []
