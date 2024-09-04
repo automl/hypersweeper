@@ -275,6 +275,8 @@ class HypersweeperSweeper:
         if all(r.status == JobStatus.FAILED for r in res) and self.trials_run == 0:
             # TODO make this configurable as a fail fast option!
             log.error("All jobs in the first batch failed. Exiting.")
+            for r in res:
+                log.error(f"Job {r.job_id} failed with exception: {r.return_value[1]}")
             raise Exception("All jobs failed.")
 
         elif any(isinstance(r.return_value, Exception) for r in res):
