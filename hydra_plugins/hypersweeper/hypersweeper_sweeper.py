@@ -277,12 +277,18 @@ class HypersweeperSweeper:
             log.error("All jobs in the first batch failed. Exiting.")
             raise Exception("All jobs failed.")
 
+        elif any(isinstance(r.return_value, Exception) for r in res):
+            failed = [r for r in res if isinstance(r.return_value[1], Exception)]
+            for f in failed:
+                log.error(f"Job {f.job_id} failed with exception: {f.return_value[1]}")
+
+
         performances = []
         if self.seeds and self.deterministic:
             for j in range(len(overrides) // len(self.seeds)):
                 performances.append(
                     np.mean(
-                        [res[j * k + k].return_value for k in range(len(self.seeds))
+                        [res[j * k + k].return_value[0] for k in range(len(self.seeds))
                          if res[j * k + k].status == JobStatus.COMPLETED]
                     ) # fixme: this will need a fix for nan values and appropriate logging
                 )
