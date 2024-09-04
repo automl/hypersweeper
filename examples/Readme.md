@@ -23,17 +23,17 @@ The configuration of the optimizers looks quite different, you'll notice, which 
 
 We pre-configured a few different combinations for you. These configuration files have the naming scheme "<target_function>_<optimizer>.yaml". To run one of them, you'll need to run the following command:
 
-´´´bash
+```bash
 python <target_function>.py -m --config-name=<target_function>_<optimizer>
-´´´
+```
 
 The "-m" flag will ensure that the hypersweeper is run instead of just executing a single run of the target function. 
 
 If you want to run some variation of our pre-configured examples, e.g. increasing the buget, you can do this in the command line - e.g. for smac on the MLP:
 
-´´´bash
+```bash
 python mlp.py -m --config-name=mlp_smac hydra.sweeper.n_trials=20
-´´´
+```
 
 You can see the key naming in the configuration files themselves. Obviously you can also make a new file with the settings you prefer - in fact we encourage you to try this out for yourself.
 
@@ -51,5 +51,4 @@ Usually, the most important files, however, will be the final config and runhist
 The runhistory contains all configurations with their budgets and performances so you can inspect the optimization process. 
 
 ## Post-Processing with DeepCave
-
 You can transfer the results to DeepCave fairly easily for further analysis. We prepared a notebook in this directory to demonstrate it and you should be able to use the same function for your future runs as well.

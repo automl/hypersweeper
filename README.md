@@ -39,3 +39,15 @@ The results are located in 'tmp', including a record of each run, the final conf
 - HEBO
 - PBT
 - CARP-S
+
+## Cite Us
+
+If you use Hypersweeper in your project, please cite us:
+
+```bibtex
+@misc{eimer24,
+  author    = {T. Eimer},
+  title     = {Hypersweeper},
+  year      = {2024},
+  url = {https://github.com/automl/hypersweeper},
+```
