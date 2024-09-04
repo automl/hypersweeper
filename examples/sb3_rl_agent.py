@@ -16,7 +16,7 @@ __license__ = "3-clause BSD"
 log = logging.getLogger(__name__)
 
 
-@hydra.main(config_path="configs", config_name="pbt_sb3_sac")
+@hydra.main(config_path="configs", config_name="sac_pbt")
 def train_sb3(cfg: DictConfig):
     log.info(OmegaConf.to_yaml(cfg))
 

@@ -43,7 +43,7 @@ dev = ["HyperSweeper[doc, tooling, test, examples]"]
 tooling = ["commitizen", "pre-commit", "ruff"]
 
 test = ["pytest", "pytest-coverage", "pytest-cases", "HyperSweeper[examples]"]
-examples = ["scikit-learn", "stable-baselines3"]
+examples = ["scikit-learn", "stable-baselines3", "deepcave"]
 doc = [
   "automl_sphinx_theme",
 ]

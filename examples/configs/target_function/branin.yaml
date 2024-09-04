@@ -1,0 +1,8 @@
+# @package _global_
+x0: 3
+x1: 4
+
+seed: None
+budget: None 
+
+spurious_var: 3.14

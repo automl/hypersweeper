@@ -373,7 +373,9 @@ class HypersweeperSweeper:
         performances = self.history["performances"]
         budgets = self.history["budgets"]
         iterations = self.history["iteration"]
-        keywords = ["run_id", "iteration", "budget", "performance"] + [str(k) for k in self.configspace.get_hyperparameter_names()]
+        keywords = ["run_id", "iteration", "budget", "performance"] + [
+            str(k) for k in self.configspace.get_hyperparameter_names()
+        ]
         with open(Path(self.output_dir) / "runhistory.csv", "a+") as f:
             f.write(f"{','.join(keywords)}\n")
             for i in range(len(configs)):

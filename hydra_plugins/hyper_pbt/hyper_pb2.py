@@ -20,7 +20,8 @@ log = logging.getLogger(__name__)
 
 
 class PB2(PBT):
-    """PB2: PBT but with a BO backend."""    
+    """PB2: PBT but with a BO backend."""
+
     def __init__(
         self,
         configspace,
@@ -34,7 +35,7 @@ class PB2(PBT):
         categorical_fixed=False,
         self_destruct=False,
         categorical_mutation="mix",
-        total_iterations=10
+        total_iterations=10,  # noqa: ARG002
     ):
         """PB2: PBT but with a BO backend.
         This implemtation covers the BO supported selection of both continuous and categorical hyperparameters.
@@ -126,7 +127,7 @@ class PB2(PBT):
             padding = np.array(
                 [[len(self.config_history) // self.population_size, performance] for _ in range(current_use.shape[0])]
             )
-            max_perf = min(min(self.performance_history[-self.population_size:]), performance)
+            max_perf = min(*self.performance_history[-self.population_size :], performance)
             padding = normalize(padding, [len(self.config_history) // self.population_size, max_perf])
             current_use = np.hstack((padding, current_use))  # [:, np.newaxis]))
             current_use[current_use <= 0] = 0.01
@@ -247,13 +248,13 @@ class PB2(PBT):
             self.cat_values = []
             for i in reversed(range(1000 // self.population_size)):
                 for j in range(self.population_size):
-                    t = len(self.performance_history)//self.population_size - i
+                    t = len(self.performance_history) // self.population_size - i
                     if t - i <= i:
                         continue
-                    p = self.performance_history[-i*j]
-                    ys.append(self.performance_history[-(i-1)*j] - self.performance_history[-i*j])
+                    p = self.performance_history[-i * j]
+                    ys.append(self.performance_history[-(i - 1) * j] - self.performance_history[-i * j])
                     tps.append([t, p])
-                    config = self.config_history[-j*i]
+                    config = self.config_history[-j * i]
                     cat = [
                         v
                         for v, n in zip(list(config.values()), list(config.keys()), strict=False)
@@ -261,7 +262,7 @@ class PB2(PBT):
                     ]
                     self.cat_values.append(cat)
             self.ys = np.array(ys)
-            self.fixed = normalize(tps, [len(self.performance_history//self.population_size), max(performances)])
+            self.fixed = normalize(tps, [len(self.performance_history // self.population_size), max(performances)])
             self.cat_current = []
             self.get_categoricals(configs[0])
             # Now filter data to user for the continuous variables
@@ -272,11 +273,11 @@ class PB2(PBT):
                 for j in range(iterations_run):
                     cvs = [
                         v
-                        for v, n in zip(config_data[i*j].values(), config_data[i*j].keys(), strict=False)
+                        for v, n in zip(config_data[i * j].values(), config_data[i * j].keys(), strict=False)
                         if n in self.categorical_hps
                     ]
                     if all(old == new for old, new in zip(cvs, self.cat_current[0], strict=False)):
-                        to_keep.append(j*i)
+                        to_keep.append(j * i)
             performance_data = [performance_data[i] for i in to_keep]
             config_data = [config_data[i] for i in to_keep]
         else:
@@ -290,13 +291,13 @@ class PB2(PBT):
         ys = []
         for i in reversed(range(1000 // self.population_size)):
             for j in range(self.population_size):
-                t = len(performance_data)//self.population_size - i
+                t = len(performance_data) // self.population_size - i
                 if t <= 0:
                     continue
                 ts.append(t)
-                p = performance_data[-i*j]
-                ys.append(performance_data[-(i-1)*j] - p)
-                config = config_data[-j*i]
+                p = performance_data[-i * j]
+                ys.append(performance_data[-(i - 1) * j] - p)
+                config = config_data[-j * i]
                 hps = [
                     v
                     for v, n in zip(list(config.values()), list(config.keys()), strict=False)
@@ -329,8 +330,8 @@ class PB2(PBT):
         if min(self.y) != max(self.y):
             self.y = normalize(self.y, [min(self.y), max(self.y)])
 
-        max_perf = min(min(self.performance_history[-self.population_size:]), *performances)
-        min_perf = max(max(self.performance_history[-self.population_size:]), *performances)
+        max_perf = min(*self.performance_history[-self.population_size :], *performances)
+        min_perf = max(*self.performance_history[-self.population_size :], *performances)
         self.ts = normalize(self.ts, [0, len(config_data) // self.population_size])
         ps = normalize(ps, [min_perf, max_perf])
         self.fixed = np.array([[t, p] for t, p in zip(self.ts, ps, strict=False)])

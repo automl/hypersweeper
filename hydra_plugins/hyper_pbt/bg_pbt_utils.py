@@ -1,4 +1,4 @@
-# # All of this is copied/lightly adapted from the original BG-PBT code: https://github.com/xingchenwan/bgpbt
+"""All of this is copied/lightly adapted from the original BG-PBT code: https://github.com/xingchenwan/bgpbt."""
 # from __future__ import annotations
 
 # import logging

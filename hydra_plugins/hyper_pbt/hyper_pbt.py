@@ -13,6 +13,7 @@ from hydra_plugins.hypersweeper import Info
 
 class PBT:
     """Population Based Training optimizer."""
+
     def __init__(
         self,
         configspace,
@@ -120,10 +121,12 @@ class PBT:
         if population_id in worst_config_ids:
             load_agent = self.rng.choice(best_config_ids)
         load_path = f"iteration_{self.iteration-1}_id_{load_agent}"
-        new_config = self.perturb_hps(last_config, performance=last_performance, is_good=population_id in best_config_ids)
+        new_config = self.perturb_hps(
+            last_config, performance=last_performance, is_good=population_id in best_config_ids
+        )
         return new_config, load_path
 
-    def perturb_hps(self, config, performance=None, is_good=None):
+    def perturb_hps(self, config, performance=None, is_good=None):  # noqa: ARG002
         """Perturb the hyperparameters."""
         for name in self.continuous_hps:
             hp = self.configspace.get_hyperparameter(name)

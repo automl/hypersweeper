@@ -1,0 +1,35 @@
+hyperparameters:
+  n_layer:
+    type: uniform_int
+    lower: 1
+    upper: 5
+    default: ${n_layer}
+  n_neurons:
+    type: uniform_int
+    lower: 8
+    upper: 1024
+    log: true
+    default_value: ${n_neurons}
+  activation:
+    type: categorical
+    choices: [ logistic, tanh, relu ]
+    default_value: ${activation}
+  solver:
+    type: categorical
+    choices: [ lbfgs, sgd, adam ]
+    default_value: ${solver}
+  batch_size:
+    type: uniform_int
+    lower: 30
+    upper: 300
+    default_value: ${batch_size}
+  learning_rate:
+    type: categorical
+    choices: [ constant, invscaling, adaptive ]
+    default_value: ${learning_rate}
+  learning_rate_init:
+    type: uniform_float
+    lower: 0.0001
+    upper: 1
+    default_value: ${learning_rate_init}
+    log: true

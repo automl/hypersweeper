@@ -1,0 +1,33 @@
+
+defaults:
+  - _self_
+  - target_function: mlp
+  - search_space: mlp
+  - override hydra/sweeper: HyperSMAC
+
+hydra:
+  sweeper:
+    n_trials: 10
+    budget_variable: epochs
+    sweeper_kwargs:
+      optimizer_kwargs:
+        smac_facade: 
+          _target_: smac.facade.multi_fidelity_facade.MultiFidelityFacade
+          _partial_: true
+        intensifier: 
+          _target_: smac.facade.multi_fidelity_facade.MultiFidelityFacade.get_intensifier
+          _partial_: true
+          eta: 3
+        scenario:
+          n_trials: ${hydra.sweeper.n_trials}
+          seed: ${seed}
+          min_budget: 5
+          max_budget: 50
+          deterministic: true
+          n_workers: 1
+          output_directory: ${hydra.sweep.dir}
+    search_space: ${search_space}
+  run:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
