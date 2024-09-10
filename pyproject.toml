@@ -8,17 +8,18 @@ dependencies = [
   "pytest>=7.0",
   "coverage",
   "ruff",
-  "hydra-core",
+  "hydra-core~=1.3.2",
   "hydra-submitit-launcher",
   "hydra_colorlog",
   "mypy",
   "tox==3.14.0",
-  "twine",
+  "twine~=5.1.1",
   "bump-my-version",
-  "configspace",
-  "numpy",
+  "configspace~=1.2.0",
+  "numpy~=1.24.4",
   "wandb==0.16.6",
-  "smac>=2.1"
+  "smac>=2.1",
+  "pandas~=2.1.0"
 ]
 
 requires-python = ">=3.10"
@@ -54,6 +55,10 @@ dehb = ["dehb==0.1.1"]
 pbt = ["GPy"]
 carps = ["carps[dehb,hebo,nevergrad,optuna,skopt,smac,synetune]"]
 all = ["HyperSweeper[hebo,nevergrad,dehb,pbt,carps]"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 # https://docs.pytest.org/en/7.2.x/reference/reference.html#ini-options-ref
 [tool.pytest.ini_options]
