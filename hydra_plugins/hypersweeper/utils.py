@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-import ConfigSpace as CS  # noqa: N817
+import ConfigSpace as CS
 import numpy as np
 import pandas as pd
 from ConfigSpace import Configuration, ConfigurationSpace

@@ -1,13 +1,7 @@
 from __future__ import annotations
 
-from copy import deepcopy
-
 from ConfigSpace import Categorical, ConfigurationSpace, Float, Integer
-from hydra.utils import instantiate
 from omegaconf import OmegaConf
-
-from hydra_plugins.hyper_smac.hyper_smac import make_smac
-from hydra_plugins.hypersweeper.utils import Info, Result
 
 BBO_CONFIG = {
     "smac_facade": OmegaConf.create(

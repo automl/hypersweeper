@@ -538,7 +538,7 @@ def exp3_get_cat(row, data, num_rounds, index):
         sum_w = np.sum(weights)
         weights = [w / sum_w for w in weights]
 
-        count += 1  # noqa: SIM113
+        count += 1
 
     # now we select our arm!
 
