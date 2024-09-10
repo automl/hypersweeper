@@ -18,7 +18,7 @@ dependencies = [
   "configspace~=1.2.0",
   "numpy~=1.24.4",
   "wandb==0.16.6",
-  "smac>=2.1",
+  "smac~=2.1",
   "pandas~=2.1.0"
 ]
 
