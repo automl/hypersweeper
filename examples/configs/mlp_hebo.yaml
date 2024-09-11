@@ -1,0 +1,16 @@
+
+defaults:
+  - _self_
+  - target_function: mlp
+  - search_space: mlp_no_conditions
+  - override hydra/sweeper: HyperHEBO
+  
+
+hydra:
+  sweeper:
+    n_trials: 10
+    search_space: ${search_space}
+  run:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}

@@ -184,7 +184,7 @@ class HypersweeperSweeper:
                 config=wandb_config,
             )
 
-    def run_configs(self, infos):  # noqa: PLR0912
+    def run_configs(self, infos):
         """Run a set of overrides.
 
         Parameters
@@ -409,7 +409,7 @@ class HypersweeperSweeper:
                 stats[f"incumbent_{n}"] = best_config.get(n)
             wandb.log(stats)
 
-    def run(self, verbose=False):  # noqa: PLR0912
+    def run(self, verbose=False):
         """Actual optimization loop.
         In each iteration:
         - get configs (either randomly upon init or through perturbation)

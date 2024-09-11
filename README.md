@@ -12,7 +12,20 @@ Hydra sweeper integration of our favorite optimization packages, utilizing ask-a
 - Documentation: https://automl.github.io/hypersweeper
 
 ## Installation 
-We recommend installing hypersweeper in a fresh conda environment:
+We recommend installing hypersweeper via a uv virtual environment:
+
+```bash
+pip install uv
+uv init
+uv sync
+```
+
+For extra dependencies, add them to the sync command like this:
+```bash
+uv sync --extra dev --extra carps
+```
+
+Alternatively you can also install in a fresh conda environment:
 
 ```bash
 conda create -n hypersweeper python=3.10
@@ -32,10 +45,23 @@ python examples/branin.py -m
 ```
 You should see the launched configurations in the terminal. 
 The results are located in 'tmp', including a record of each run, the final config and a full runhistory.
+For more information, see our example ReadMe.
 
 ## Current Sweeper Integrations
 - Random Search
 - SMAC
 - HEBO
 - PBT
-- CARP-S
+- CARP-S (whcih contains many different optimizers in itself)
+
+## Cite Us
+
+If you use Hypersweeper in your project, please cite us:
+
+```bibtex
+@misc{eimer24,
+  author    = {T. Eimer},
+  title     = {Hypersweeper},
+  year      = {2024},
+  url = {https://github.com/automl/hypersweeper},
+```

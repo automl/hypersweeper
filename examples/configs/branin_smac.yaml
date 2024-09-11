@@ -1,6 +1,8 @@
 
 defaults:
   - _self_
+  - target_function: branin
+  - search_space: branin
   - override hydra/sweeper: HyperSMAC
 
 hydra:
@@ -20,28 +22,8 @@ hydra:
           deterministic: true
           n_workers: 4
           output_directory: ${hydra.sweep.dir}
-    search_space:
-      hyperparameters:
-        x0:
-          type: uniform_float
-          lower: -5
-          upper: 10
-          log: false
-        x1:
-          type: uniform_float
-          lower: 0
-          upper: 15
-          log: false
-          default_value: 2
+    search_space: ${search_space}
   run:
     dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
   sweep:
     dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
-
-x0: 3
-x1: 4
-
-seed: None
-budget: None 
-
-spurious_var: 3.14

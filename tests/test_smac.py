@@ -62,8 +62,7 @@ DEFAULT_CONFIG_SPACE = ConfigurationSpace(
 #     def setup(self, mf=False):
 #         configspace = DEFAULT_CONFIG_SPACE
 #         hyper_smac_args = deepcopy(BBO_CONFIG) if not mf else deepcopy(MF_CONFIG)
-#         hyper_smac_args["intensifier"] =
-#                instantiate(hyper_smac_args["intensifier"]) if mf else None
+#         hyper_smac_args["intensifier"] = instantiate(hyper_smac_args["intensifier"]) if mf else None
 #         hyper_smac_args["smac_facade"] = instantiate(hyper_smac_args["smac_facade"])
 #         return make_smac(configspace, hyper_smac_args)
 

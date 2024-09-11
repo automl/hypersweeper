@@ -1,0 +1,25 @@
+
+defaults:
+  - _self_
+  - target_function: mlp
+  - search_space: mlp_no_conditions
+  - override hydra/sweeper: HyperDEHB
+
+hydra:
+  sweeper:
+    n_trials: 10
+    budget_variable: epochs
+    sweeper_kwargs:
+      max_parallelization: 0.1
+      optimizer_kwargs:
+          _target_: dehb.DEHB
+          _partial_: true
+          n_workers: 1
+          min_fidelity: 1
+          max_fidelity: 10
+          output_path: ${hydra.sweep.dir}
+    search_space: ${search_space}
+  run:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}

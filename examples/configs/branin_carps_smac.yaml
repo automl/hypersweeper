@@ -1,0 +1,45 @@
+
+defaults:
+  - _self_
+  - carps_task: branin
+  - search_space: branin
+  - override hydra/sweeper: HyperCARPS
+  
+
+x0: 3
+x1: 4
+
+seed: None
+budget: None 
+
+spurious_var: 3.14
+
+hydra:
+  sweeper:
+    n_trials: ${carps_task.n_trials}
+    search_space: ${search_space}
+    sweeper_kwargs:
+      optimizer_kwargs:
+        _target_: carps.optimizers.smac20.SMAC3Optimizer
+        _partial_: true
+        task: ${carps_task}
+        smac_cfg:
+          smac_class: smac.facade.multi_fidelity_facade.MultiFidelityFacade
+          scenario:
+            seed: 0
+            n_trials: ${carps_task.n_trials}
+            deterministic: true
+            n_workers: 1
+            min_budget: 1
+            max_budget: 10
+            output_directory: ${hydra.sweep.dir}
+          smac_kwargs:
+            dask_client: null
+            intensifier:
+              _target_: smac.intensifier.hyperband.Hyperband
+              _partial_: true
+              eta: 3
+  run:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
