@@ -18,8 +18,9 @@ class Info:
 
     config: dict
     budget: float
-    load_path: str = None
-    seed: int = None
+    config_id: str | None = None
+    load_path: str | None = None
+    seed: int | None = None
 
 
 @dataclass
@@ -81,7 +82,7 @@ def convert_to_configuration(x: pd.Series, configspace: ConfigurationSpace) -> C
     return Configuration(configuration_space=configspace, values=hp_config)
 
 
-def read_warmstart_data(warmstart_filename: str, search_space: DictConfig) -> list[tuple[Info, Result]]:
+def read_warmstart_data(warmstart_filename: str, search_space: ConfigurationSpace) -> list[tuple[Info, Result]]:
     """Read initial design / warmstart data from csv-logfile.
 
     Parameters
