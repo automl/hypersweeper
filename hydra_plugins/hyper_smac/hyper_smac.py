@@ -11,10 +11,9 @@ from omegaconf import DictConfig, OmegaConf
 from smac import Scenario
 from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
-from hydra_plugins.hypersweeper import Info
 from hydra_plugins.hypersweeper.search_space_encoding import \
     search_space_to_config_space
-from hydra_plugins.hypersweeper.utils import convert_to_configuration
+from hydra_plugins.hypersweeper.utils import Info, convert_to_configuration
 
 if TYPE_CHECKING:
     from ConfigSpace import Configuration
