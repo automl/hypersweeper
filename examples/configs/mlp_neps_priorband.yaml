@@ -21,7 +21,7 @@ hydra:
     budget_variable: epochs
     sweeper_kwargs:
       job_array_size_limit: 1
-      seeds: [0, 1, 2]
+      #seeds: [0, 1, 2]
       optimizer_kwargs:
         fidelity_variable: ${hydra.sweeper.budget_variable}
         min_budget: 5
