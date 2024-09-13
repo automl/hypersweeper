@@ -472,7 +472,7 @@ class HypersweeperSweeper:
                 if self.seeds:
                     performance = float(np.mean(performance))
                 
-                    logged_performance = -performance if self.maximize else performance
+                logged_performance = -performance if self.maximize else performance
 
                 value = Result(performance=logged_performance, cost=cost)
                 self.optimizer.tell(info=info, value=value)
