@@ -446,11 +446,6 @@ class HypersweeperSweeper:
             terminate = False
             while t < self.max_parallel and not terminate and not trial_termination and not budget_termination:
                 info, terminate = self.optimizer.ask()
-
-                # If the first config has a config ID > 0, we have to set the initial job index
-                # if self.job_idx == 0 and info.config_id and info.config_id > 0:
-                #     self.job_idx = info.config_id
-
                 configs.append(info.config)
                 t += 1
                 if info.budget is not None:
