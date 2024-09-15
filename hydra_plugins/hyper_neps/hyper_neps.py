@@ -10,6 +10,8 @@ from neps.runtime import Trial
 import time
 from pathlib import Path
 import math
+import numpy as np
+import random
 
 
 if (spec := importlib.util.find_spec("neps")) is not None:
@@ -84,6 +86,10 @@ class HyperNEPS:
 
 def make_neps(configspace, hyper_neps_args):
     """Make a NEPS instance for optimization."""
+    # important for NePS optimizers
+    random.seed(hyper_neps_args["seed"])  
+    np.random.seed(hyper_neps_args["seed"])
+
     dict_search_space = get_dict_from_configspace(configspace)
 
     dict_search_space[hyper_neps_args["fidelity_variable"]] = neps.IntegerParameter(

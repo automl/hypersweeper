@@ -14,6 +14,7 @@ activation: tanh
 
 seed: 42
 epochs: 10  # Default number of epochs
+neps_seed: 0
 
 hydra:
   sweeper:
@@ -26,6 +27,7 @@ hydra:
         fidelity_variable: ${hydra.sweeper.budget_variable}
         min_budget: 5
         max_budget: 50
+        seed: ${neps_seed}
         optimizer:
           _target_: neps.optimizers.multi_fidelity_prior.priorband.PriorBand
           _partial_: true
@@ -42,6 +44,7 @@ hydra:
           inc_mutation_std: 0.25
           inc_style: dynamic
     search_space:
+      seed: ${neps_seed}
       hyperparameters:
         n_layer:
           type: uniform_int
