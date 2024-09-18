@@ -14,7 +14,6 @@ import pandas as pd
 import wandb
 from ConfigSpace import Configuration, ConfigurationSpace
 from hydra.plugins.launcher import Launcher
-from hydra_plugins.hyper_smac.hyper_smac import HyperSMACAdapter
 from hydra.utils import to_absolute_path
 from omegaconf import DictConfig, OmegaConf
 
@@ -170,7 +169,6 @@ class HypersweeperSweeper:
         self.warmstart_data: list[tuple[Info, Result]] = []
 
         if warmstart_file:
-            assert not isinstance(self.optimizer, HyperSMACAdapter), "Default performance and budget can only be used with HyperSMAC."
             self.warmstart_data = read_warmstart_data(warmstart_filename=warmstart_file, search_space=self.configspace)
 
         self.wandb_project = wandb_project
