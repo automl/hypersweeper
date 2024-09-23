@@ -132,7 +132,7 @@ class HypersweeperSweeper:
             for i in range(len(self.global_overrides)):
                 if self.global_overrides[i].split("=")[0] == "seed":
                     self.global_overrides = (
-                        self.global_overrides[:i] + self.global_overrides[i + 1 :]
+                        self.global_overrides[:i] + self.global_overrides[i + 1:]
                     )
                     break
 
@@ -165,7 +165,8 @@ class HypersweeperSweeper:
 
         if warmstart_file:
             self.warmstart = True
-            self.warmstart_data = read_warmstart_data(warmstart_filename=warmstart_file, search_space=self.configspace)
+            self.warmstart_data = read_warmstart_data(warmstart_filename=warmstart_file,
+                                                      search_space=self.configspace)
         else:
             self.warmstart = False
 
@@ -218,7 +219,8 @@ class HypersweeperSweeper:
             if self.budget_arg_name is not None:
                 values += [infos[i].budget]
             if self.load_tf and self.iteration > 0:
-                values += [Path(self.checkpoint_dir) / f"{str(infos[i].load_path)}{self.checkpoint_path_typing}"]
+                values += [Path(
+                    self.checkpoint_dir) / f"{str(infos[i].load_path)}{self.checkpoint_path_typing}"]
 
             if self.slurm:
                 names += ["hydra.launcher.timeout_min"]
@@ -284,7 +286,6 @@ class HypersweeperSweeper:
             for f in failed:
                 log.error(f"Job failed with exception: {f.return_value[1]}")
 
-
         performances = []
         if self.seeds and self.deterministic:
             for j in range(len(overrides) // len(self.seeds)):
@@ -292,13 +293,16 @@ class HypersweeperSweeper:
                     np.mean(
                         [res[j * k + k].return_value[0] for k in range(len(self.seeds))
                          if res[j * k + k].status == JobStatus.COMPLETED]
-                    ) # fixme: this will need a fix for nan values and appropriate logging
+                    )  # fixme: this will need a fix for nan values and appropriate logging
                 )
                 self.trials_run += 1
         else:
             for j in range(len(overrides)):
-                performances.append(res[j].return_value if res[j].status == JobStatus.COMPLETED else
-                                    float("nan"))
+                performances.append(
+                    res[j].return_value[0]
+                    if res[j].status == JobStatus.COMPLETED
+                    else float("nan")
+                )
 
                 self.trials_run += 1
         if self.maximize:
@@ -315,16 +319,18 @@ class HypersweeperSweeper:
         """
         if self.seeds:
             save_path = (
-                        Path(self.checkpoint_dir)
-                        / f"iteration_{self.iteration}_id_{id}_s{seed}{self.checkpoint_path_typing}"  # noqa:E501
-                    )
+                Path(self.checkpoint_dir)
+                / f"iteration_{self.iteration}_id_{id}_s{seed}{self.checkpoint_path_typing}"
+                # noqa:E501
+            )
         elif not self.deterministic:
             save_path = (
-                    Path(self.checkpoint_dir)
-                    / f"iteration_{self.iteration}_id_{id}{self.checkpoint_path_typing}"
-                )
+                Path(self.checkpoint_dir)
+                / f"iteration_{self.iteration}_id_{id}{self.checkpoint_path_typing}"
+            )
         else:
-            save_path = Path(self.checkpoint_dir) / f"iteration_{self.iteration}_id_{id}{self.checkpoint_path_typing}"
+            save_path = Path(
+                self.checkpoint_dir) / f"iteration_{self.iteration}_id_{id}{self.checkpoint_path_typing}"
         return save_path
 
     def get_incumbent(self):
@@ -400,7 +406,8 @@ class HypersweeperSweeper:
         configs = [c.get_dictionary() for c in self.history["configs"]]
         performances = self.history["performances"]
         budgets = self.history["budgets"]
-        keywords = ["run_id", "budget", "performance"] + [str(k) for k in self.configspace.get_hyperparameter_names()]
+        keywords = ["run_id", "budget", "performance"] + [str(k) for k in
+                                                          self.configspace.get_hyperparameter_names()]
         with open(Path(self.output_dir) / "runhistory.csv", "w") as f:
             f.write(f"{','.join(keywords)}\n")
             for i in range(len(configs)):
@@ -492,7 +499,8 @@ class HypersweeperSweeper:
                 log.info(f"Finished Iteration {self.iteration}!")
                 _, inc_performance = self.get_incumbent()
                 log.info(
-                    f"Current incumbent has a performance of {np.round(inc_performance, decimals=2)}."  # noqa:E501
+                    f"Current incumbent has a performance of {np.round(inc_performance, decimals=2)}."
+                    # noqa:E501
                 )
             self._save_incumbent()
             self.write_history()
@@ -504,7 +512,8 @@ class HypersweeperSweeper:
         if verbose:
             log.info(
                 f"Finished Sweep! Total duration was {np.round(total_time, decimals=2)}s, \
-                    incumbent had a performance of {np.round(inc_performance, decimals=2)}"  # noqa:E501
+                    incumbent had a performance of {np.round(inc_performance, decimals=2)}"
+                # noqa:E501
             )
             log.info(f"The incumbent configuration is {inc_config}")
         return self.incumbent
