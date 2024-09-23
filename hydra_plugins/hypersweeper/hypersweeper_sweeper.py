@@ -451,7 +451,6 @@ class HypersweeperSweeper:
             if self.seeds and self.deterministic:
                 seeds = np.zeros(len(performances))
             for info, performance, cost in zip(infos, performances, costs, strict=True):
-                logged_performance = -performance if self.maximize else performance
                 value = Result(performance=logged_performance, cost=cost)
                 self.optimizer.tell(info=info, value=value)
             self.record_iteration(performances, configs, budgets)
