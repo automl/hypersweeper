@@ -52,7 +52,7 @@ For more information, see our example ReadMe.
 - SMAC
 - HEBO
 - PBT
-- CARP-S (whcih contains many different optimizers in itself)
+- CARP-S (which contains many different optimizers in itself)
 
 ## Cite Us
 
