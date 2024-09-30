@@ -123,8 +123,8 @@ def get_start_point(cs: CS.ConfigurationSpace, x_center, frozen_dims: list[int] 
         # print(param_name)
         if np.isnan(new_config_array[i]) or (frozen_dims is not None and i in frozen_dims):
             continue
-        param_name = cs.get_hyperparameter_by_idx(i)
-        if type(cs[param_name]) == CSH.CategoricalHyperparameter:
+        param_name = cs.at(i)
+        if isinstance(cs[param_name], CSH.CategoricalHyperparameter):
             new_config_array[i] = rng.choice(range(len(cs[param_name].choices)))
         elif (
             type(cs[param_name]) in [CSH.UniformIntegerHyperparameter, CSH.NormalIntegerHyperparameter]
@@ -140,9 +140,9 @@ def get_start_point(cs: CS.ConfigurationSpace, x_center, frozen_dims: list[int] 
     config = deactivate_inactive_hyperparameters(config, cs)
 
     try:
-        cs.check_configuration(config)
+        config.check_valid_configuration()
     except ValueError:
-        config = CS.Configuration(cs, config.get_dictionary())
+        config = CS.Configuration(cs, dict(config))
     new_config_array = config.get_array()
     if return_config:
         return new_config_array, config
@@ -171,20 +171,20 @@ def construct_bounding_box(
         if np.isnan(_dim) or i >= len(cs):
             lb[i], ub[i] = 0.0, 1.0
         else:
-            hp = cs[cs.get_hyperparameter_by_idx(i)]
-            if type(hp) == CSH.CategoricalHyperparameter:
+            hp = cs[cs.at(i)]
+            if isinstance(hp, CSH.CategoricalHyperparameter):
                 lb[i], ub[i] = 0, len(hp.choices)
             else:
                 lb[i] = np.clip(_dim - weights[i] * tr_length / 2.0, 0.0, 1.0)
                 ub[i] = np.clip(_dim + weights[i] * tr_length / 2.0, 0.0, 1.0)
-                if type(hp) in [
-                    CSH.UniformIntegerHyperparameter,
-                    CSH.NormalIntegerHyperparameter,
-                    CSH.NormalFloatHyperparameter,
-                    CSH.UniformFloatHyperparameter,
+                if any[
+                    isinstance(hp, CSH.UniformIntegerHyperparameter),
+                    isinstance(hp, CSH.NormalIntegerHyperparameter),
+                    isinstance(hp, CSH.NormalFloatHyperparameter),
+                    isinstance(hp, CSH.UniformFloatHyperparameter),
                 ]:
-                    lb[i] = max(hp._inverse_transform(hp.lower), lb[i])
-                    ub[i] = min(hp._inverse_transform(hp.upper), ub[i])
+                    lb[i] = max(hp.to_vector(hp.lower), lb[i])
+                    ub[i] = min(hp.to_vector(hp.upper), ub[i])
     return lb, ub
 
 
@@ -200,20 +200,20 @@ def get_dim_info(cs: CS.ConfigurationSpace, x, return_indices=False):
         # do not sample an inactivated hyperparameter (such a hyperparameter has nan value imputed)
         if x[variable] != x[variable]:
             continue
-        if type(cs[cs.get_hyperparameter_by_idx(variable)]) == CSH.CategoricalHyperparameter:
-            cat_dims.append(cs.get_hyperparameter_by_idx(variable))
+        if isinstance(cs[cs.at(variable)], CSH.CategoricalHyperparameter):
+            cat_dims.append(cs.at(variable))
             cat_dims_idx.append(i)
-        elif type(cs[cs.get_hyperparameter_by_idx(variable)]) in [
+        elif type(cs[cs.at(variable)]) in [
             CSH.UniformIntegerHyperparameter,
             CSH.NormalIntegerHyperparameter,
         ]:
-            int_dims.append(cs.get_hyperparameter_by_idx(variable))
+            int_dims.append(cs.at(variable))
             int_dims_idx.append(i)
-        elif type(cs[cs.get_hyperparameter_by_idx(variable)]) in [
+        elif type(cs[cs.at(variable)]) in [
             CSH.UniformFloatHyperparameter,
             CSH.NormalFloatHyperparameter,
         ]:
-            cont_dims.append(cs.get_hyperparameter_by_idx(variable))
+            cont_dims.append(cs.at(variable))
             cont_dims_idx.append(i)
     if return_indices:
         return cat_dims_idx, cont_dims_idx, int_dims_idx
@@ -239,21 +239,21 @@ def sample_discrete_neighbour(cs: CS.ConfigurationSpace, x, frozen_dims: list[in
     config = CS.Configuration(cs, vector=x.detach().numpy() if isinstance(x, torch.Tensor) else x)
 
     try:
-        cs.check_configuration(config)
+        config.check_valid_configuration()
     except ValueError:
         # there seems to be a bug with ConfigSpace that raises error even when a config is valid
         # Issue #196: https://github.com/automl/ConfigSpace/issues/196
         # print(config)
-        config = CS.Configuration(cs, config.get_dictionary())
+        config = CS.Configuration(cs, dict(config))
 
     # print(config)
     config_pert = deepcopy(config)
     rng = np.random.default_rng()
     selected_dim = str(rng.choice(cat_dims + int_dims, 1)[0])
-    index_in_array = cs.get_idx_by_hyperparameter_name(selected_dim)
+    index_in_array = cs.index_of(selected_dim)
     while config_pert[selected_dim] is None or (frozen_dims is not None and index_in_array in frozen_dims):
         selected_dim = str(rng.choice(cat_dims + int_dims, 1)[0])
-        index_in_array = cs.get_idx_by_hyperparameter_name(selected_dim)
+        index_in_array = cs.index_of(selected_dim)
 
     # if the selected dimension is categorical, change the value to another variable
     if selected_dim in cat_dims:
@@ -630,12 +630,10 @@ class CasmoKernel(gpytorch.kernels.Kernel):
         # extract the dim indices of the continuous dimensions (incl. integers)
         self.cont_dims = [
             i
-            for i, dim in enumerate(self.cs.get_hyperparameters())
+            for i, dim in enumerate(self.cs.values())
             if type(dim) in [CSH.UniformIntegerHyperparameter, CSH.UniformFloatHyperparameter]
         ]
-        self.cat_dims = [
-            i for i, dim in enumerate(self.cs.get_hyperparameters()) if type(dim) == CSH.CategoricalHyperparameter
-        ]
+        self.cat_dims = [i for i, dim in enumerate(self.cs.values()) if isinstance(dim, CSH.CategoricalHyperparameter)]
 
         # initialise the kernels
         self.continuous_kern = ConditionalMatern(

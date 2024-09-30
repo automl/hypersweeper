@@ -122,7 +122,7 @@ def search_space_to_config_space(search_space: str | DictConfig) -> Configuratio
 
         jason_string = json.dumps(search_space, cls=JSONCfgEncoder)
         cs = csjson.read(jason_string)
-    elif type(search_space) == ConfigurationSpace:
+    elif isinstance(search_space, ConfigurationSpace):
         cs = search_space
     else:
         raise ValueError(f"search_space must be of type str or DictConfig. Got {type(search_space)}.")
