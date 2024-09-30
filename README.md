@@ -16,20 +16,13 @@ We recommend installing hypersweeper via a uv virtual environment:
 
 ```bash
 pip install uv
-uv init
-uv sync
+uv venv --python 3.10
+make install
 ```
 
-For extra dependencies, add them to the sync command like this:
+For extra dependencies, add them like this:
 ```bash
 uv sync --extra dev --extra carps
-```
-
-Alternatively you can also install in a fresh conda environment:
-
-```bash
-conda create -n hypersweeper python=3.10
-make install
 ```
 
 ## Basic Usage

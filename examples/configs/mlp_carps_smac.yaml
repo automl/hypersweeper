@@ -35,6 +35,6 @@ hydra:
               eta: 3
     search_space: ${search_space}
   run:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/mlp_carps_smac/
   sweep:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/mlp_carps_smac/

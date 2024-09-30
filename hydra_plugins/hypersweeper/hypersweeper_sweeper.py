@@ -271,8 +271,6 @@ class HypersweeperSweeper:
             for j in range(len(overrides)):
                 performances.append(res[j].return_value)
                 self.trials_run += 1
-        if self.maximize:
-            performances = [-p for p in performances]
         return performances, costs
 
     def get_save_path(self, config_id, seed=None):
@@ -308,7 +306,10 @@ class HypersweeperSweeper:
         Float
             Best performance value
         """
-        best_current_id = np.argmin(self.history["performances"])
+        if self.maximize:
+            best_current_id = np.argmax(self.history["performances"])
+        else:
+            best_current_id = np.argmin(self.history["performances"])
         inc_performance = self.history["performances"][best_current_id]
         inc_config = self.history["configs"][best_current_id]
         return inc_config, inc_performance
@@ -381,7 +382,7 @@ class HypersweeperSweeper:
             for i in range(len(configs)):
                 current_config = configs[i]
                 line = []
-                for k in keywords[3:]:
+                for k in keywords[4:]:
                     if k in current_config:
                         line.append(current_config[k])
                     elif k in self.global_overrides:
@@ -451,6 +452,7 @@ class HypersweeperSweeper:
             if self.seeds and self.deterministic:
                 seeds = np.zeros(len(performances))
             for info, performance, cost in zip(infos, performances, costs, strict=True):
+                logged_performance = performance if not self.maximize else -performance
                 value = Result(performance=logged_performance, cost=cost)
                 self.optimizer.tell(info=info, value=value)
             self.record_iteration(performances, configs, budgets)

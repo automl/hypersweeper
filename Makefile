@@ -33,7 +33,6 @@ clean-build: ## remove build artifacts
 	rm -fr dist/
 	rm -fr .eggs/
 	find . -name '*.egg-info' -exec rm -fr {} +
-	find . -name '*.egg' -exec rm -f {} +
 
 clean-pyc: ## remove Python file artifacts
 	find . -name '*.pyc' -exec rm -f {} +
@@ -51,11 +50,11 @@ clean-docs: ## remove docs artifacts
 	cd docs && make clean
 
 ruff: ## run ruff as a formatter
-	python -m ruff format hydra_plugins
-	python -m ruff check --silent --exit-zero --no-cache --fix hydra_plugins
-	python -m ruff check --exit-zero hydra_plugins
+	uvx ruff format hydra_plugins
+	uvx ruff check --silent --exit-zero --no-cache --fix hydra_plugins
+	uvx ruff check --exit-zero hydra_plugins
 isort:
-	python -m isort hydra_plugins tests
+	uvx isort hydra_plugins tests
 
 test: ## run tests quickly with the default Python
 	python -m pytest tests
@@ -99,13 +98,13 @@ dist: clean ## builds source and wheel package
 	python setup.py bdist_wheel
 	ls -l dist
 install: clean ## install the package to the active Python's site-packages
-	pip install -e . --config-settings editable_mode=compat
+	uv pip install -e . --config-settings editable_mode=compat
 
 install-dev: clean ## install the package to the active Python's site-packages
-	pip install -e ".[dev,examples,doc,all]" --config-settings editable_mode=compat
+	uv pip install -e ".[dev,examples,doc,all]" --config-settings editable_mode=compat
 
 check:
-	pre-commit run --all-files
+	uvx pre-commit run --all-files
 
 format:
 	make ruff

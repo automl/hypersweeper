@@ -20,6 +20,6 @@ hydra:
       load_tf: true
     search_space: ${search_space}
   run:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/sac_pb2/
   sweep:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/sac_pb2/

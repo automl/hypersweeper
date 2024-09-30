@@ -1,4 +1,5 @@
 """All of this is copied/lightly adapted from the original BG-PBT code: https://github.com/xingchenwan/bgpbt."""
+
 from __future__ import annotations
 
 import logging
@@ -167,15 +168,15 @@ def construct_bounding_box(
     weights = weights / np.prod(np.power(weights, 1.0 / len(weights)))
     lb, ub = np.zeros_like(x), np.ones_like(x)
     for i, _dim in enumerate(x):
-        if np.isnan(x[i]) or i >= len(cs):
+        if np.isnan(_dim) or i >= len(cs):
             lb[i], ub[i] = 0.0, 1.0
         else:
             hp = cs[cs.get_hyperparameter_by_idx(i)]
             if type(hp) == CSH.CategoricalHyperparameter:
                 lb[i], ub[i] = 0, len(hp.choices)
             else:
-                lb[i] = np.clip(x[i] - weights[i] * tr_length / 2.0, 0.0, 1.0)
-                ub[i] = np.clip(x[i] + weights[i] * tr_length / 2.0, 0.0, 1.0)
+                lb[i] = np.clip(_dim - weights[i] * tr_length / 2.0, 0.0, 1.0)
+                ub[i] = np.clip(_dim + weights[i] * tr_length / 2.0, 0.0, 1.0)
                 if type(hp) in [
                     CSH.UniformIntegerHyperparameter,
                     CSH.NormalIntegerHyperparameter,
@@ -794,7 +795,7 @@ class ExpCategoricalOverlap(CategoricalOverlap):
             if exp == "rbf":
                 k_cat = rbf(diff1, self.ard_num_dims is not None and self.ard_num_dims > 1)
             else:
-                raise ValueError("Exponentiation scheme %s is not recognised!" % exp)
+                raise ValueError(f"Exponentiation scheme {exp} is not recognised!")
             if diag:
                 return torch.diag(k_cat).float()
         return k_cat.float()

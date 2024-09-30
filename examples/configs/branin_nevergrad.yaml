@@ -17,6 +17,6 @@ hydra:
           budget: 100
     search_space: ${search_space}
   run:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/branin_nevergrad/
   sweep:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/branin_nevergrad/
