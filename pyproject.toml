@@ -40,7 +40,7 @@ classifiers = [
 license = { file = "LICENSE" }
 
 [project.optional-dependencies]
-dev = ["HyperSweeper[doc, tooling, test, examples]"]
+dev = ["HyperSweeper[doc, tooling, test]"]
 tooling = ["commitizen", "pre-commit", "ruff"]
 
 test = ["pytest", "pytest-coverage", "pytest-cases", "HyperSweeper[examples]"]
