@@ -312,7 +312,10 @@ class HypersweeperSweeper:
         Float
             Best performance value
         """
-        best_current_id = np.argmin(self.history["performance"])
+        if self.maximize:
+            best_current_id = np.argmax(self.history["performance"])
+        else:
+            best_current_id = np.argmin(self.history["performance"])
         inc_performance = self.history["performance"][best_current_id]
         inc_config = self.history["config"][best_current_id]
         return inc_config, inc_performance
@@ -377,11 +380,14 @@ class HypersweeperSweeper:
             else:
                 self.history["budget"].append(self.max_budget)
 
-        self._write_csv(self.history, "history")
+        self._write_csv(self.history, "runhistory")
 
     def write_incumbents(self) -> None:   
         """Write the incumbent configurations to a csv file.""" 
-        best_config_id = np.argmin(self.history["performance"])
+        if self.maximize:
+            best_config_id = np.argmax(self.history["performance"])
+        else:
+            best_config_id = np.argmin(self.history["performance"])
         self.incumbents["config_id"].append(best_config_id)
         self.incumbents["config"].append(self.history["config"][best_config_id])
         self.incumbents["performance"].append(self.history["performance"][best_config_id])
