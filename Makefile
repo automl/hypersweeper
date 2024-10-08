@@ -50,11 +50,11 @@ clean-docs: ## remove docs artifacts
 	cd docs && make clean
 
 ruff: ## run ruff as a formatter
-	uvx ruff format hydra_plugins
-	uvx ruff check --silent --exit-zero --no-cache --fix hydra_plugins
-	uvx ruff check --exit-zero hydra_plugins
+	ruff format 
+	ruff check --silent --exit-zero --no-cache --fix hydra_plugins
+	ruff check --exit-zero hydra_plugins
 isort:
-	uvx isort hydra_plugins tests
+	isort hydra_plugins tests
 
 test: ## run tests quickly with the default Python
 	python -m pytest tests
