@@ -277,8 +277,6 @@ class HypersweeperSweeper:
             for j in range(len(overrides)):
                 performances.append(res[j].return_value)
                 self.trials_run += 1
-        if self.maximize:
-            performances = [-p for p in performances]
         return performances, costs
 
     def get_save_path(self, config_id, seed=None):
@@ -471,7 +469,6 @@ class HypersweeperSweeper:
                     performance = float(np.mean(performance))
                 
                 logged_performance = -performance if self.maximize else performance
-
                 value = Result(performance=logged_performance, cost=cost)
                 self.optimizer.tell(info=info, value=value)
 

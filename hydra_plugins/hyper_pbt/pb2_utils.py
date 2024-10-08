@@ -33,8 +33,7 @@ class TVSquaredExp(GPy.kern.Kern):
     def K(self, X, X2):
         """Compute the kernel."""
         # time must be in the far left column
-        if self.epsilon > 0.5:  # noqa: PLR2004
-            self.epsilon = 0.5
+        self.epsilon = min(self.epsilon, 0.5)
         if X2 is None:
             X2 = np.copy(X)
         T1 = X[:, 0].reshape(-1, 1)
@@ -188,11 +187,9 @@ class TVMixtureViaSumAndProduct(GPy.kern.Kern):
     def K(self, x, x2):
         """Compute the kernel."""
         # clip epsilons
-        if self.epsilon_1 > 0.5:  # noqa: PLR2004
-            self.epsilon_1 = 0.5
+        self.epsilon_1 = min(self.epsilon_1, 0.5)
 
-        if self.epsilon_2 > 0.5:  # noqa: PLR2004
-            self.epsilon_2 = 0.5
+        self.epsilon_2 = min(self.epsilon_2, 0.5)
 
         # format data
         if x2 is None:
@@ -538,7 +535,7 @@ def exp3_get_cat(row, data, num_rounds, index):
         sum_w = np.sum(weights)
         weights = [w / sum_w for w in weights]
 
-        count += 1
+        count += 1  # noqa: SIM113
 
     # now we select our arm!
 

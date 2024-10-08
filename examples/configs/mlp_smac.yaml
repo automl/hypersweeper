@@ -28,6 +28,6 @@ hydra:
           output_directory: ${hydra.sweep.dir}
     search_space: ${search_space}
   run:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/mlp_smac/
   sweep:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/mlp_smac/

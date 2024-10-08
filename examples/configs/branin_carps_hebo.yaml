@@ -16,6 +16,6 @@ hydra:
         task: ${carps_task}
     search_space: ${search_space}
   run:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/branin_carps_hebo/
   sweep:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/branin_carps_hebo/

@@ -12,6 +12,6 @@ def get_other_requirements():
             return other_requirements
         
 setup(
-    version="0.1.0",
+    version="0.2.1",
     packages=find_namespace_packages(include=["hydra_plugins.*"]),
 )

@@ -1,6 +1,6 @@
 [project]
 name = "HyperSweeper"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
   "typing_extensions", # Better typing
   "tomli", 
@@ -40,10 +40,10 @@ classifiers = [
 license = { file = "LICENSE" }
 
 [project.optional-dependencies]
-dev = ["HyperSweeper[doc, tooling, test, examples]"]
+dev = ["HyperSweeper[doc, tooling, test]"]
 tooling = ["commitizen", "pre-commit", "ruff"]
 
-test = ["pytest", "pytest-coverage", "pytest-cases", "HyperSweeper[examples]"]
+test = ["pytest", "pytest-coverage", "pytest-cases"]
 examples = ["scikit-learn", "stable-baselines3", "deepcave"]
 doc = [
   "automl_sphinx_theme",
@@ -97,7 +97,6 @@ changelog_start_rev = "1.0.0"
 [tool.ruff]
 target-version = "py310"
 line-length = 120
-show-source = true
 src = ["src", "tests", "examples"]
 lint.extend-safe-fixes = ["ALL"]
 
@@ -186,6 +185,8 @@ lint.ignore = [
   "N812",
   "N817",
   "S307",
+  "S603",
+  "S607"
 ]
 
 exclude = [
