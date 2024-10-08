@@ -18,7 +18,6 @@ class Info:
 
     config: dict
     budget: float
-    config_id: str | None = None
     load_path: str | None = None
     seed: int | None = None
 

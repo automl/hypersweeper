@@ -54,7 +54,12 @@ class HyperSMACAdapter:
     def ask(self):
         """Ask for the next configuration."""
         smac_info = self.smac.ask()
-        info = Info(smac_info.config, smac_info.budget, None, smac_info.seed)
+        info = Info(
+            config=smac_info.config,
+            budget=smac_info.budget,
+            load_path=None,
+            seed=smac_info.seed
+        )
         return info, False
 
     def tell(self, info, value):
