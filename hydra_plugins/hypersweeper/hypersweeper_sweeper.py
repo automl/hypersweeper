@@ -485,6 +485,7 @@ class HypersweeperSweeper:
             
             self.opt_time += time.time() - opt_time_start
             done = trial_termination or budget_termination
+            self.iteration += 1
 
         total_time = time.time() - self.start
         inc_config, inc_performance = self.get_incumbent()

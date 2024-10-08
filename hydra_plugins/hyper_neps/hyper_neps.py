@@ -92,7 +92,7 @@ def make_neps(configspace, hyper_neps_args):
 
     dict_search_space = get_dict_from_configspace(configspace)
 
-    dict_search_space[hyper_neps_args["fidelity_variable"]] = neps.IntegerParameter(
+    dict_search_space[hyper_neps_args["fidelity_variable"]] = neps.FloatParameter(
         lower=hyper_neps_args["min_budget"],
         upper=hyper_neps_args["max_budget"],
         is_fidelity=True
