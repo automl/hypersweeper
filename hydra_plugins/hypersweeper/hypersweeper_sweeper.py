@@ -2,22 +2,24 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import time
 from collections import defaultdict
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
 import wandb
-from ConfigSpace import Configuration, ConfigurationSpace
-from hydra.plugins.launcher import Launcher
 from hydra.utils import to_absolute_path
 from omegaconf import DictConfig, OmegaConf
 
 from hydra_plugins.hypersweeper.utils import Info, Result, read_warmstart_data
+
+if TYPE_CHECKING:
+    from ConfigSpace import Configuration, ConfigurationSpace
+    from hydra.plugins.launcher import Launcher
 
 log = logging.getLogger(__name__)
 
@@ -81,7 +83,7 @@ class HypersweeperSweeper:
             Number of trials to run
         cs: ConfigSpace
             Configspace object containing the hyperparameter search space.
-        seeds: List[int] 
+        seeds: List[int]
             If not False, optimization will be run and averaged across the given seeds.
         seed_keyword: str = "seed"
             Keyword for the seed argument
@@ -235,7 +237,8 @@ class HypersweeperSweeper:
                         local_values += [save_path]
 
                     job_overrides = tuple(self.global_overrides) + tuple(
-                        f"{name}={val}" for name, val in zip([*names, self.seed_keyword], [*local_values, s], strict=True)
+                        f"{name}={val}"
+                        for name, val in zip([*names, self.seed_keyword], [*local_values, s], strict=True)
                     )
                     overrides.append(job_overrides)
             elif not self.deterministic:
@@ -245,7 +248,8 @@ class HypersweeperSweeper:
                 manually set the 'seeds' parameter of the sweeper to a list of seeds."""
                 save_path = self.get_save_path(i)
                 job_overrides = tuple(self.global_overrides) + tuple(
-                    f"{name}={val}" for name, val in zip([*names, self.seed_keyword], [*values, infos[i].seed], strict=True)
+                    f"{name}={val}"
+                    for name, val in zip([*names, self.seed_keyword], [*values, infos[i].seed], strict=True)
                 )
                 overrides.append(job_overrides)
             else:
@@ -302,7 +306,7 @@ class HypersweeperSweeper:
             )
         return save_path
 
-    def get_incumbent(self) -> tuple[Union[Configuration, dict], float]:
+    def get_incumbent(self) -> tuple[Configuration | dict, float]:
         """Get the best sequence of configurations so far.
 
         Returns:
@@ -319,10 +323,10 @@ class HypersweeperSweeper:
         inc_performance = self.history["performance"][best_current_id]
         inc_config = self.history["config"][best_current_id]
         return inc_config, inc_performance
-    
+
     def _write_csv(self, data: dict, filename: str) -> None:
         """Write a dictionary to a csv file.
-        
+
         Parameters
         ----------
         data: dict
@@ -346,15 +350,12 @@ class HypersweeperSweeper:
         dataframes_to_concat += [dataframe.drop(columns="config"), configs_df]
         full_dataframe = pd.concat(dataframes_to_concat, axis=1)
         full_dataframe.to_csv(Path(self.output_dir) / f"{filename}.csv", index=False)
-    
+
     def write_history(
-            self,
-            performances: Union[list[list[float]], list[float]],
-            configs: list[Configuration],
-            budgets: list[float]
-        ) -> None:
+        self, performances: list[list[float]] | list[float], configs: list[Configuration], budgets: list[float]
+    ) -> None:
         """Write the history of the optimization to a csv file.
-        
+
         Parameters
         ----------
         performances: Union[list[list[float]], list[float]]
@@ -382,8 +383,8 @@ class HypersweeperSweeper:
 
         self._write_csv(self.history, "runhistory")
 
-    def write_incumbents(self) -> None:   
-        """Write the incumbent configurations to a csv file.""" 
+    def write_incumbents(self) -> None:
+        """Write the incumbent configurations to a csv file."""
         if self.maximize:
             best_config_id = np.argmax(self.history["performance"])
         else:
@@ -471,10 +472,9 @@ class HypersweeperSweeper:
             if self.seeds and self.deterministic:
                 seeds = np.zeros(len(performances))
             for info, performance, cost in zip(infos, performances, costs, strict=True):
-                if self.seeds:
-                    performance = float(np.mean(performance))
-                
-                logged_performance = -performance if self.maximize else performance
+                run_performance = float(np.mean(performance)) if self.seeds else performance
+
+                logged_performance = -run_performance if self.maximize else run_performance
                 value = Result(performance=logged_performance, cost=cost)
                 self.optimizer.tell(info=info, value=value)
 
@@ -485,7 +485,7 @@ class HypersweeperSweeper:
                 log.info(f"Finished Iteration {self.iteration}!")
                 _, inc_performance = self.get_incumbent()
                 log.info(f"Current incumbent has a performance of {np.round(inc_performance, decimals=2)}.")
-            
+
             self.opt_time += time.time() - opt_time_start
             done = trial_termination or budget_termination
             self.iteration += 1

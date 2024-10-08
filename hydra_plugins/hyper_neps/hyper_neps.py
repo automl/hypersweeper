@@ -3,20 +3,19 @@
 from __future__ import annotations
 
 import importlib
-from ConfigSpace import ConfigurationSpace, Configuration
-from neps.optimizers.base_optimizer import BaseOptimizer
-from neps.optimizers.multi_fidelity.hyperband import Hyperband
-from neps.runtime import Trial
+import math
+import random
 import time
 from pathlib import Path
-import math
-import numpy as np
-import random
 
+import numpy as np
+from neps.runtime import Trial
 
 if (spec := importlib.util.find_spec("neps")) is not None:
-    import neps 
+    import neps
     import neps.search_spaces
+
+from typing import TYPE_CHECKING
 
 from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
                                          NormalFloatHyperparameter,
@@ -25,6 +24,10 @@ from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
                                          UniformIntegerHyperparameter)
 
 from hydra_plugins.hypersweeper import Info
+
+if TYPE_CHECKING:
+    from ConfigSpace import ConfigurationSpace
+    from neps.optimizers.base_optimizer import BaseOptimizer
 
 
 class HyperNEPS:
@@ -63,7 +66,7 @@ class HyperNEPS:
             config=config,
             report=None,
             time_sampled=time_sampled,
-            pipeline_dir=Path("."),   # TODO
+            pipeline_dir=Path(),  # TODO
             previous=previous,
             metadata={"time_sampled": time_sampled},
         )
@@ -84,37 +87,31 @@ class HyperNEPS:
 
         self.previous_results[info.config_id] = trial
 
+
 def make_neps(configspace, hyper_neps_args):
     """Make a NEPS instance for optimization."""
     # important for NePS optimizers
-    random.seed(hyper_neps_args["seed"])  
-    np.random.seed(hyper_neps_args["seed"])
+    random.seed(hyper_neps_args["seed"])
+
+    np.random.seed(hyper_neps_args["seed"])  # noqa: NPY002
 
     dict_search_space = get_dict_from_configspace(configspace)
 
     dict_search_space[hyper_neps_args["fidelity_variable"]] = neps.FloatParameter(
-        lower=hyper_neps_args["min_budget"],
-        upper=hyper_neps_args["max_budget"],
-        is_fidelity=True
+        lower=hyper_neps_args["min_budget"], upper=hyper_neps_args["max_budget"], is_fidelity=True
     )
-    
+
     neps_search_space = neps.search_spaces.SearchSpace(**dict_search_space)
 
     optimizer = hyper_neps_args["optimizer"](
         pipeline_space=neps_search_space,
     )
-    
-    print(f"Budget levels for NEPS:")
-    check_budget_levels(
-        hyper_neps_args["min_budget"],
-        hyper_neps_args["max_budget"],
-        optimizer.eta
-    )
+
+    print("Budget levels for NEPS:")
+    check_budget_levels(hyper_neps_args["min_budget"], hyper_neps_args["max_budget"], optimizer.eta)
 
     return HyperNEPS(
-        configspace=configspace,
-        optimizer=optimizer,
-        fidelity_variable=hyper_neps_args["fidelity_variable"]
+        configspace=configspace, optimizer=optimizer, fidelity_variable=hyper_neps_args["fidelity_variable"]
     )
 
 
@@ -129,7 +126,7 @@ def get_dict_from_configspace(configspace: ConfigurationSpace) -> dict:
                 upper=param.upper,
                 log=param.log,
                 default=param.default_value,
-                default_confidence="medium"
+                default_confidence="medium",
             )
         elif isinstance(param, NormalIntegerHyperparameter | UniformIntegerHyperparameter):
             search_space[k] = neps.IntegerParameter(
@@ -137,18 +134,17 @@ def get_dict_from_configspace(configspace: ConfigurationSpace) -> dict:
                 upper=param.upper,
                 log=param.log,
                 default=param.default_value,
-                default_confidence="medium"
+                default_confidence="medium",
             )
         elif isinstance(param, CategoricalHyperparameter):
             search_space[k] = neps.CategoricalParameter(
-                choices=param.choices,
-                default=param.default_value,
-                default_confidence="medium"
+                choices=param.choices, default=param.default_value, default_confidence="medium"
             )
     return search_space
 
 
 def check_budget_levels(min_epoch, max_epoch, eta):
+    """Check the Hyperband budget levels for NEPS."""
     total_budget = 0
     _min = max_epoch
     counter = 0
@@ -159,4 +155,3 @@ def check_budget_levels(min_epoch, max_epoch, eta):
         _min = _min // eta
         counter += 1
         fid_level -= 1
-    

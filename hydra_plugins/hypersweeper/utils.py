@@ -9,7 +9,7 @@ import ConfigSpace as CS
 import numpy as np
 import pandas as pd
 from ConfigSpace import Configuration, ConfigurationSpace
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import OmegaConf
 
 
 @dataclass

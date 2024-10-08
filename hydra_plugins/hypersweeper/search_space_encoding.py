@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import json
+from io import StringIO
 
 from ConfigSpace import ConfigurationSpace
-from omegaconf import DictConfig, ListConfig, open_dict
-from io import StringIO
+from omegaconf import DictConfig, ListConfig
 
 
 class JSONCfgEncoder(json.JSONEncoder):
@@ -108,7 +108,7 @@ def search_space_to_config_space(search_space: str | DictConfig) -> Configuratio
 
         jason_string = json.dumps(search_space, cls=JSONCfgEncoder)
         cs = ConfigurationSpace.from_json(StringIO(jason_string))
-    elif type(search_space) == ConfigurationSpace:
+    elif type(search_space) is ConfigurationSpace:
         cs = search_space
     else:
         raise ValueError(f"search_space must be of type str or DictConfig. Got {type(search_space)}.")

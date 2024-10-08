@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 """Tests for `hypersweeper` package."""
+
 from __future__ import annotations
 
 from hydra.core.plugins import Plugins
