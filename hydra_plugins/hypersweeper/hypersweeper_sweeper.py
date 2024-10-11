@@ -13,9 +13,8 @@ import numpy as np
 import pandas as pd
 import wandb
 from hydra.utils import to_absolute_path
-from omegaconf import DictConfig, OmegaConf
-
 from hydra_plugins.hypersweeper.utils import Info, Result, read_warmstart_data
+from omegaconf import DictConfig, OmegaConf
 
 if TYPE_CHECKING:
     from ConfigSpace import Configuration, ConfigurationSpace
@@ -219,8 +218,7 @@ class HypersweeperSweeper:
             values = [*list(infos[i].config.values())]
             if self.budget_arg_name is not None:
                 values += [infos[i].budget]
-            if self.load_tf and self.iteration > 0:
-                values += [Path(self.checkpoint_dir) / f"{infos[i].load_path!s}{self.checkpoint_path_typing}"]
+
 
             if self.slurm:
                 names += ["hydra.launcher.timeout_min"]
@@ -232,7 +230,11 @@ class HypersweeperSweeper:
             if self.seeds:
                 for s in self.seeds:
                     local_values = values.copy()
+                    load_path = Path(self.checkpoint_dir) / f"{infos[i].load_path!s}_s{s}{self.checkpoint_path_typing}"
                     save_path = self.get_save_path(i, s)
+
+                    if self.load_tf and self.iteration > 0:
+                        local_values += [load_path]
                     if self.checkpoint_tf:
                         local_values += [save_path]
 
@@ -246,14 +248,20 @@ class HypersweeperSweeper:
                 For non-deterministic target functions, seeds must be provided.
                 If the optimizer you chose does not support this,
                 manually set the 'seeds' parameter of the sweeper to a list of seeds."""
+                load_path = Path(self.checkpoint_dir) / f"{infos[i].load_path!s}_s{s}{self.checkpoint_path_typing}"
                 save_path = self.get_save_path(i)
+
                 job_overrides = tuple(self.global_overrides) + tuple(
                     f"{name}={val}"
                     for name, val in zip([*names, self.seed_keyword], [*values, infos[i].seed], strict=True)
                 )
                 overrides.append(job_overrides)
             else:
+                load_path = Path(self.checkpoint_dir) / f"{infos[i].load_path!s}{self.checkpoint_path_typing}"
                 save_path = self.get_save_path(i)
+
+                if self.load_tf and self.iteration > 0:
+                    values += [load_path]
                 if self.checkpoint_tf:
                     values += [save_path]
 
