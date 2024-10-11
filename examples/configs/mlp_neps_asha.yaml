@@ -1,0 +1,93 @@
+
+defaults:
+  - _self_
+  - override hydra/sweeper: HyperNEPS
+  
+
+learning_rate: constant
+learning_rate_init: 0.001
+batch_size: 200
+n_neurons: 10
+n_layer: 1
+solver: adam
+activation: tanh
+
+seed: 42
+epochs: 10  # Default number of epochs
+
+hydra:
+  sweeper:
+    budget: 500
+    budget_variable: epochs
+    sweeper_kwargs:
+      job_array_size_limit: 1
+      seeds: [0, 1, 2]
+      optimizer_kwargs:
+        fidelity_variable: ${hydra.sweeper.budget_variable}
+        min_budget: 5
+        max_budget: 50
+        optimizer:
+          _target_: neps.optimizers.multi_fidelity.successive_halving.AsynchronousSuccessiveHalving
+          _partial_: true
+          budget: ${hydra.sweeper.budget}
+          eta: 3
+          early_stopping_rate: 0
+          initial_design_type: max_budget
+          use_priors: false
+          random_interleave_prob: 0.0
+          sample_default_first: false
+          sample_default_at_target: false
+    search_space:
+      hyperparameters:
+        n_layer:
+          type: uniform_int
+          lower: 1
+          upper: 5
+          default: ${n_layer}
+        n_neurons:
+          type: uniform_int
+          lower: 8
+          upper: 1024
+          log: true
+          default_value: ${n_neurons}
+        activation:
+          type: categorical
+          choices: [ logistic, tanh, relu ]
+          default_value: ${activation}
+        solver:
+          type: categorical
+          choices: [ lbfgs, sgd, adam ]
+          default_value: ${solver}
+        batch_size:
+          type: uniform_int
+          lower: 30
+          upper: 300
+          default_value: ${batch_size}
+        learning_rate:
+          type: categorical
+          choices: [ constant, invscaling, adaptive ]
+          default_value: ${learning_rate}
+        learning_rate_init:
+          type: uniform_float
+          lower: 0.0001
+          upper: 1
+          default_value: ${learning_rate_init}
+          log: true
+      conditions:
+        - child: batch_size
+          parent: solver
+          type: IN
+          values: [ sgd, adam ]
+        - child: learning_rate
+          parent: solver
+          type: EQ
+          value: sgd
+        - child: learning_rate_init
+          parent: solver
+          type: IN
+          values: [ sgd, adam ]
+
+  run:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}

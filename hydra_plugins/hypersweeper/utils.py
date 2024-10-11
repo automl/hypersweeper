@@ -9,7 +9,7 @@ import ConfigSpace as CS
 import numpy as np
 import pandas as pd
 from ConfigSpace import Configuration, ConfigurationSpace
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import OmegaConf
 
 
 @dataclass
@@ -18,8 +18,8 @@ class Info:
 
     config: dict
     budget: float
-    load_path: str = None
-    seed: int = None
+    load_path: str | None = None
+    seed: int | None = None
 
 
 @dataclass
@@ -81,7 +81,7 @@ def convert_to_configuration(x: pd.Series, configspace: ConfigurationSpace) -> C
     return Configuration(configuration_space=configspace, values=hp_config)
 
 
-def read_warmstart_data(warmstart_filename: str, search_space: DictConfig) -> list[tuple[Info, Result]]:
+def read_warmstart_data(warmstart_filename: str, search_space: ConfigurationSpace) -> list[tuple[Info, Result]]:
     """Read initial design / warmstart data from csv-logfile.
 
     Parameters
