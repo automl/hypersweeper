@@ -7,7 +7,7 @@ import automl_sphinx_theme  # Must come after the path injection above
 
 
 options = {
-    "copyright": copyright,
+    "copyright": "Copyright: Theresa Eimer",
     "author": "Theresa Eimer",
     "version": "0.1",
     "versions": {
