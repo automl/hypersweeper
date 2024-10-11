@@ -50,11 +50,11 @@ clean-docs: ## remove docs artifacts
 	cd docs && make clean
 
 ruff: ## run ruff as a formatter
-	ruff format 
-	ruff check --silent --exit-zero --no-cache --fix hydra_plugins
-	ruff check --exit-zero hydra_plugins
+	uvx ruff format hydra_plugins
+	uvx ruff check --silent --exit-zero --no-cache --fix hydra_plugins
+	uvx ruff check --exit-zero hydra_plugins
 isort:
-	isort hydra_plugins tests
+	uvx isort hydra_plugins tests
 
 test: ## run tests quickly with the default Python
 	python -m pytest tests
@@ -104,7 +104,7 @@ install-dev: clean ## install the package to the active Python's site-packages
 	uv pip install -e ".[dev,examples,doc,all]" --config-settings editable_mode=compat
 
 check:
-	pre-commit run --all-files
+	uvx pre-commit run --all-files
 
 format:
 	make ruff
