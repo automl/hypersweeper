@@ -1,0 +1,29 @@
+hyper\_neps package
+===================
+
+Submodules
+----------
+
+hyper\_neps.config module
+-------------------------
+
+.. automodule:: hyper_neps.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_neps.hyper\_neps module
+------------------------------
+
+.. automodule:: hyper_neps.hyper_neps
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: hyper_neps
+   :members:
+   :undoc-members:
+   :show-inheritance:
