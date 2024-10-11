@@ -15,7 +15,7 @@ class HyperRS:
     def ask(self):
         """Randomly sample a configuration."""
         config = self.configspace.sample_configuration()
-        info = Info(config, None, None, None)
+        info = Info(config=config, budget=None, load_path=None, seed=None)
         return info, False
 
     def tell(self, info, value):
