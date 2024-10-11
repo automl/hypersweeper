@@ -17,6 +17,7 @@ We recommend installing hypersweeper via a uv virtual environment:
 ```bash
 pip install uv
 uv venv --python 3.10
+source .venv/bin/activate
 make install
 ```
 
