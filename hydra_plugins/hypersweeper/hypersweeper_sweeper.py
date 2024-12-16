@@ -456,7 +456,16 @@ class HypersweeperSweeper:
             t = 0
             terminate = False
             while t < self.max_parallel and not terminate and not trial_termination and not budget_termination:
-                info, terminate = self.optimizer.ask()
+                try:
+                    info, terminate = self.optimizer.ask()
+                except Exception as e:
+                    if len(infos) > 0:
+                        print("Optimizer failed on ask - running remaining configs.")
+                        performances, costs = self.run_configs(infos)
+                        self.write_history(performances, configs, budgets)
+                    print("Optimizer failed on ask - terminating optimization.")
+                    print(f"Error was: {e}")
+                    return self.incumbents[-1]
                 configs.append(info.config)
                 t += 1
                 if info.budget is not None:
@@ -472,10 +481,7 @@ class HypersweeperSweeper:
                 if self.n_trials is not None:
                     trial_termination = self.trials_run + len(configs) >= self.n_trials
             self.opt_time += time.time() - opt_time_start
-            performances, costs = self.run_configs(
-                infos
-                # configs, budgets, seeds, loading_paths
-            )
+            performances, costs = self.run_configs(infos)
             opt_time_start = time.time()
             if self.seeds and self.deterministic:
                 seeds = np.zeros(len(performances))
