@@ -1,0 +1,45 @@
+hyper\_analysis package
+=======================
+
+Submodules
+----------
+
+hyper\_analysis.ablation\_path\_sweeper module
+----------------------------------------------
+
+.. automodule:: hyper_analysis.ablation_path_sweeper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_analysis.config module
+-----------------------------
+
+.. automodule:: hyper_analysis.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_analysis.grid\_sweeper module
+------------------------------------
+
+.. automodule:: hyper_analysis.grid_sweeper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+hyper\_analysis.utils module
+----------------------------
+
+.. automodule:: hyper_analysis.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: hyper_analysis
+   :members:
+   :undoc-members:
+   :show-inheritance:
