@@ -26,7 +26,7 @@ class AblationPath:
         performance_key="performance",
         config_key="config_id",
         variation_key="env",
-        run_source=True
+        run_source=True,
     ) -> None:
         """Initialize the optimizer."""
         assert (data_path is not None and variation is not None) or (
@@ -34,10 +34,10 @@ class AblationPath:
         ), "Either data_path and variation or source_config and target_config must be provided."
         if source_config is not None and target_config is not None:
             self.source_config = configspace.get_default_configuration()
-            for k in source_config.keys():
+            for k in source_config:
                 self.source_config[k] = source_config[k]
             self.target_config = configspace.get_default_configuration()
-            for k in target_config.keys():
+            for k in target_config:
                 self.target_config[k] = target_config[k]
         else:
             df = load_data(data_path, performance_key, config_key, variation_key)  # noqa: PD901
@@ -60,7 +60,7 @@ class AblationPath:
         self.returns = []
         self.recompute_diffs = False
         self.configs = self.get_configs()
-        self.configs = self.configs 
+        self.configs = self.configs
         if run_source:
             self.configs += [self.source_config]
 

@@ -455,7 +455,6 @@ class HypersweeperSweeper:
             t = 0
             terminate = False
             while t < self.max_parallel and not terminate and not trial_termination and not budget_termination:
-
                 try:
                     info, terminate = self.optimizer.ask()
                 except Exception as e:  # noqa: BLE001

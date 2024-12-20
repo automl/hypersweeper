@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import numpy as np
+from ConfigSpace.hyperparameters import CategoricalHyperparameter
 
 from hydra_plugins.hypersweeper import Info
-from ConfigSpace.hyperparameters import CategoricalHyperparameter
 
 
 class Grid:
@@ -34,7 +34,9 @@ class Grid:
         for hp in configspace:
             if isinstance(configspace[hp], CategoricalHyperparameter):
                 self.hp_values[hp] = np.linspace(0, len(configspace[hp].choices), configs_per_hp)
-                self.hp_values[hp] = [configspace[hp].choices[min(int(v), len(configspace[hp].choices)-1)] for v in self.hp_values[hp]]
+                self.hp_values[hp] = [
+                    configspace[hp].choices[min(int(v), len(configspace[hp].choices) - 1)] for v in self.hp_values[hp]
+                ]
             else:
                 self.hp_values[hp] = np.linspace(configspace[hp].lower, configspace[hp].upper, configs_per_hp)
         print(f"HP values in grid: {self.hp_values}")
@@ -43,7 +45,9 @@ class Grid:
     def reset_indices(self, i):
         """Increment last index and pass on overflow to previous one."""
         self.config_indices[list(self.config_indices.keys())[i]] += 1
-        if self.config_indices[list(self.config_indices.keys())[i]] >= len(self.hp_values[list(self.config_indices.keys())[i]]):
+        if self.config_indices[list(self.config_indices.keys())[i]] >= len(
+            self.hp_values[list(self.config_indices.keys())[i]]
+        ):
             self.config_indices[list(self.config_indices.keys())[i]] = 0
             try:
                 self.reset_indices(i - 1)
