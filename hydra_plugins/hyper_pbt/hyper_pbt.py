@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+import os
+import shutil
 
 import numpy as np
 from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
@@ -172,12 +173,14 @@ class PBT:
 
     def remove_checkpoints(self, iteration: int) -> None:
         """Remove checkpoints."""
-        import os
-
         # Delete all files in checkpoints dir starting with iteration_{iteration}
         for file in os.listdir(self.checkpoint_dir):
             if file.startswith(f"iteration_{iteration}"):
-                (Path(self.checkpoint_dir) / file).unlink()
+                file_path = os.path.join(self.checkpoint_dir, file)
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                else:
+                    shutil.rmtree(file_path)
 
 
 def make_pbt(configspace, pbt_args):
