@@ -1,0 +1,54 @@
+learning_rate: constant
+learning_rate_init: 0.001
+batch_size: 200
+n_neurons: 10
+n_layer: 1
+solver: adam
+activation: tanh
+seed: 42
+epochs: 10
+search_space:
+  hyperparameters:
+    n_layer:
+      type: uniform_int
+      lower: 1
+      upper: 5
+      default: 1
+    n_neurons:
+      type: uniform_int
+      lower: 8
+      upper: 1024
+      log: true
+      default_value: 10
+    activation:
+      type: categorical
+      choices:
+      - logistic
+      - tanh
+      - relu
+      default_value: tanh
+    solver:
+      type: categorical
+      choices:
+      - lbfgs
+      - sgd
+      - adam
+      default_value: adam
+    batch_size:
+      type: uniform_int
+      lower: 30
+      upper: 300
+      default_value: 200
+    learning_rate:
+      type: categorical
+      choices:
+      - constant
+      - invscaling
+      - adaptive
+      default_value: constant
+    learning_rate_init:
+      type: uniform_float
+      lower: 0.0001
+      upper: 1
+      default_value: 0.001
+      log: true

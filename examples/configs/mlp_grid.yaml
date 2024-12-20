@@ -1,0 +1,19 @@
+
+defaults:
+  - _self_
+  - target_function: mlp
+  - search_space: mlp_no_conditions
+  - override hydra/sweeper: HyperGrid
+
+hydra:
+  sweeper:
+    n_trials: 100
+    sweeper_kwargs:
+      max_budget: 100
+      optimizer_kwargs:
+        configs_per_hp: 2
+    search_space: ${search_space}
+  run:
+    dir: ./tmp/mlp_grid/
+  sweep:
+    dir: ./tmp/mlp_grid/
