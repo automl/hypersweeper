@@ -1,0 +1,25 @@
+
+defaults:
+  - _self_
+  - target_function: branin
+  - search_space: branin
+  - override hydra/sweeper: HyperAblationPath
+
+hydra:
+  sweeper:
+    n_trials: 100
+    sweeper_kwargs:
+      max_budget: 100
+      optimizer_kwargs:
+        source_config:
+          x0: -5.0
+          x1: 0.0
+        target_config:
+          x0: 10.0
+          x1: 5.0
+        run_source: True
+    search_space: ${search_space}
+  run:
+    dir: ./tmp/branin_ablation_path/
+  sweep:
+    dir: ./tmp/branin_ablation_path/

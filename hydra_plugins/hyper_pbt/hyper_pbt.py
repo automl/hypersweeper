@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
-from ConfigSpace.hyperparameters import (
-    CategoricalHyperparameter,
-    NormalIntegerHyperparameter,
-    OrdinalHyperparameter,
-    UniformIntegerHyperparameter,
-)
+from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
+                                         NormalIntegerHyperparameter,
+                                         OrdinalHyperparameter,
+                                         UniformIntegerHyperparameter)
+
 from hydra_plugins.hypersweeper import Info
 
 
@@ -176,7 +177,8 @@ class PBT:
         # Delete all files in checkpoints dir starting with iteration_{iteration}
         for file in os.listdir(self.checkpoint_dir):
             if file.startswith(f"iteration_{iteration}"):
-                os.remove(os.path.join(self.checkpoint_dir, file))
+                (Path(self.checkpoint_dir) / file).unlink()
+
 
 def make_pbt(configspace, pbt_args):
     """Make a PBT instance for optimization."""
