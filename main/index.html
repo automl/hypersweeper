@@ -22,7 +22,7 @@
       
 
     
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=2eb4fb78" />
     
   <link rel="preload" as="script" href="_static/js/index.9ea38e314b9e6d9dab77.js">
@@ -264,10 +264,10 @@ We also include a range of optimizers that you can use out of the box.</p>
 <h2>How Can You Use the Hypersweeper?<a class="headerlink" href="#how-can-you-use-the-hypersweeper" title="Link to this heading">¶</a></h2>
 <p>To use Hypersweeper, you first need to define your target function, i.e. whatever you want to tune, using Hydra as a command line interface.
 You should also return the performance value of the target function.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span> <span class="nn">hydra</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="linenos">1</span><span class="kn">import</span><span class="w"> </span><span class="nn">hydra</span>
 <span class="linenos">2</span>
 <span class="linenos">3</span><span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;configs&quot;</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;example&quot;</span><span class="p">,</span> <span class="n">version_base</span><span class="o">=</span><span class="s2">&quot;1.1&quot;</span><span class="p">)</span>
-<span class="linenos">4</span> <span class="k">def</span> <span class="nf">my_target_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+<span class="linenos">4</span> <span class="k">def</span><span class="w"> </span><span class="nf">my_target_function</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
 <span class="linenos">5</span>    <span class="n">performance</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">cfg</span><span class="o">.</span><span class="n">y</span>
 <span class="linenos">6</span>    <span class="k">return</span> <span class="n">performance</span>
 <span class="linenos">7</span>
