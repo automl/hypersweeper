@@ -220,10 +220,10 @@ class HypersweeperSweeper:
             if self.budget_arg_name is not None:
                 values += [infos[i].budget]
 
-            if self.slurm:
+            if self.slurm and self.max_budget is not None:
                 names += ["hydra.launcher.timeout_min"]
                 optimized_timeout = (
-                    self.slurm_timeout * 1 / (self.total_budget // infos[i].budget) + 0.1 * self.slurm_timeout
+                    self.slurm_timeout * 1 / (self.max_budget // infos[i].budget) + 0.1 * self.slurm_timeout
                 )
                 values += [int(optimized_timeout)]
 
