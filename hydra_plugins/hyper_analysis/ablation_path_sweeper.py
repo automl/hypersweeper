@@ -5,6 +5,9 @@ from __future__ import annotations
 from copy import deepcopy
 
 import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import pathlib
 
 from hydra_plugins.hyper_analysis.utils import (df_to_config,
                                                 get_best_config_per_variation,
@@ -27,6 +30,7 @@ class AblationPath:
         config_key="config_id",
         variation_key="env",
         run_source=True,
+        run_target=True,
     ) -> None:
         """Initialize the optimizer."""
         assert (data_path is not None and variation is not None) or (
@@ -61,20 +65,28 @@ class AblationPath:
         self.recompute_diffs = False
         self.configs = self.get_configs()
         self.configs = self.configs
+        self.run_source = run_source
         if run_source:
-            self.configs += [self.source_config]
+            self.configs = [self.source_config]
 
     def get_configs(self):
         """Get all possible configs for the next path segment."""
         if self.recompute_diffs:
-            returns = [r[1] for r in self.returns]
-            chosen_hp = self.hps_left[np.argmax(returns)]
-            best_return = max(returns)
-            self.ablation_path.append((chosen_hp, best_return))
-            self.hps_left.remove(chosen_hp)
-            self.returns = []
-            self.source_config[chosen_hp] = self.target_config[chosen_hp]
-            self.recompute_diffs = False
+            if self.run_source:
+                self.run_source = False
+                self.ablation_path.append(("source", self.returns[0][1]))
+                self.returns = []
+                self.recompute_diffs = False
+            else:
+                returns = [r[1] for r in self.returns]
+                chosen_hp = self.hps_left[np.argmax(returns)]
+                best_return = max(returns)
+                print("Best hyperparamter {chosen_hp} with score {best_return}")
+                self.ablation_path.append((chosen_hp, best_return))
+                self.hps_left.remove(chosen_hp)
+                self.returns = []
+                self.source_config[chosen_hp] = self.target_config[chosen_hp]
+                self.recompute_diffs = False
 
         configs = []
         for hp in self.hps_left:
@@ -88,19 +100,38 @@ class AblationPath:
         if self.recompute_diffs:
             self.configs = self.get_configs()
 
-        if len(self.configs) == 0:
-            raise ValueError("No more configs to evaluate. Likely the path is finished.")
+        optimizer_termination = False
+        if len(self.configs) == 1 and len(self.hps_left) == 1:
+            optimizer_termination = True
         config = self.configs.pop()
         config = deepcopy(to_json_types(config))
         info = Info(config=config, budget=None, load_path=None, seed=None)
         done = len(self.configs) == 0
         if done:
             self.recompute_diffs = True
-        return info, done
+        return info, done, optimizer_termination
 
     def tell(self, info, value):
         """Record result."""
         self.returns.append((info.config, value.performance))
+
+    def finish_run(self, output_path):
+        returns = [r[1] for r in self.returns]
+        chosen_hp = self.hps_left[np.argmax(returns)]
+        best_return = max(returns)
+        print("Best hyperparamter {chosen_hp} with score {best_return}")
+        self.ablation_path.append((chosen_hp, best_return))
+
+        file_name = "ablation_path"
+        path_df = pd.DataFrame(self.ablation_path, columns=["hp", "performance"])
+        path_df.to_csv(pathlib.PurePath(output_path, file_name + ".csv"))
+        plt.plot(path_df["hp"], path_df["performance"])
+        plt.xticks(rotation=90)
+        plt.xlabel("Hyperparameter Change")
+        plt.ylabel("Performance")
+        plt.title("Ablation Path")
+        plt.tight_layout()
+        plt.savefig(pathlib.PurePath(output_path, file_name + ".png"))
 
 
 def make_ablation_path(configspace, kwargs):

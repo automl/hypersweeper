@@ -456,7 +456,7 @@ class HypersweeperSweeper:
             terminate = False
             while t < self.max_parallel and not terminate and not trial_termination and not budget_termination:
                 try:
-                    info, terminate = self.optimizer.ask()
+                    info, terminate, optimizer_termination = self.optimizer.ask()
                 except Exception as e:  # noqa: BLE001
                     if len(infos) > 0:
                         print("Optimizer failed on ask - running remaining configs.")
@@ -503,11 +503,14 @@ class HypersweeperSweeper:
                 log.info(f"Current incumbent has a performance of {np.round(inc_performance, decimals=2)}.")
 
             self.opt_time += time.time() - opt_time_start
-            done = trial_termination or budget_termination
+            done = trial_termination or budget_termination or optimizer_termination
             self.iteration += 1
 
         total_time = time.time() - self.start
         inc_config, inc_performance = self.get_incumbent()
+
+        self.optimizer.finish_run(Path(self.output_dir))
+
         if verbose:
             log.info(
                 f"Finished Sweep! Total duration was {np.round(total_time, decimals=2)}s, \
