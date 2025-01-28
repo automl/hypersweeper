@@ -51,7 +51,17 @@ class AblationPath:
         self.configspace = configspace
         self.different_hps = []
 
-        for key in self.source_config:
+        unconditional_hps = configspace.unconditional_hyperparameters
+        conditional_hps = configspace.conditional_hyperparameters
+        for child in conditional_hps:
+            parent = self.configspace.parents_of[child][0].name  # assuming every conditional hp has only one parent! 
+            if self.source_config[parent] == self.target_config[parent]:
+                if not child in self.source_config:
+                    continue
+                if self.source_config[child] != self.target_config[child]:
+                    self.different_hps.append(child)
+                unconditional_hps.remove(parent)
+        for key in unconditional_hps:
             if self.source_config[key] != self.target_config[key]:
                 self.different_hps.append(key)
 
@@ -59,6 +69,7 @@ class AblationPath:
             f"""Found {len(self.different_hps)} different hyperparameters
             between source and target config: {self.different_hps}"""
         )
+
         self.hps_left = self.different_hps.copy()
         self.ablation_path = []
         self.returns = []
@@ -92,6 +103,10 @@ class AblationPath:
         for hp in self.hps_left:
             config = deepcopy(self.source_config)
             config[hp] = self.target_config[hp]
+            if len(self.configspace.children_of[hp]) > 0:
+                for cond_hp in self.configspace.children_of[hp]:
+                    if cond_hp.name in self.target_config:
+                        config[cond_hp.name] = self.target_config[cond_hp.name]
             configs.append(config)
         return configs
 

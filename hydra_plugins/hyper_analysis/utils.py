@@ -7,6 +7,8 @@ import math
 import numpy as np
 import pandas as pd
 
+from ConfigSpace import Configuration
+
 
 def load_data(data_path, performance_key, config_key, variation_key):
     """Load data and add mean performance columns."""
@@ -41,17 +43,11 @@ def get_best_config_per_variation(df, var, variation_key="env"):
 
 def df_to_config(configspace, row):
     """Convert a dataframe row to a configspace configuration."""
-    config = configspace.sample_configuration()
-    for c in row.keys():
-        if c in config:
-            if math.isnan(row[c]):
-                row[c] = 0
-            if not isinstance(row[c], str):
-                try:
-                    value = float(row[c])
-                except:  # noqa: E722
-                    value = int(row[c])
-            config[c] = value
+    config = configspace.get_default_configuration()
+    unconditional_hps = configspace.unconditional_hyperparameters
+    conditional_hps = configspace.conditional_hyperparameters
+    row_dict = row.loc[unconditional_hps + conditional_hps].dropna().to_dict()
+    config = Configuration(configspace, row_dict)
     return config
 
 
