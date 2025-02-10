@@ -19,7 +19,7 @@ class HyperDEHB:
         job_info = self.dehb.ask()
         info = Info(job_info["config"], job_info["fidelity"], None, None)
         self.storage[job_info["config_id"]] = job_info
-        return info, False
+        return info, False, False
 
     def tell(self, info, value):
         """Return the performance."""

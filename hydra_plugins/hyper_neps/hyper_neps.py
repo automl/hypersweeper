@@ -77,7 +77,7 @@ class HyperNEPS:
         budget = config.pop(self.fidelity_variable)
 
         info = Info(dict(config), budget, config_id, None, None)
-        return info, False
+        return info, False, False
 
     def tell(self, info: Info, value):
         """Return the performance."""

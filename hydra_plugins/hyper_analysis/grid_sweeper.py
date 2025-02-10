@@ -62,7 +62,7 @@ class Grid:
             config[hp] = self.hp_values[hp][self.config_indices[hp]]
         self.reset_indices(len(list(self.config_indices.keys())) - 1)
         info = Info(config=config, budget=None, load_path=None, seed=None)
-        return info, False
+        return info, False, False
 
     def tell(self, info, value):
         """Do nothing for Grid."""

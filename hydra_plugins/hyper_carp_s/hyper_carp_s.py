@@ -23,7 +23,7 @@ class HyperCARPSAdapter:
         """Ask for the next configuration."""
         carps_info = self.carps.ask()
         info = Info(carps_info.config, carps_info.budget, None, carps_info.seed)
-        return info, False
+        return info, False, False
 
     def tell(self, info, value):
         """Tell the result of the configuration."""

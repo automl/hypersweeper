@@ -31,7 +31,7 @@ class HyperNevergrad:
         config = get_config_from_x(self.configspace, x)
         info = Info(config, None, None, None)
         self.storage[config] = x
-        return info, False
+        return info, False, False
 
     def tell(self, info, value):
         """Return the performance."""

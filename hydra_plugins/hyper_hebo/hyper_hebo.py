@@ -38,7 +38,7 @@ class HyperHEBOAdapter:
             config_space=self.configspace,
         )
         info = Info(config, None, None, None)
-        return info, False
+        return info, False, False
 
     def tell(self, info, value):
         """Tell the result of the configuration."""

@@ -97,7 +97,7 @@ class PBT:
             budget=self.budget_per_run,
             load_path=load_path,
             seed=None,
-        ), iteration_end
+        ), iteration_end, False
 
     def perturb_config(self, population_id):
         """Perturb existing configuration."""
