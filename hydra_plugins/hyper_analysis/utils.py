@@ -43,7 +43,6 @@ def get_best_config_per_variation(df, var, variation_key="env"):
 
 def df_to_config(configspace, row):
     """Convert a dataframe row to a configspace configuration."""
-    config = configspace.get_default_configuration()
     unconditional_hps = configspace.unconditional_hyperparameters
     conditional_hps = configspace.conditional_hyperparameters
     row_dict = row.loc[unconditional_hps + conditional_hps].dropna().to_dict()
