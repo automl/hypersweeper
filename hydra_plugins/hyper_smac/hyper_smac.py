@@ -63,6 +63,9 @@ class HyperSMACAdapter:
         smac_value = TrialValue(time=value.cost, cost=value.performance)
         self.smac.tell(smac_info, smac_value)
 
+    def finish_run(self, output_path):
+        """Do nothing for SMAC."""
+
 
 def make_smac(configspace, smac_args):
     """Make a SMAC instance for optimization."""

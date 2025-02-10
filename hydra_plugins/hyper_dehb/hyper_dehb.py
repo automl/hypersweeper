@@ -28,6 +28,9 @@ class HyperDEHB:
         job_return = {"fitness": value.performance, "cost": value.cost}
         self.dehb.tell(job_info, job_return)
 
+    def finish_run(self, output_path):
+        """Do nothing for DEHB."""
+
 
 def make_dehb(configspace, hyper_dehb_args):
     """Make a DEHB instance for optimization."""

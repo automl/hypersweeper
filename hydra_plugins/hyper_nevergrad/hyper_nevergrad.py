@@ -38,6 +38,9 @@ class HyperNevergrad:
         x = self.storage[info.config]
         self.optimizer.tell(x, value.performance)
 
+    def finish_run(self, output_path):
+        """Do nothing for Nevergrad."""
+
 
 def make_nevergrad(configspace, hyper_nevergrad_args):
     """Make a Nevergrad instance for optimization."""

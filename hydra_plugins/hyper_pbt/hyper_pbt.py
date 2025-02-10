@@ -171,6 +171,9 @@ class PBT:
             if self.self_destruct and self.iteration > 1:
                 self.remove_checkpoints(self.iteration - 2)
 
+    def finish_run(self, output_path):
+        """Do nothing for PBT."""
+
     def remove_checkpoints(self, iteration: int) -> None:
         """Remove checkpoints."""
         # Delete all files in checkpoints dir starting with iteration_{iteration}

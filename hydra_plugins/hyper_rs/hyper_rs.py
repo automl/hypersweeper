@@ -21,6 +21,9 @@ class HyperRS:
     def tell(self, info, value):
         """Do nothing for RS."""
 
+    def finish_run(self, output_path):
+        """Do nothing for RS."""
+
 
 def make_rs(configspace, hyper_rs_args):
     """Make a RS instance for optimization."""

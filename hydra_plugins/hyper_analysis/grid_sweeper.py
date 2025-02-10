@@ -67,6 +67,9 @@ class Grid:
     def tell(self, info, value):
         """Do nothing for Grid."""
 
+    def finish_run(self, output_path):
+        """Do nothing for Grid."""
+
 
 def make_grid(configspace, kwargs):
     """Make grid sweeper."""

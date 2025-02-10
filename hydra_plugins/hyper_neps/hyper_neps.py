@@ -87,6 +87,9 @@ class HyperNEPS:
 
         self.previous_results[info.config_id] = trial
 
+    def finish_run(self, output_path):
+        """Do nothing for Neps."""
+
 
 def make_neps(configspace, hyper_neps_args):
     """Make a NEPS instance for optimization."""

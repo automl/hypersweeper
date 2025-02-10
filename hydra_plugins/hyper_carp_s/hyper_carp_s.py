@@ -31,6 +31,9 @@ class HyperCARPSAdapter:
         smac_value = TrialValue(time=value.cost, cost=value.performance)
         self.carps.tell(smac_info, smac_value)
 
+    def finish_run(self, output_path):
+        """Do nothing for CARPS."""
+
 
 def make_carp_s(configspace, carps_args):
     """Make a CARP-S instance for optimization."""
