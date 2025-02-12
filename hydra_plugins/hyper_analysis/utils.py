@@ -50,6 +50,11 @@ def df_to_config(configspace, row):
     return config
 
 
+def dict_to_config(configspace, row):
+    """Convert a dict row to a configspace configuration."""
+    return Configuration(configspace, row)
+
+
 def to_json_types(config):
     """Make sure all values are JSON serializable."""
     for key in config:

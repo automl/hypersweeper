@@ -441,6 +441,7 @@ class HypersweeperSweeper:
         self.start = time.time()
         trial_termination = False
         budget_termination = False
+        optimizer_termination = False
         done = False
         if len(self.warmstart_data) > 0:
             for info, value in self.warmstart_data:
@@ -454,7 +455,12 @@ class HypersweeperSweeper:
             infos = []
             t = 0
             terminate = False
-            while t < self.max_parallel and not terminate and not trial_termination and not budget_termination:
+            while (t < self.max_parallel
+                   and not terminate
+                   and not trial_termination
+                   and not budget_termination
+                   and not optimizer_termination
+            ):
                 try:
                     info, terminate, optimizer_termination = self.optimizer.ask()
                 except Exception as e:  # noqa: BLE001

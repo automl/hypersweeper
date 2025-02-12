@@ -1,0 +1,8 @@
+hyperparameter,lpi,uncertainty
+solver,0.4265948704167034,0.0
+n_layer,0.27995509418887804,0.0
+n_neurons,0.15976569885218686,0.0
+activation,0.13368433654223177,0.0
+learning_rate_init,9.643069571197941e-32,0.0
+batch_size,9.618961897269946e-32,0.0
+learning_rate,0.0,0.0

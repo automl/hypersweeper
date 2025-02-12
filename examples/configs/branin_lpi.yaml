@@ -1,0 +1,23 @@
+
+defaults:
+  - _self_
+  - target_function: branin
+  - search_space: branin
+  - override hydra/sweeper: HyperLPI
+
+hydra:
+  sweeper:
+    n_trials: 2000
+    sweeper_kwargs:
+      max_budget: 100
+      optimizer_kwargs:
+        config:
+          x0: -5.0
+          x1: 0.0
+        configs_per_hp: 200
+        run_source: True
+    search_space: ${search_space}
+  run:
+    dir: ./tmp/branin_lpi/
+  sweep:
+    dir: ./tmp/branin_lpi/
