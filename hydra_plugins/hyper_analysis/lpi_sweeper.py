@@ -33,7 +33,7 @@ class LPI:
         self.run_source = run_source
         self.configspace = configspace
         self.configs_per_hp = configs_per_hp
-        self.rs = np.random.RandomState(42)
+        self.rs = np.random.RandomState(seed)
         assert config or data_path, "Either config or data_path must be provided."
         if config:
             self.config = dict_to_config(configspace, config)
