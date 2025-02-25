@@ -8,7 +8,9 @@ from collections.abc import Callable
 from functools import reduce
 from pathlib import Path
 from typing import TYPE_CHECKING
+import itertools
 
+from hydra.core.override_parser.overrides_parser import OverridesParser
 from hydra.core.plugins import Plugins
 from hydra.plugins.sweeper import Sweeper
 from hydra.utils import get_class, get_method
@@ -134,34 +136,68 @@ class HypersweeperBackend(Sweeper):
         assert self.launcher is not None
         assert self.hydra_context is not None
 
-        printr("Config", self.config)
+        # printr("Config", self.config)
+        printr(OmegaConf.to_yaml(self.config))
         printr("Hydra context", self.hydra_context)
-
-        self.launcher.global_overrides = arguments
-        if len(arguments) == 0:
-            log.info("Sweep doesn't override default config.")
-        else:
-            log.info(f"Sweep overrides: {' '.join(arguments)}")
 
         configspace = search_space_to_config_space(search_space=self.search_space)
 
-        optimizer = HypersweeperSweeper(
-            make_optimizer=self.opt_constructor,
-            global_config=self.config,
-            global_overrides=arguments,
-            launcher=self.launcher,
-            budget_arg_name=self.budget_variable,
-            save_arg_name=self.saving_variable,
-            load_arg_name=self.loading_variable,
-            budget=self.budget,
-            n_trials=self.n_trials,
-            base_dir=self.sweep_dir,
-            cs=configspace,
-            **self.sweeper_kwargs,
-        )
+        # FIXME: add in subfolder name for sweeptype arguments!
+        argumentslist = self.parse_cmd_overrides(arguments)
+        for arguments in argumentslist:
+            self.launcher.global_overrides = arguments
+            if len(arguments) == 0:
+                log.info("Sweep doesn't override default config.")
+            else:
+                log.info(f"Sweep overrides: {' '.join(arguments)}")
 
-        incumbent = optimizer.run(verbose=True)
+            optimizer = HypersweeperSweeper(
+                make_optimizer=self.opt_constructor,
+                global_config=self.config,
+                global_overrides=arguments,
+                launcher=self.launcher,
+                budget_arg_name=self.budget_variable,
+                save_arg_name=self.saving_variable,
+                load_arg_name=self.loading_variable,
+                budget=self.budget,
+                n_trials=self.n_trials,
+                base_dir=self.sweep_dir,
+                cs=configspace,
+                **self.sweeper_kwargs,
+            )
 
+            incumbent = optimizer.run(verbose=True)
+
+            if len(argumentslist) == 1:
+                return self.write_incumbent_config(optimizer, incumbent, arguments)
+
+
+    def parse_cmd_overrides(self, arguments):
+        # parse cmd overrides (and sweep overrides)
+        parser = OverridesParser.create()
+        parsed = parser.parse_overrides(arguments)
+
+        lists = []
+        for override in parsed:
+            if override.is_sweep_override():
+                # Sweepers must manipulate only overrides that return true to is_sweep_override()
+                # This syntax is shared across all sweepers, so it may limiting.
+                # Sweeper must respect this though: failing to do so will cause all sorts of hard to debug issues.
+                # If you would like to propose an extension to the grammar (enabling new types of sweep overrides)
+                # Please file an issue and describe the use case and the proposed syntax.
+                # Be aware that syntax extensions are potentially breaking compatibility for existing users and the
+                # use case will be scrutinized heavily before the syntax is changed.
+                sweep_choices = override.sweep_string_iterator()
+                key = override.get_key_element()
+                sweep = [f"{key}={val}" for val in sweep_choices]
+                lists.append(sweep)
+            else:
+                key = override.get_key_element()
+                value = override.get_value_element_as_str()
+                lists.append([f"{key}={value}"])
+        return list(itertools.product(*lists))
+
+    def write_incumbent_config(self, optimizer, incumbent, arguments):
         final_config = self.config
         with open_dict(final_config):
             del final_config["hydra"]
