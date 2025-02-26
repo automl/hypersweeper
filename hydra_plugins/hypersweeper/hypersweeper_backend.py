@@ -179,7 +179,7 @@ class HypersweeperBackend(Sweeper):
 
         lists = []
         for override in parsed:
-            if override.is_sweep_override():
+            if override.is_sweep_override() and not override.key_or_group == 'budget':
                 # Sweepers must manipulate only overrides that return true to is_sweep_override()
                 # This syntax is shared across all sweepers, so it may limiting.
                 # Sweeper must respect this though: failing to do so will cause all sorts of hard to debug issues.
