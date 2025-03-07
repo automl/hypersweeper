@@ -117,6 +117,7 @@ class HypersweeperBackend(Sweeper):
         )
         self.task_function = task_function
         self.sweep_dir = config.hydra.sweep.dir
+        log.info(f'Sweep dir: {self.sweep_dir}')
 
     def sweep(self, arguments: list[str]) -> list | None:
         """Run PBT optimization and returns the incumbent configurations.
