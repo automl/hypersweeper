@@ -58,6 +58,7 @@ class LPI:
         if run_source:
             self.hp_list.append(self.config)
 
+
     def ask(self):
         """Move one config further in the path."""
         config = self.hp_list.pop()

@@ -39,10 +39,12 @@ class AblationPath:
         if source_config is not None and target_config is not None:
             self.source_config = configspace.get_default_configuration()
             for k in source_config:
-                self.source_config[k] = source_config[k]
+                if not np.isnan(source_config[k]):
+                    self.source_config[k] = source_config[k]
             self.target_config = configspace.get_default_configuration()
             for k in target_config:
-                self.target_config[k] = target_config[k]
+                if not np.isnan(target_config[k]):
+                    self.target_config[k] = target_config[k]
         else:
             df = load_data(data_path, performance_key, config_key, variation_key)  # noqa: PD901
             self.source_config = df_to_config(configspace, get_overall_best_config(df))
