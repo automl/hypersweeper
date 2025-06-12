@@ -93,7 +93,6 @@ def make_smac(configspace, smac_args):
     if "config_selector" in smac_args:
         smac_kwargs["config_selector"] = smac_args["config_selector"](scenario=scenario)
 
-    import ipdb; ipdb.set_trace()
     if "initial_design" in smac_args:
         if "warmstart_file" in smac_args["initial_design"]:
             config_list = read_additional_configs(
@@ -111,6 +110,9 @@ def make_smac(configspace, smac_args):
 
     if "intensifier" in smac_args:
         smac_kwargs["intensifier"] = smac_args["intensifier"](scenario)
+
+    if "random_design" in smac_args:
+        smac_kwargs["random_design"] = smac_args["random_design"]()
 
     smac = smac_args["smac_facade"](scenario, dummy_func, **smac_kwargs)
     return HyperSMACAdapter(smac)
