@@ -81,7 +81,11 @@ def convert_to_configuration(x: pd.Series, configspace: ConfigurationSpace) -> C
     return Configuration(configuration_space=configspace, values=hp_config)
 
 
-def read_warmstart_data(warmstart_filename: str, search_space: ConfigurationSpace) -> list[tuple[Info, Result]]:
+def read_warmstart_data(
+        warmstart_filename: str, 
+        search_space: ConfigurationSpace,
+        maximize: bool,
+    ) -> list[tuple[Info, Result]]:
     """Read initial design / warmstart data from csv-logfile.
 
     Parameters
@@ -105,7 +109,10 @@ def read_warmstart_data(warmstart_filename: str, search_space: ConfigurationSpac
     configs = initial_design.apply(convert_to_configuration, args=(configspace,), axis=1).to_list()
     budgets = initial_design["budget"]
     seeds = initial_design["seed"]
-    logged_performances = initial_design["performance"].to_list()
+    if maximize:
+        logged_performances = (-1 * initial_design["performance"]).to_list()
+    else:
+        logged_performances = initial_design["performance"].to_list()
     infos = [Info(config=c, budget=b, seed=s) for c, b, s in zip(configs, budgets, seeds, strict=False)]
     # the cost in hypersweeper is the runtime of the configuration
     # cost is not tracked for initial design
