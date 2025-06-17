@@ -171,7 +171,11 @@ class HypersweeperSweeper:
         self.warmstart_data: list[tuple[Info, Result]] = []
 
         if warmstart_file:
-            self.warmstart_data = read_warmstart_data(warmstart_filename=warmstart_file, search_space=self.configspace)
+            self.warmstart_data = read_warmstart_data(
+                warmstart_filename=warmstart_file, 
+                search_space=self.configspace,
+                maximize=self.maximize,
+            )
 
         self.wandb_project = wandb_project
         if self.wandb_project:
