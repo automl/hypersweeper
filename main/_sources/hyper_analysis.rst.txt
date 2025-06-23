@@ -28,6 +28,14 @@ hyper\_analysis.grid\_sweeper module
    :undoc-members:
    :show-inheritance:
 
+hyper\_analysis.lpi\_sweeper module
+-----------------------------------
+
+.. automodule:: hyper_analysis.lpi_sweeper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 hyper\_analysis.utils module
 ----------------------------
 
