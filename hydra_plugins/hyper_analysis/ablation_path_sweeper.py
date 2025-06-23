@@ -30,7 +30,6 @@ class AblationPath:
         config_key="config_id",
         variation_key="env",
         run_source=True,
-        run_target=True,
     ) -> None:
         """Initialize the optimizer."""
         assert (data_path is not None and variation is not None) or (
@@ -56,7 +55,7 @@ class AblationPath:
         unconditional_hps = configspace.unconditional_hyperparameters
         conditional_hps = configspace.conditional_hyperparameters
         for child in conditional_hps:
-            parent = self.configspace.parents_of[child][0].name  # assuming every conditional hp has only one parent! 
+            parent = self.configspace.parents_of[child][0].name  # assuming every conditional hp has only one parent!
             if self.source_config[parent] == self.target_config[parent]:
                 if not child in self.source_config:
                     continue
@@ -143,7 +142,7 @@ class AblationPath:
         path_df = pd.DataFrame(self.ablation_path, columns=["hp", "performance"])
         path_df.to_csv(pathlib.PurePath(output_path, file_name + ".csv"))
         plt.plot(path_df["hp"], path_df["performance"])
-        plt.xticks(rotation=90)
+        plt.xticks(rotation=45)
         plt.xlabel("Hyperparameter Change")
         plt.ylabel("Performance")
         plt.title("Ablation Path")
