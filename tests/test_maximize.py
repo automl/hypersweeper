@@ -9,8 +9,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from hydra_plugins.hypersweeper.utils import read_warmstart_data
 from ConfigSpace import ConfigurationSpace, Float
+
+from hydra_plugins.hypersweeper.utils import read_warmstart_data
+
 
 def test_non_max_incumbent():
     if Path("./tmp/branin_rs").exists():

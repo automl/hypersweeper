@@ -627,12 +627,12 @@ def DepRound(weights_p, k=1):
     assert k < K, f"Error: k = {k} should be < K = {K}."  # DEBUG
     if not np.isclose(np.sum(p), 1):
         p = p / np.sum(p)
-    assert np.all(p >= 0) and np.all(
-        p <= 1
-    ), f"Error: the weights (p_1, ..., p_K) should all be 0 <= p_i <= 1 ..., is {p}"
-    assert np.isclose(
-        np.sum(p), 1
-    ), f"Error: the sum of weights p_1 + ... + p_K should be = 1 (= {np.sum(p)})."  # DEBUG
+    assert np.all(p >= 0) and np.all(p <= 1), (
+        f"Error: the weights (p_1, ..., p_K) should all be 0 <= p_i <= 1 ..., is {p}"
+    )
+    assert np.isclose(np.sum(p), 1), (
+        f"Error: the sum of weights p_1 + ... + p_K should be = 1 (= {np.sum(p)})."
+    )  # DEBUG
     # Main loop
     possible_ij = [a for a in range(K) if 0 < p[a] < 1]
     while possible_ij:
@@ -717,12 +717,12 @@ def DepRound2(weights_p, k=1):
     assert k < K, f"Error: k = {k} should be < K = {K}."  # DEBUG
     if not np.isclose(np.sum(p), 1):
         p = p / np.sum(p)
-    assert np.all(p >= 0) and np.all(
-        p <= 1
-    ), f"Error: the weights (p_1, ..., p_K) should all be 0 <= p_i <= 1 ... but are {p}"
-    assert np.isclose(
-        np.sum(p), 1
-    ), f"Error: the sum of weights p_1 + ... + p_K should be = 1 (= {np.sum(p)})."  # DEBUG
+    assert np.all(p >= 0) and np.all(p <= 1), (
+        f"Error: the weights (p_1, ..., p_K) should all be 0 <= p_i <= 1 ... but are {p}"
+    )
+    assert np.isclose(np.sum(p), 1), (
+        f"Error: the sum of weights p_1 + ... + p_K should be = 1 (= {np.sum(p)})."
+    )  # DEBUG
     # Main loop
     possible_ij = [a for a in range(K) if 0 < p[a] < 1]
     while possible_ij:

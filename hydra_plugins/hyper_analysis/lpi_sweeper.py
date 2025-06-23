@@ -1,22 +1,26 @@
-"""Perform a LPI analysis of a target configuration"""
+"""Perform a LPI analysis of a target configuration."""
 
 from __future__ import annotations
 
 import pathlib
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
 from ConfigSpace import Configuration, ForbiddenValueError
-from ConfigSpace.hyperparameters import CategoricalHyperparameter, FloatHyperparameter, IntegerHyperparameter, NumericalHyperparameter
+from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
+                                         NumericalHyperparameter)
 from ConfigSpace.util import change_hp_value
 
+from hydra_plugins.hyper_analysis.utils import (df_to_config, dict_to_config,
+                                                get_overall_best_config,
+                                                load_data)
 from hydra_plugins.hypersweeper import Info
-from hydra_plugins.hyper_analysis.utils import dict_to_config, load_data, get_overall_best_config, df_to_config
 
 
 class LPI:
     """Perform Local Parameter Importance analysis of target configuration."""
+
     def __init__(
         self,
         configspace,
@@ -45,7 +49,6 @@ class LPI:
         print(f"HP values in grid: {neighbors}")
         print(f"Number of HP values: {sum([len(x[0]) for x in neighbors.values()])}")
 
-
         self.hp_list = []
         for hp in self.config:
             for value in neighbors[hp][1]:
@@ -58,7 +61,6 @@ class LPI:
         if run_source:
             self.hp_list.append(self.config)
 
-
     def ask(self):
         """Move one config further in the path."""
         config = self.hp_list.pop()
@@ -70,17 +72,16 @@ class LPI:
 
     def finish_run(self, output_path):
         df = pd.read_csv(pathlib.PurePath(output_path, "runhistory.csv"))
-        if not "seed" in df.columns:
+        if "seed" not in df.columns:
             df["seed"] = 0
         seeds = df["seed"].unique()
         lpi_scores_by_seed = {}
 
-        hp_keys = (self.configspace.unconditional_hyperparameters +
-                   self.configspace.conditional_hyperparameters)
+        hp_keys = self.configspace.unconditional_hyperparameters + self.configspace.conditional_hyperparameters
         for seed in seeds:
             seed_df = df[df["seed"] == seed]
             stats_df = (
-                seed_df.groupby(["config_id"] + hp_keys, as_index=False)["performance"]
+                seed_df.groupby(["config_id", *hp_keys], as_index=False)["performance"]
                 .agg(["mean"])
                 .reset_index(drop=True)
             )
@@ -109,7 +110,7 @@ class LPI:
             if total_importance > 0:
                 seed_lpi = {hp: score / total_importance for hp, score in seed_lpi.items()}
             else:
-                seed_lpi = {hp: 0 for hp in seed_lpi.keys()}
+                seed_lpi = dict.fromkeys(seed_lpi.keys(), 0)
 
             lpi_scores_by_seed[seed] = seed_lpi
 
@@ -120,11 +121,13 @@ class LPI:
             final_lpi[hp] = np.mean(hp_values)
             uncertainty[hp] = np.var(hp_values)
 
-        lpi_df = pd.DataFrame({
-            "hyperparameter": list(final_lpi.keys()),
-            "lpi": list(final_lpi.values()),
-            "uncertainty": list(uncertainty.values())
-        })
+        lpi_df = pd.DataFrame(
+            {
+                "hyperparameter": list(final_lpi.keys()),
+                "lpi": list(final_lpi.values()),
+                "uncertainty": list(uncertainty.values()),
+            }
+        )
         lpi_df = lpi_df.sort_values(by="lpi", ascending=False)
         lpi_df.to_csv(pathlib.PurePath(output_path, "lpi_scores.csv"), index=False)
 
@@ -158,7 +161,7 @@ class LPI:
 
             if num_neighbors == 0:
                 continue
-            elif np.isinf(num_neighbors):
+            if np.isinf(num_neighbors):
                 assert isinstance(hp, NumericalHyperparameter)
                 if hp.log:
                     base = np.e
@@ -173,7 +176,7 @@ class LPI:
                     )
                 else:
                     neighbors_range = np.linspace(hp.lower, hp.upper, self.configs_per_hp)
-                neighbors = list(map(lambda x: hp.to_vector(x), neighbors_range))
+                neighbors = [hp.to_vector(x) for x in neighbors_range]
             else:
                 neighbors = hp.neighbors_vectorized(incumbent_array[hp_idx], n=self.configs_per_hp, seed=self.rs)
 
@@ -195,21 +198,15 @@ class LPI:
                 except (ForbiddenValueError, ValueError):
                     pass
 
-            sort_idx = list(
-                map(lambda x: x[0], sorted(enumerate(checked_neighbors), key=lambda y: y[1]))
-            )
+            sort_idx = [x[0] for x in sorted(enumerate(checked_neighbors), key=lambda y: y[1])]
             if isinstance(self.configspace[hp_name], CategoricalHyperparameter):
-                checked_neighbors_non_unit_cube_categorical = list(
-                    np.array(checked_neighbors_non_unit_cube)[sort_idx]
-                )
+                checked_neighbors_non_unit_cube_categorical = list(np.array(checked_neighbors_non_unit_cube)[sort_idx])
                 neighborhood[hp_name] = [
                     np.array(checked_neighbors)[sort_idx],
                     checked_neighbors_non_unit_cube_categorical,
                 ]
             else:
-                checked_neighbors_non_unit_cube_non_categorical = np.array(
-                    checked_neighbors_non_unit_cube
-                )[sort_idx]
+                checked_neighbors_non_unit_cube_non_categorical = np.array(checked_neighbors_non_unit_cube)[sort_idx]
                 neighborhood[hp_name] = [
                     np.array(checked_neighbors)[sort_idx],
                     checked_neighbors_non_unit_cube_non_categorical,

@@ -75,17 +75,15 @@ def convert_to_configuration(x: pd.Series, configspace: ConfigurationSpace) -> C
         The converted configuration.
     """
     x = dict(x)
-    hp_config = {
-        k: maybe_convert_types(k, v, configspace=configspace) for k, v in x.items() if k in configspace.keys()
-    }
+    hp_config = {k: maybe_convert_types(k, v, configspace=configspace) for k, v in x.items() if k in configspace}
     return Configuration(configuration_space=configspace, values=hp_config)
 
 
 def read_warmstart_data(
-        warmstart_filename: str, 
-        search_space: ConfigurationSpace,
-        maximize: bool,
-    ) -> list[tuple[Info, Result]]:
+    warmstart_filename: str,
+    search_space: ConfigurationSpace,
+    maximize: bool,
+) -> list[tuple[Info, Result]]:
     """Read initial design / warmstart data from csv-logfile.
 
     Parameters

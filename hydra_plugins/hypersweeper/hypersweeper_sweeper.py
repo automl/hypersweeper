@@ -172,7 +172,7 @@ class HypersweeperSweeper:
 
         if warmstart_file:
             self.warmstart_data = read_warmstart_data(
-                warmstart_filename=warmstart_file, 
+                warmstart_filename=warmstart_file,
                 search_space=self.configspace,
                 maximize=self.maximize,
             )
@@ -459,11 +459,12 @@ class HypersweeperSweeper:
             infos = []
             t = 0
             terminate = False
-            while (t < self.max_parallel
-                   and not terminate
-                   and not trial_termination
-                   and not budget_termination
-                   and not optimizer_termination
+            while (
+                t < self.max_parallel
+                and not terminate
+                and not trial_termination
+                and not budget_termination
+                and not optimizer_termination
             ):
                 try:
                     info, terminate, optimizer_termination = self.optimizer.ask()

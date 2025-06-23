@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import pandas as pd
 from hydra.utils import get_class
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import OmegaConf
 from smac import Scenario
-from smac.runhistory.dataclasses import TrialInfo, TrialValue
 from smac.facade import HyperparameterOptimizationFacade
+from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
 from hydra_plugins.hypersweeper.utils import Info, convert_to_configuration
 

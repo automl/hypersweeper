@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import math
-
 import numpy as np
 import pandas as pd
-
 from ConfigSpace import Configuration
 
 
@@ -18,15 +15,18 @@ def load_data(data_path, performance_key, config_key, variation_key):
         overall_mean_per_config.set_index(config_key)[performance_key]
     )
     mean_per_variation = (
-        data.groupby([variation_key, config_key])[performance_key].mean().reset_index()[[variation_key, config_key, performance_key]]
+        data.groupby([variation_key, config_key])[performance_key]
+        .mean()
+        .reset_index()[[variation_key, config_key, performance_key]]
     )
     data["mean_performance"] = data.apply(
         lambda row: mean_per_variation.set_index([variation_key, config_key])[performance_key].get(
-            (row[variation_key], row[config_key]), None),
-        axis=1
+            (row[variation_key], row[config_key]), None
+        ),
+        axis=1,
     )
-    #mean_per_variation = np.repeat(mean_per_variation, len(data) // len(mean_per_variation), axis=0)
-    #data["mean_performance"] = mean_per_variation
+    # mean_per_variation = np.repeat(mean_per_variation, len(data) // len(mean_per_variation), axis=0)
+    # data["mean_performance"] = mean_per_variation
     return data
 
 
@@ -46,8 +46,7 @@ def df_to_config(configspace, row):
     unconditional_hps = configspace.unconditional_hyperparameters
     conditional_hps = configspace.conditional_hyperparameters
     row_dict = row.loc[unconditional_hps + conditional_hps].dropna().to_dict()
-    config = Configuration(configspace, row_dict)
-    return config
+    return Configuration(configspace, row_dict)
 
 
 def dict_to_config(configspace, row):

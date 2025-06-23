@@ -706,9 +706,9 @@ class CasmoKernel(gpytorch.kernels.Kernel):
         if x2 is not None:
             assert x2.shape[1] == x1.shape[1]
         if t1 is not None and self.time_kernel is not None:
-            assert (
-                t1.shape[0] == x1.shape[0]
-            ), f"Dimension mismatch between x1 {x1.shape[0]} and its timestep vector t1 {t1.shape[0]}!"
+            assert t1.shape[0] == x1.shape[0], (
+                f"Dimension mismatch between x1 {x1.shape[0]} and its timestep vector t1 {t1.shape[0]}!"
+            )
         if t2 is not None and self.time_kernel is not None:
             assert t2.shape[0] == x2.shape[0], "Dimension mismatch between x2 and its timestep vector t2!"
         if len(self.cat_dims) == 0 and len(self.cont_dims) == 0:
@@ -1135,9 +1135,9 @@ class Casmo4RL(HyperparameterOptimizer):
                         self.res.iloc[j, :] = [j, float(self.y[j]), float(np.min(self.y[: j + 1])), end - start]
                 argmin = np.argmin(self.y[: self.cur_iters + 1])
 
-                logging.info(f"fX={rewards}." f"fX_best={self.y[argmin]}")
+                logging.info(f"fX={rewards}.fX_best={self.y[argmin]}")
                 if self.cur_iters % self.log_interval == 0 and self.log_dir is not None:
-                    logging.info(f'Saving intermediate results to {Path(self.log_dir)/"stats.pkl"}')
+                    logging.info(f"Saving intermediate results to {Path(self.log_dir) / 'stats.pkl'}")
                     self.res.to_csv(Path(self.log_dir) / "stats-pandas.csv")
                     with open(Path(self.log_dir) / "stats.pkl", "wb") as f:
                         pickle.dump([self.X, self.y], f)

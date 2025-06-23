@@ -53,7 +53,6 @@ class HyperHEBOAdapter:
         """Do nothing for Hebo."""
 
 
-
 def make_hebo(configspace, hebo_args):
     """Make a HEBO instance for optimization."""
     hps_hebo = []

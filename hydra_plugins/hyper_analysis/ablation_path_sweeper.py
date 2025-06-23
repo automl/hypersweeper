@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import pathlib
 from copy import deepcopy
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
-import pathlib
 
 from hydra_plugins.hyper_analysis.utils import (df_to_config,
                                                 get_best_config_per_variation,
@@ -57,7 +57,7 @@ class AblationPath:
         for child in conditional_hps:
             parent = self.configspace.parents_of[child][0].name  # assuming every conditional hp has only one parent!
             if self.source_config[parent] == self.target_config[parent]:
-                if not child in self.source_config:
+                if child not in self.source_config:
                     continue
                 if self.source_config[child] != self.target_config[child]:
                     self.different_hps.append(child)

@@ -18,9 +18,9 @@ class Grid:
         configs_per_hp=None,
     ) -> None:
         """Initialize the optimizer."""
-        assert (
-            max_grid_size is not None or configs_per_hp is not None
-        ), "Either total_grid_size or configs_per_hp must be provided."
+        assert max_grid_size is not None or configs_per_hp is not None, (
+            "Either total_grid_size or configs_per_hp must be provided."
+        )
 
         self.configspace = configspace
         if max_grid_size is None:
@@ -40,7 +40,7 @@ class Grid:
             else:
                 self.hp_values[hp] = np.linspace(configspace[hp].lower, configspace[hp].upper, configs_per_hp)
         print(f"HP values in grid: {self.hp_values}")
-        self.config_indices = {hp: 0 for hp in configspace}
+        self.config_indices = dict.fromkeys(configspace, 0)
 
     def reset_indices(self, i):
         """Increment last index and pass on overflow to previous one."""

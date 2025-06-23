@@ -92,12 +92,16 @@ class PBT:
         if iteration_end:
             self.iteration += 1
 
-        return Info(
-            config=config,
-            budget=self.budget_per_run,
-            load_path=load_path,
-            seed=None,
-        ), iteration_end, False
+        return (
+            Info(
+                config=config,
+                budget=self.budget_per_run,
+                load_path=load_path,
+                seed=None,
+            ),
+            iteration_end,
+            False,
+        )
 
     def perturb_config(self, population_id):
         """Perturb existing configuration."""
@@ -124,7 +128,7 @@ class PBT:
         load_agent = population_id
         if population_id in worst_config_ids:
             load_agent = self.rng.choice(best_config_ids)
-        load_path = f"iteration_{self.iteration-1}_id_{load_agent}"
+        load_path = f"iteration_{self.iteration - 1}_id_{load_agent}"
         new_config = self.perturb_hps(
             last_config, performance=last_performance, is_good=population_id in best_config_ids
         )
