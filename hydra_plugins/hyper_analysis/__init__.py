@@ -1,3 +1,3 @@
-from .config import AblationPathConfig, GridConfig
+from .config import AblationPathConfig, GridConfig, LPIConfig
 
-__all__ = ["AblationPathConfig", "GridConfig"]
+__all__ = ["AblationPathConfig", "GridConfig", "LPIConfig"]

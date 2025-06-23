@@ -77,7 +77,7 @@ class HyperNEPS:
         budget = config.pop(self.fidelity_variable)
 
         info = Info(dict(config), budget, config_id, None, None)
-        return info, False
+        return info, False, False
 
     def tell(self, info: Info, value):
         """Return the performance."""
@@ -86,6 +86,9 @@ class HyperNEPS:
         trial.report = trial.create_success_report(value.performance)
 
         self.previous_results[info.config_id] = trial
+
+    def finish_run(self, output_path):
+        """Do nothing for Neps."""
 
 
 def make_neps(configspace, hyper_neps_args):

@@ -19,7 +19,7 @@ class HyperDEHB:
         job_info = self.dehb.ask()
         info = Info(job_info["config"], job_info["fidelity"], None, None)
         self.storage[job_info["config_id"]] = job_info
-        return info, False
+        return info, False, False
 
     def tell(self, info, value):
         """Return the performance."""
@@ -27,6 +27,9 @@ class HyperDEHB:
         job_info = self.storage[config_id]
         job_return = {"fitness": value.performance, "cost": value.cost}
         self.dehb.tell(job_info, job_return)
+
+    def finish_run(self, output_path):
+        """Do nothing for DEHB."""
 
 
 def make_dehb(configspace, hyper_dehb_args):

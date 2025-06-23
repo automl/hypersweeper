@@ -40,6 +40,22 @@ class GridConfig:
     sweeper_kwargs: dict | None = field(default_factory=dict)
 
 
+@dataclass
+class LPIConfig:
+    """Config for Grid sweeper."""
+
+    _target_: str = "hydra_plugins.hypersweeper.hypersweeper.Hypersweeper"
+    opt_constructor: str = "hydra_plugins.hyper_analysis.lpi_sweeper.make_lpi"
+    search_space: dict | None = field(default_factory=dict)
+    resume: str | bool = False
+    budget: Any | None = None
+    n_trials: int | None = None
+    budget_variable: str | None = None
+    loading_variable: str | None = None
+    saving_variable: str | None = None
+    sweeper_kwargs: dict | None = field(default_factory=dict)
+
+
 ConfigStore.instance().store(
     group="hydra/sweeper",
     name="HyperAblationPath",
@@ -51,5 +67,12 @@ ConfigStore.instance().store(
     group="hydra/sweeper",
     name="HyperGrid",
     node=GridConfig,
+    provider="hypersweeper",
+)
+
+ConfigStore.instance().store(
+    group="hydra/sweeper",
+    name="HyperLPI",
+    node=LPIConfig,
     provider="hypersweeper",
 )

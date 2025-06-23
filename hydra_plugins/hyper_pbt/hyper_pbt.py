@@ -97,7 +97,7 @@ class PBT:
             budget=self.budget_per_run,
             load_path=load_path,
             seed=None,
-        ), iteration_end
+        ), iteration_end, False
 
     def perturb_config(self, population_id):
         """Perturb existing configuration."""
@@ -170,6 +170,9 @@ class PBT:
             print("Remove checkpoints")
             if self.self_destruct and self.iteration > 1:
                 self.remove_checkpoints(self.iteration - 2)
+
+    def finish_run(self, output_path):
+        """Do nothing for PBT."""
 
     def remove_checkpoints(self, iteration: int) -> None:
         """Remove checkpoints."""

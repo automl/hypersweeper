@@ -38,7 +38,7 @@ class HyperHEBOAdapter:
             config_space=self.configspace,
         )
         info = Info(config, None, None, None)
-        return info, False
+        return info, False, False
 
     def tell(self, info, value):
         """Tell the result of the configuration."""
@@ -48,6 +48,10 @@ class HyperHEBOAdapter:
         cost = np.asarray([cost]) if not isinstance(cost, abc.Sequence) else np.asarray(cost)
 
         self.hebo.observe(suggestion, cost)
+
+    def finish_run(self, output_path):
+        """Do nothing for Hebo."""
+
 
 
 def make_hebo(configspace, hebo_args):

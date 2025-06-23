@@ -1,0 +1,19 @@
+x0: 3
+x1: 4
+seed: None
+budget: None
+spurious_var: 3.14
+search_space:
+  seed: 0
+  hyperparameters:
+    x0:
+      type: uniform_float
+      lower: -5
+      upper: 10
+      log: false
+    x1:
+      type: uniform_float
+      lower: 0
+      upper: 15
+      log: false
+      default_value: 2

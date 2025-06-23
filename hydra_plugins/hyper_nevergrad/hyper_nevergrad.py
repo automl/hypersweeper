@@ -31,12 +31,15 @@ class HyperNevergrad:
         config = get_config_from_x(self.configspace, x)
         info = Info(config, None, None, None)
         self.storage[config] = x
-        return info, False
+        return info, False, False
 
     def tell(self, info, value):
         """Return the performance."""
         x = self.storage[info.config]
         self.optimizer.tell(x, value.performance)
+
+    def finish_run(self, output_path):
+        """Do nothing for Nevergrad."""
 
 
 def make_nevergrad(configspace, hyper_nevergrad_args):

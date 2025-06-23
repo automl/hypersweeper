@@ -23,13 +23,16 @@ class HyperCARPSAdapter:
         """Ask for the next configuration."""
         carps_info = self.carps.ask()
         info = Info(carps_info.config, carps_info.budget, None, carps_info.seed)
-        return info, False
+        return info, False, False
 
     def tell(self, info, value):
         """Tell the result of the configuration."""
         smac_info = TrialInfo(info.config, seed=info.seed, budget=info.budget)
         smac_value = TrialValue(time=value.cost, cost=value.performance)
         self.carps.tell(smac_info, smac_value)
+
+    def finish_run(self, output_path):
+        """Do nothing for CARPS."""
 
 
 def make_carp_s(configspace, carps_args):

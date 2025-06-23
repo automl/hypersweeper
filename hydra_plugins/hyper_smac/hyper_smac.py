@@ -10,16 +10,12 @@ from hydra.utils import get_class
 from omegaconf import DictConfig, OmegaConf
 from smac import Scenario
 from smac.runhistory.dataclasses import TrialInfo, TrialValue
+from smac.facade import HyperparameterOptimizationFacade
 
-from hydra_plugins.hypersweeper.search_space_encoding import \
-    search_space_to_config_space
 from hydra_plugins.hypersweeper.utils import Info, convert_to_configuration
 
-if TYPE_CHECKING:
-    from ConfigSpace import Configuration
 
-
-def read_additional_configs(initial_design_fn: str, search_space: DictConfig) -> list[Configuration]:
+def read_additional_configs(initial_design_fn, configspace):
     """Read configurations from csv-logfile.
 
     Parameters
@@ -35,7 +31,6 @@ def read_additional_configs(initial_design_fn: str, search_space: DictConfig) ->
     list[Configuration]
         The configurations from the log file.
     """
-    configspace = search_space_to_config_space(search_space=search_space)
     initial_design = pd.read_csv(initial_design_fn)
     return initial_design.apply(convert_to_configuration, args=(configspace,), axis=1).to_list()
 
@@ -55,13 +50,16 @@ class HyperSMACAdapter:
         """Ask for the next configuration."""
         smac_info = self.smac.ask()
         info = Info(config=smac_info.config, budget=smac_info.budget, load_path=None, seed=smac_info.seed)
-        return info, False
+        return info, False, False
 
     def tell(self, info, value):
         """Tell the result of the configuration."""
         smac_info = TrialInfo(info.config, seed=info.seed, budget=info.budget)
         smac_value = TrialValue(time=value.cost, cost=value.performance)
         self.smac.tell(smac_info, smac_value)
+
+    def finish_run(self, output_path):
+        """Do nothing for SMAC."""
 
 
 def make_smac(configspace, smac_args):
@@ -96,10 +94,25 @@ def make_smac(configspace, smac_args):
         smac_kwargs["config_selector"] = smac_args["config_selector"](scenario=scenario)
 
     if "initial_design" in smac_args:
-        smac_kwargs["initial_design"] = smac_args["initial_design"](scenario=scenario)
+        if "warmstart_file" in smac_args["initial_design"]:
+            config_list = read_additional_configs(
+                initial_design_fn=smac_args["initial_design"]["warmstart_file"],
+                configspace=configspace,
+            )
+            initial_design = HyperparameterOptimizationFacade.get_initial_design(
+                scenario=scenario,
+                n_configs=0,
+                additional_configs=config_list,
+            )
+        else:
+            initial_design = smac_args["initial_design"](scenario=scenario)
+        smac_kwargs["initial_design"] = initial_design
 
     if "intensifier" in smac_args:
         smac_kwargs["intensifier"] = smac_args["intensifier"](scenario)
+
+    if "random_design" in smac_args:
+        smac_kwargs["random_design"] = smac_args["random_design"]()
 
     smac = smac_args["smac_facade"](scenario, dummy_func, **smac_kwargs)
     return HyperSMACAdapter(smac)
