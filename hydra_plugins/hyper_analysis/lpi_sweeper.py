@@ -42,7 +42,7 @@ class LPI:
         if config:
             self.config = dict_to_config(configspace, config)
         else:
-            df = load_data(data_path, performance_key, config_key, variation_key)  # noqa: PD901
+            df = load_data(data_path, performance_key, config_key, variation_key)
             self.config = df_to_config(configspace, get_overall_best_config(df))
 
         neighbors = self._get_neighborhood()
@@ -68,9 +68,10 @@ class LPI:
         return info, False, len(self.hp_list) == 0
 
     def tell(self, info, value):
-        pass
+        """Tell not applicable for LPI sweeper."""
 
     def finish_run(self, output_path):
+        """Finish the run and calculate LPI scores."""
         df = pd.read_csv(pathlib.PurePath(output_path, "runhistory.csv"))
         if "seed" not in df.columns:
             df["seed"] = 0
@@ -92,13 +93,13 @@ class LPI:
                 )
                 if not mask.any():
                     raise ValueError(f"Base configuration not found in run history for seed {seed}!")
-                main_config_id = seed_df.loc[mask, "config_id"].values[0]
+                main_config_id = seed_df.loc[mask, "config_id"].to_numpy()[0]
                 main_config_row = stats_df[stats_df["config_id"] == main_config_id]
 
             seed_lpi = {}
             for hp in self.config:
                 if isinstance(self.config[hp], NumericalHyperparameter):
-                    mask = np.any(np.isclose(stats_df[hp].values[:, None], self.config[hp], rtol=1e-3), axis=1)
+                    mask = np.any(np.isclose(stats_df[hp].to_numpy()[:, None], self.config[hp], rtol=1e-3), axis=1)
                 else:
                     mask = stats_df[hp] == self.config[hp]
                 sub_df = stats_df[~mask]

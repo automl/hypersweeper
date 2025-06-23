@@ -26,6 +26,15 @@ For extra dependencies, add them like this:
 uv sync --extra dev --extra carps
 ```
 
+Note that CARP-S requires you to install benchmarks and optimizers on your own, e.g. by running:
+```bash
+python -m carps.build.make optimizer_smac
+```
+The full optimizer options are:
+```bash
+optimizer_smac optimizer_dehb optimizer_nevergrad optimizer_optuna optimizer_ax optimizer_skopt optimizer_synetune
+```
+
 ## Basic Usage
 
 To use the sweeper, you need to specify a target function with a hydra interface (see our examples). 

@@ -8,6 +8,6 @@ from hydra.plugins.sweeper import Sweeper
 
 
 def test_discovery() -> None:
-    assert "Hypersweeper" in [
-        x.__name__ for x in Plugins.instance().discover(Sweeper)
-    ], "Hypersweeper not found in Hydra Sweeper plugins"
+    assert "Hypersweeper" in [x.__name__ for x in Plugins.instance().discover(Sweeper)], (
+        "Hypersweeper not found in Hydra Sweeper plugins"
+    )

@@ -10,6 +10,7 @@ import time
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from copy import deepcopy
+from math import sqrt
 from pathlib import Path
 
 import ConfigSpace as CS
@@ -486,8 +487,6 @@ def train_gp(
     noise_variance: if provided, this value will be used as the noise variance for the GP model. Otherwise, the noise
         variance will be inferred from the model.
     """
-    from math import sqrt
-
     if hypers is None:
         hypers = {}
     assert train_x.ndim == 2  # noqa: PLR2004
@@ -1365,7 +1364,7 @@ class _Casmo:
             This implementation assumes the objective function should be MINIMIZED, and the acquisition function should
                 also be MINIMIZED (hence negative sign on both the GP prediction and the acquisition function value).
             """
-            from torch.distributions import Normal
+            from torch.distributions import Normal  # noqa: PLC0415
 
             if not isinstance(X, torch.Tensor):
                 X = torch.tensor(X, dtype=dtype)

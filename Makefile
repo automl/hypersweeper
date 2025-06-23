@@ -50,14 +50,14 @@ clean-docs: ## remove docs artifacts
 	cd docs && make clean
 
 ruff: ## run ruff as a formatter
-	uvx ruff format hydra_plugins
+	uvx ruff format hydra_plugins tests
 	uvx ruff check --silent --exit-zero --no-cache --fix hydra_plugins
 	uvx ruff check --exit-zero hydra_plugins
 isort:
 	uvx isort hydra_plugins tests
 
 test: ## run tests quickly with the default Python
-	python -m pytest tests
+	uv run pytest tests
 cov-report:
 	coverage html -d coverage_html
 
@@ -102,6 +102,7 @@ install: clean ## install the package to the active Python's site-packages
 
 install-dev: clean ## install the package to the active Python's site-packages
 	uv pip install -e ".[dev,examples,doc,all]" --config-settings editable_mode=compat
+	source .venv/bin/activate && python -m carps.build.make optimizer_smac optimizer_hebo
 
 check:
 	uvx pre-commit run --all-files

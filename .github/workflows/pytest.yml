@@ -1,6 +1,10 @@
 name: Tests
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 on:
+  workflow_dispatch:  # Manually trigger the workflow
   # Triggers with push to main
   push:
     branches:
@@ -14,21 +18,14 @@ on:
       - development
 
 env:
-  package-name: "Hypersweeper"
+  package-name: "hypersweeper"
   test-dir: tests
-  extra-requires: "[dev]"  # "" for no extra_requires
-
-  # Arguments used for pytest
-  pytest-args: >-
-    --durations=20
-    -v
+  UV_SYSTEM_PYTHON: 1
 
 jobs:
-
   # General unit tests
   source-test:
-    name: tests
-
+    name: test
     runs-on: "ubuntu-latest"
     defaults:
       run:
@@ -36,18 +33,21 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v2
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
       with:
-        python-version: "3.10"
+        # Install a specific version of uv.
+        version: "0.6.14"
+
+    - name: "Set up Python"
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: "pyproject.toml"
 
     - name: Install ${{ env.package-name }}
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install wheel
-        python -m pip install -e ".${{ env.extra-requires }}"
+      run: make install-dev
 
     - name: Store git status
       id: status-before
@@ -56,8 +56,7 @@ jobs:
         echo "::set-output name=BEFORE::$(git status --porcelain -b)"
 
     - name: Tests
-      run: |
-        pytest ${{ env.pytest-args }} ${{ env.test-dir }}
+      run: make test
 
     - name: Check for files left behind by test
       run: |

@@ -2,18 +2,19 @@
 defaults:
   - _self_
   - target_function: branin
-  - carps_task: branin
+  - task: branin
   - search_space: branin
   - override hydra/sweeper: HyperCARPS
 
 hydra:
   sweeper:
-    n_trials: ${carps_task.n_trials}
+    n_trials: 15
     sweeper_kwargs:
       optimizer_kwargs:
-        _target_: carps.optimizers.hebo.HEBOOptimizer
-        _partial_: true
-        task: ${carps_task}
+        optimizer:
+          _target_: carps.optimizers.hebo.HEBOOptimizer
+          _partial_: true
+        task_config: ${task}
     search_space: ${search_space}
   run:
     dir: ./tmp/branin_carps_hebo/

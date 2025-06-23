@@ -52,6 +52,7 @@ class HypersweeperSweeper:
         wandb_project: str | None = None,
         wandb_entity: str | None = None,
         wandb_tags: list[str] | None = None,
+        wandb_mode: str = "online",
         maximize: bool = False,
         deterministic: bool = True,
         checkpoint_tf: bool = False,
@@ -182,10 +183,7 @@ class HypersweeperSweeper:
             wandb_config = OmegaConf.to_container(global_config, resolve=False, throw_on_missing=False)
             assert wandb_entity, "Please provide an entity to log to W&B."
             wandb.init(
-                project=self.wandb_project,
-                entity=wandb_entity,
-                tags=wandb_tags,
-                config=wandb_config,
+                project=self.wandb_project, entity=wandb_entity, tags=wandb_tags, config=wandb_config, mode=wandb_mode
             )
 
     def run_configs(self, infos):

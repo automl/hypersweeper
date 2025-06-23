@@ -2,11 +2,6 @@
 
 from __future__ import annotations
 
-import importlib
-
-if (spec := importlib.util.find_spec("carps")) is not None:
-    from carps.benchmarks.dummy_problem import DummyProblem
-
 from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
 from hydra_plugins.hypersweeper import Info
@@ -35,10 +30,11 @@ class HyperCARPSAdapter:
         """Do nothing for CARPS."""
 
 
-def make_carp_s(configspace, carps_args):
+def make_carp_s(configspace, optimizer_kwargs):
     """Make a CARP-S instance for optimization."""
-    problem = DummyProblem()
-    problem._configspace = configspace
-    optimizer = carps_args(problem)
+    task = optimizer_kwargs["task_config"]
+    task.objective_function.configuration_space = configspace
+    task.input_space.configuration_space = configspace
+    optimizer = optimizer_kwargs["optimizer"](task, optimizer_kwargs["optimizer_config"])
     optimizer.solver = optimizer._setup_optimizer()
     return HyperCARPSAdapter(optimizer)

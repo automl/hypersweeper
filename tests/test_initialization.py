@@ -2,10 +2,12 @@ import shutil
 from collections import defaultdict
 from pathlib import Path
 
+import numpy as np
+import pandas as pd
 from ConfigSpace import ConfigurationSpace, Float
 from hydra.utils import to_absolute_path
 from omegaconf import DictConfig
-from pytest import mark, warns
+from pytest import mark
 
 from hydra_plugins.hypersweeper import HypersweeperSweeper
 
@@ -15,56 +17,63 @@ class DummyOptimizer:
     checkpoint_path_typing = None
     seeds = []
 
+
 def dummy_func(cs, kwargs):
     """Dummy function to simulate a task function."""
     return DummyOptimizer()
 
+
 GLOBAL_CONFIG = DictConfig({})
 CS = ConfigurationSpace({"x0": Float("x0", bounds=(-5.0, 10.0)), "x1": Float("x1", bounds=(0.0, 15.0))})
 
-TEST_CONFIG1 = {"global_config": GLOBAL_CONFIG,
-        "global_overrides": ["seed=42"],
-        "launcher": "this should be a launcher class",
-        "make_optimizer": dummy_func,
-        "budget_arg_name": "budget_alt",
-        "load_arg_name": "load_alt",
-        "save_arg_name": "save_alt",
-        "cs": CS,
-        "budget": 20,
-        "optimizer_kwargs": {},
-        "seeds": [],
-        "seed_keyword": "seed_alt",
-        "slurm": True,
-        "slurm_timeout": 10,
-        "max_parallelization": 0.2,
-        "job_array_size_limit": 12,
-        "base_dir": None,
-        "maximize": True,
-        "deterministic": True,
-        "checkpoint_tf": True,
-        "load_tf": True,
-        "checkpoint_path_typing": ".npz",
-        "warmstart_file": None}
+TEST_CONFIG1 = {
+    "global_config": GLOBAL_CONFIG,
+    "global_overrides": ["seed=42"],
+    "launcher": "this should be a launcher class",
+    "make_optimizer": dummy_func,
+    "budget_arg_name": "budget_alt",
+    "load_arg_name": "load_alt",
+    "save_arg_name": "save_alt",
+    "cs": CS,
+    "budget": 20,
+    "optimizer_kwargs": {},
+    "seeds": [],
+    "seed_keyword": "seed",
+    "slurm": True,
+    "slurm_timeout": 10,
+    "max_parallelization": 0.2,
+    "job_array_size_limit": 12,
+    "base_dir": None,
+    "maximize": True,
+    "deterministic": True,
+    "checkpoint_tf": True,
+    "load_tf": True,
+    "checkpoint_path_typing": ".npz",
+    "warmstart_file": None,
+}
 
-TEST_CONFIG2 = {"global_config": GLOBAL_CONFIG,
-        "global_overrides": [],
-        "launcher": "this should be a launcher class",
-        "make_optimizer": dummy_func,
-        "budget_arg_name": "budget",
-        "load_arg_name": "load",
-        "save_arg_name": "save",
-        "cs": CS,
-        "n_trials": 20,
-        "optimizer_kwargs": None,
-        "max_budget": 10,
-        "base_dir": "some_dir",
-        "min_budget": 2,
-        "maximize": False,
-        "deterministic": True,
-        "checkpoint_tf": False,
-        "load_tf": False,
-        "checkpoint_path_typing": ".pt",
-        "warmstart_file": None}
+TEST_CONFIG2 = {
+    "global_config": GLOBAL_CONFIG,
+    "global_overrides": [],
+    "launcher": "this should be a launcher class",
+    "make_optimizer": dummy_func,
+    "budget_arg_name": "budget",
+    "load_arg_name": "load",
+    "save_arg_name": "save",
+    "cs": CS,
+    "n_trials": 20,
+    "optimizer_kwargs": None,
+    "max_budget": 10,
+    "base_dir": "some_dir",
+    "min_budget": 2,
+    "maximize": False,
+    "deterministic": True,
+    "checkpoint_tf": False,
+    "load_tf": False,
+    "checkpoint_path_typing": ".pt",
+    "warmstart_file": None,
+}
+
 
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
 def test_init(config):
@@ -85,12 +94,15 @@ def test_init(config):
     assert sweeper.checkpoint_dir == Path(sweeper.output_dir) / "checkpoints", "Checkpoint directory does not match"
     assert sweeper.checkpoint_dir.exists(), "Checkpoint directory does not exist"
     assert sweeper.job_idx == 0, "Job index should be initialized to 0"
-    assert sweeper.seeds == config["seeds"], "Seeds do not match"    
+    assert sweeper.seeds == config.get("seeds", None), "Seeds do not match"
     assert sweeper.maximize == config["maximize"], "Maximize flag does not match"
     assert sweeper.deterministic == config["deterministic"], "Deterministic flag does not match"
-    assert sweeper.slurm == config["slurm"], "Slurm flag does not match"
-    assert sweeper.slurm_timeout == config["slurm_timeout"], "Slurm timeout does not match"
-    assert sweeper.max_parallel == min(config.get("job_array_size_limit", 100), max(1, int(config.get("max_parallelization", 0.1) * config.get("n_trials", 1_000_000)))), "Max parallelization does not match"
+    assert sweeper.slurm == config.get("slurm", False), "Slurm flag does not match"
+    assert sweeper.slurm_timeout == config.get("slurm_timeout", 10), "Slurm timeout does not match"
+    assert sweeper.max_parallel == min(
+        config.get("job_array_size_limit", 100),
+        max(1, int(config.get("max_parallelization", 0.1) * config.get("n_trials", 1_000_000))),
+    ), "Max parallelization does not match"
     assert sweeper.budget == config.get("budget", 1_000_000), "Budget does not match"
     assert sweeper.min_budget == config.get("min_budget", None), "Minimum budget does not match"
     assert sweeper.max_budget == config.get("max_budget", None), "Maximum budget does not match"
@@ -107,30 +119,81 @@ def test_init(config):
     assert not sweeper.warmstart_data, "Warmstart data should be empty at initialization"
     assert sweeper.wandb_project == config.get("wandb_project", None), "WandB project does not match"
     assert isinstance(sweeper.optimizer, DummyOptimizer), "Optimizer should be an instance of DummyOptimizer"
-    assert sweeper.optimizer.checkpoint_dir == sweeper.checkpoint_dir, "Optimizer checkpoint directory does not match sweeper checkpoint directory"
-    assert sweeper.optimizer.checkpoint_path_typing == sweeper.checkpoint_path_typing, "Optimizer checkpoint path type does not match sweeper checkpoint pyth type"
+    assert sweeper.optimizer.checkpoint_dir == sweeper.checkpoint_dir, (
+        "Optimizer checkpoint directory does not match sweeper checkpoint directory"
+    )
+    assert sweeper.optimizer.checkpoint_path_typing == sweeper.checkpoint_path_typing, (
+        "Optimizer checkpoint path type does not match sweeper checkpoint pyth type"
+    )
     assert sweeper.optimizer.seeds == sweeper.seeds, "Optimizer seeds do not match sweeper seeds"
     shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
 
+
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
 def test_init_with_warmstart(config):
-    pass
+    config["warmstart_file"] = Path("./examples/example_grids/branin/runhistory.csv")
+    actual_warmstart_values = pd.read_csv(config["warmstart_file"])
+    sweeper = HypersweeperSweeper(**config)
+    assert sweeper.warmstart_data is not None, "Warmstart data should not be None"
+    assert isinstance(sweeper.warmstart_data, list), "Warmstart data should be a list"
+    actual_performances = actual_warmstart_values["performance"].to_list()
+    if config["maximize"]:
+        actual_performances = [-x for x in actual_performances]
+    warmstart_performances = [res.performance for _, res in sweeper.warmstart_data]
+    assert np.allclose(warmstart_performances, actual_performances), (
+        "Warmstart performances do not match the expected values"
+    )
+    shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
+
 
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
 def test_init_with_seeds(config):
-    pass
+    config["seeds"] = [42, 43, 44]
+    sweeper = HypersweeperSweeper(**config)
+    assert sweeper.seeds == config["seeds"], "Seeds do not match the expected values"
+    assert sweeper.optimizer.seeds == config["seeds"], "Optimizer seeds do not match the expected values"
+    if any("seed" in o for o in config["global_overrides"]):
+        assert len(sweeper.global_overrides) == len(config["global_overrides"]) - 1, (
+            f"Global overrides length does not match the config - 1. Likely the seed key was not removed: {sweeper.global_overrides}"
+        )
+        assert not any("seed" in o for o in sweeper.global_overrides), (
+            "Global overrides should not contain 'seed' after initialization"
+        )
+    shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
+
 
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
 def test_init_non_deterministic(config):
-    pass
+    config["deterministic"] = False
+    sweeper = HypersweeperSweeper(**config)
+    assert not sweeper.deterministic, "Deterministic flag should be set to False"
+    if any("seed" in o for o in config["global_overrides"]):
+        assert len(sweeper.global_overrides) == len(config["global_overrides"]) - 1, (
+            f"Global overrides length does not match the config - 1. Likely the seed key was not removed: {sweeper.global_overrides}"
+        )
+        assert not any("seed" in o for o in sweeper.global_overrides), (
+            "Global overrides should not contain 'seed' after initialization"
+        )
+    shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
+
 
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
 def test_init_without_n_trials(config):
-    pass
+    config["n_trials"] = None
+    sweeper = HypersweeperSweeper(**config)
+    assert sweeper.n_trials is None, "Number of trials should be set to None"
+    assert sweeper.max_parallel == config.get("job_array_size_limit", 100), (
+        "Max parallelization should match job array size limit without n_trials"
+    )
+    shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
+
 
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
 def test_init_with_wandb(config):
-    config["wandb_project"] = None
-    config["wandb_entity"] = None
-    config["wandb_tags"] = None
-    pass
+    config["wandb_project"] = "test"
+    config["wandb_entity"] = "hypersweeper"
+    config["wandb_tags"] = ["test", "hypersweeper"]
+    config["wandb_mode"] = "offline"
+    HypersweeperSweeper(**config)
+    shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
+    shutil.rmtree("wandb", ignore_errors=True)

@@ -16,7 +16,7 @@ class Hypersweeper(Sweeper):
 
     def __init__(self, *args: Any, **kwargs: dict[Any, Any]) -> None:
         """Initialize the sweeper."""
-        from .hypersweeper_backend import HypersweeperBackend
+        from .hypersweeper_backend import HypersweeperBackend  # noqa: PLC0415
 
         self.sweeper = HypersweeperBackend(*args, **kwargs)
 

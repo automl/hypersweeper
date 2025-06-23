@@ -45,7 +45,7 @@ class AblationPath:
                 if not np.isnan(target_config[k]):
                     self.target_config[k] = target_config[k]
         else:
-            df = load_data(data_path, performance_key, config_key, variation_key)  # noqa: PD901
+            df = load_data(data_path, performance_key, config_key, variation_key)
             self.source_config = df_to_config(configspace, get_overall_best_config(df))
             self.target_config = df_to_config(configspace, get_best_config_per_variation(df, variation))
 
@@ -132,6 +132,7 @@ class AblationPath:
         self.returns.append((info.config, value.performance))
 
     def finish_run(self, output_path):
+        """Finish the ablation path run and save results."""
         returns = [r[1] for r in self.returns]
         chosen_hp = self.hps_left[np.argmax(returns)]
         best_return = max(returns)
