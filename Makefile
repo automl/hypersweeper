@@ -102,7 +102,6 @@ install: clean ## install the package to the active Python's site-packages
 
 install-dev: clean ## install the package to the active Python's site-packages
 	uv pip install -e ".[dev,examples,doc,all]" --config-settings editable_mode=compat
-	source .venv/bin/activate && python -m carps.build.make optimizer_smac optimizer_hebo
 
 check:
 	uv run pre-commit run --all-files
