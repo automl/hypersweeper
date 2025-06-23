@@ -50,11 +50,11 @@ clean-docs: ## remove docs artifacts
 	cd docs && make clean
 
 ruff: ## run ruff as a formatter
-	uvx ruff format hydra_plugins tests
-	uvx ruff check --silent --exit-zero --no-cache --fix hydra_plugins
-	uvx ruff check --exit-zero hydra_plugins
+	uv run ruff format hydra_plugins tests
+	uv run ruff check --silent --exit-zero --no-cache --fix hydra_plugins
+	uv run ruff check --exit-zero hydra_plugins
 isort:
-	uvx isort hydra_plugins tests
+	uv run isort hydra_plugins tests
 
 test: ## run tests quickly with the default Python
 	uv run pytest tests
@@ -105,7 +105,7 @@ install-dev: clean ## install the package to the active Python's site-packages
 	source .venv/bin/activate && python -m carps.build.make optimizer_smac optimizer_hebo
 
 check:
-	uvx pre-commit run --all-files
+	uv run pre-commit run --all-files
 
 format:
 	make ruff
