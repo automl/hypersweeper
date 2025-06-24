@@ -1,39 +1,39 @@
 
 defaults:
   - _self_
-  - target_function: mlp
+  - task: mlp
   - search_space: mlp
+  - target_function: mlp
   - override hydra/sweeper: HyperCARPS
 
 hydra:
   sweeper:
-    n_trials: 10
-    budget_variable: epochs
+    n_trials: ${task.resource_kwargs.n_trials}
+    search_space: ${search_space}
     sweeper_kwargs:
       optimizer_kwargs:
-        _target_: carps.optimizers.smac20.SMAC3Optimizer
-        _partial_: true
-        task:
-          n_trials: ${hydra.sweeper.n_trials}
-          n_workers: 1
-          n_objectives: 1
-        smac_cfg:
+        optimizer: 
+          _target_: carps.optimizers.smac20.SMAC3Optimizer
+          _partial_: true
+        task: ${task}
+        optimizer_cfg:
           smac_class: smac.facade.multi_fidelity_facade.MultiFidelityFacade
           scenario:
-            seed: ${seed}
-            n_trials: ${hydra.sweeper.n_trials}
+            seed: 0
+            n_trials: ${task.resource_kwargs.n_trials}
+            objectives: ${task.output_kwargs.objectives}
             deterministic: true
             n_workers: 1
-            min_budget: 1
-            max_budget: 10
             output_directory: ${hydra.sweep.dir}
+            min_budget: ${task.fidelity_kwargs.min_fidelity}
+            max_budget: ${task.fidelity_kwargs.max_fidelity}
           smac_kwargs:
             dask_client: null
+            overwrite: true
             intensifier:
               _target_: smac.intensifier.hyperband.Hyperband
               _partial_: true
               eta: 3
-    search_space: ${search_space}
   run:
     dir: ./tmp/mlp_carps_smac/
   sweep:

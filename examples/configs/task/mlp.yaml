@@ -1,12 +1,12 @@
 fidelity_kwargs:
-  is_multifidelity: false
-  fidelity_type: n_bongos
-  min_fidelity: 1
-  max_fidelity: 10
+  is_multifidelity: true
+  fidelity_type: epochs
+  min_fidelity: 5
+  max_fidelity: 50
 output_kwargs:
   n_objectives: 1
   objectives:
-  - quality
+  - accuracy
 resource_kwargs:
   n_trials: 15
   time_budget: null

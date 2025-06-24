@@ -1,21 +1,30 @@
 
 defaults:
   - _self_
-  - target_function: branin
   - task: branin
   - search_space: branin
+  - target_function: branin
   - override hydra/sweeper: HyperCARPS
 
 hydra:
   sweeper:
-    n_trials: 15
+    n_trials: ${task.resource_kwargs.n_trials}
+    search_space: ${search_space}
     sweeper_kwargs:
       optimizer_kwargs:
-        optimizer:
+        optimizer: 
           _target_: carps.optimizers.hebo.HEBOOptimizer
           _partial_: true
-        task_config: ${task}
-    search_space: ${search_space}
+        task: ${task}
+        optimizer_cfg:
+          model_name: gp  # surrogate model to be used
+          rand_sample: null  # iterations to perform random sampling
+          acq_cls:
+            _target_: hebo.acquisitions.acq.MACE
+            _partial_: true
+          es: nsga2
+          model_config: null
+          scramble_seed: 0
   run:
     dir: ./tmp/branin_carps_hebo/
   sweep:

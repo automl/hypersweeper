@@ -88,6 +88,6 @@ hydra:
           values: [ sgd, adam ]
 
   run:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/mlp_neps_asha/
   sweep:
-    dir: ./tmp/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ./tmp/mlp_neps_asha/

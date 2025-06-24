@@ -55,7 +55,7 @@ ruff: ## run ruff as a formatter
 	uv run ruff check --exit-zero hydra_plugins
 
 test: ## run tests quickly with the default Python
-	uv run pytest tests
+	uv run pytest tests 
 cov-report:
 	coverage html -d coverage_html
 

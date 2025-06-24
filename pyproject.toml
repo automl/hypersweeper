@@ -52,7 +52,7 @@ doc = [
 hebo = ["hebo==0.3.5"]
 nevergrad = ["nevergrad==1.0.2"]
 dehb = ["dehb==0.1.1"]
-pbt = ["GPy"]
+pbt = ["GPy~=1.13.2"]
 carps = ["carps~=1.0.2"]
 all = ["HyperSweeper[hebo,nevergrad,dehb,pbt,carps]"]
 
@@ -70,7 +70,7 @@ log_level = "DEBUG"
 xfail_strict = true
 addopts = "--durations=10 -vv"
 markers = ["example: An example"]
-
+adopts = "--ignore=tests/test_runs/test_neps.py"  
 
 [tool.coverage.run]
 branch = true

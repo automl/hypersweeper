@@ -51,11 +51,21 @@ The results are located in 'tmp', including a record of each run, the final conf
 For more information, see our example ReadMe.
 
 ## Current Sweeper Integrations
-- Random Search
+Hypersweeper currently interfaces the following optimizers:
 - SMAC
 - HEBO
-- PBT
+- Nevergrad
 - CARP-S (which contains many different optimizers in itself)
+
+
+We also implement sweepers from scratch for:
+- Random Search
+- Grid Search (for collecting analysis data)
+- PBT, PB2 and BGPBT as adaptations of the original code
+- Local parameter importance (LPI)
+- Ablation Paths
+
+We also have an interface for NePS, but due to them using an old configspace version, this sweeper is not usable out of the box and requires at least a change to the configspace version, possibly even some smaller changes to the config parsing.
 
 ## Cite Us
 
