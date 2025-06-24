@@ -16,6 +16,8 @@ def test_pbt_sac_example():
             "-m",
             "algorithm.total_timesteps=1000",
             "hydra.sweeper.sweeper_kwargs.optimizer_kwargs.config_interval=500",
+            "hydra.run.dir=sac_pbt",
+            "hydra.sweep.dir=sac_pbt",
         ]
     )
     assert Path("sac_pbt").exists(), "Run directory not created"
@@ -37,6 +39,8 @@ def test_pb2_sac_example():
             "-m",
             "algorithm.total_timesteps=1000",
             "hydra.sweeper.sweeper_kwargs.optimizer_kwargs.config_interval=500",
+            "hydra.run.dir=sac_pb2",
+            "hydra.sweep.dir=sac_pb2",
         ]
     )
     assert Path("sac_pb2").exists(), "Run directory not created"

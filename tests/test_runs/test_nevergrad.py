@@ -9,7 +9,15 @@ def test_nevergrad_branin_example():
     if Path("branin_nevergrad").exists():
         shutil.rmtree(Path("branin_nevergrad"))
     subprocess.call(
-        ["python", "examples/branin.py", "--config-name=branin_nevergrad", "-m", "hydra.sweeper.n_trials=5"]
+        [
+            "python",
+            "examples/branin.py",
+            "--config-name=branin_nevergrad",
+            "-m",
+            "hydra.sweeper.n_trials=5",
+            "hydra.run.dir=branin_nevergrad",
+            "hydra.sweep.dir=branin_nevergrad",
+        ]
     )
     assert Path("branin_nevergrad").exists(), "Run directory not created"
     assert Path("branin_nevergrad/runhistory.csv").exists(), "Run history file not created"

@@ -16,6 +16,8 @@ def test_lpi_branin_example():
             "-m",
             "hydra.sweeper.n_trials=5",
             "hydra.sweeper.sweeper_kwargs.optimizer_kwargs.configs_per_hp=2",
+            "hydra.run.dir=branin_lpi",
+            "hydra.sweep.dir=branin_lpi",
         ]
     )
     assert Path("branin_lpi").exists(), "Run directory not created"

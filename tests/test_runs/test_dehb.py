@@ -8,7 +8,17 @@ import pandas as pd
 def test_dehb_mlp_example():
     if Path("mlp_dehb").exists():
         shutil.rmtree(Path("mlp_dehb"))
-    subprocess.call(["python", "examples/mlp.py", "--config-name=mlp_dehb", "-m", "hydra.sweeper.n_trials=5"])
+    subprocess.call(
+        [
+            "python",
+            "examples/mlp.py",
+            "--config-name=mlp_dehb",
+            "-m",
+            "hydra.sweeper.n_trials=5",
+            "hydra.run.dir=mlp_dehb",
+            "hydra.sweep.dir=mlp_dehb",
+        ]
+    )
     assert Path("mlp_dehb").exists(), "Run directory not created"
     assert Path("mlp_dehb/runhistory.csv").exists(), "Run history file not created"
     runhistory = pd.read_csv("mlp_dehb/runhistory.csv")

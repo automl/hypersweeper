@@ -12,7 +12,7 @@
 # def test_neps_asha_mlp_example():
 #     if Path("mlp_neps_asha").exists():
 #         shutil.rmtree(Path("mlp_neps_asha"))
-#     subprocess.call(["python", "examples/mlp.py", "--config-name=mlp_neps_asha", "-m", "hydra.sweeper.n_trials=5"])
+#     subprocess.call(["python", "examples/mlp.py", "--config-name=mlp_neps_asha", "-m", "hydra.sweeper.n_trials=5", "hydra.run.dir=mlp_neps_asha", "hydra.sweep.dir=mlp_neps_asha"])
 #     assert Path("mlp_neps_asha").exists(), "Run directory not created"
 #     assert Path("mlp_neps_asha/runhistory.csv").exists(), "Run history file not created"
 #     runhistory = pd.read_csv("mlp_neps_asha/runhistory.csv")
@@ -23,7 +23,7 @@
 # def test_neps_priorband_mlp_example():
 #     if Path("mlp_neps_priorband").exists():
 #         shutil.rmtree(Path("mlp_neps_priorband"))
-#     subprocess.call(["python", "examples/mlp.py", "--config-name=mlp_neps_priorband", "-m", "hydra.sweeper.n_trials=5"])
+#     subprocess.call(["python", "examples/mlp.py", "--config-name=mlp_neps_priorband", "-m", "hydra.sweeper.n_trials=5", "hydra.run.dir=mlp_neps_asha", "hydra.sweep.dir=mlp_neps_asha"])
 #     assert Path("mlp_neps_priorband").exists(), "Run directory not created"
 #     assert Path("mlp_neps_priorband/runhistory.csv").exists(), "Run history file not created"
 #     runhistory = pd.read_csv("mlp_neps_priorband/runhistory.csv")
