@@ -17,7 +17,16 @@ from hydra_plugins.hypersweeper.utils import read_warmstart_data
 def test_non_max_incumbent():
     if Path("branin_non_max").exists():
         shutil.rmtree(Path("branin_non_max"))
-    subprocess.call(["python", "examples/branin.py", "--config-name=branin_rs", "-m", "hydra.run.dir=branin_non_max", "hydra.sweep.dir=branin_non_max"])
+    subprocess.call(
+        [
+            "python",
+            "examples/branin.py",
+            "--config-name=branin_rs",
+            "-m",
+            "hydra.run.dir=branin_non_max",
+            "hydra.sweep.dir=branin_non_max",
+        ]
+    )
     assert Path("branin_non_max").exists(), "Run directory not created"
     runhistory = pd.read_csv("branin_non_max/runhistory.csv")
     incumbent = pd.read_csv("branin_non_max/incumbent.csv")
@@ -33,7 +42,15 @@ def test_max_incumbent():
     if Path("branin_max").exists():
         shutil.rmtree(Path("branin_max"))
     subprocess.call(
-        ["python", "examples/branin.py", "--config-name=branin_rs", "-m", "+hydra.sweeper.sweeper_kwargs.maximize=True", "hydra.run.dir=branin_max", "hydra.sweep.dir=branin_max"]
+        [
+            "python",
+            "examples/branin.py",
+            "--config-name=branin_rs",
+            "-m",
+            "+hydra.sweeper.sweeper_kwargs.maximize=True",
+            "hydra.run.dir=branin_max",
+            "hydra.sweep.dir=branin_max",
+        ]
     )
     assert Path("branin_max").exists(), "Run directory not created"
     runhistory = pd.read_csv("branin_max/runhistory.csv")
