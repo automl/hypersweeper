@@ -12,11 +12,9 @@ from typing import TYPE_CHECKING
 from hydra.core.plugins import Plugins
 from hydra.plugins.sweeper import Sweeper
 from hydra.utils import get_class, get_method
+from hydra_plugins.hypersweeper.search_space_encoding import search_space_to_config_space
 from omegaconf import DictConfig, OmegaConf, open_dict
 from rich import print as printr
-
-from hydra_plugins.hypersweeper.search_space_encoding import \
-    search_space_to_config_space
 
 from .hypersweeper_sweeper import HypersweeperSweeper
 

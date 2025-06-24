@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from smac.runhistory.dataclasses import TrialInfo, TrialValue
-
 from hydra_plugins.hypersweeper import Info
+from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
 
 class HyperCARPSAdapter:

@@ -6,12 +6,11 @@ from pathlib import Path
 
 import pandas as pd
 from hydra.utils import get_class
+from hydra_plugins.hypersweeper.utils import Info, convert_to_configuration
 from omegaconf import OmegaConf
 from smac import Scenario
 from smac.facade import HyperparameterOptimizationFacade
 from smac.runhistory.dataclasses import TrialInfo, TrialValue
-
-from hydra_plugins.hypersweeper.utils import Info, convert_to_configuration
 
 
 def read_additional_configs(initial_design_fn, configspace):

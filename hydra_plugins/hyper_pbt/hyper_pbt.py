@@ -6,11 +6,12 @@ import shutil
 from pathlib import Path
 
 import numpy as np
-from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
-                                         NormalIntegerHyperparameter,
-                                         OrdinalHyperparameter,
-                                         UniformIntegerHyperparameter)
-
+from ConfigSpace.hyperparameters import (
+    CategoricalHyperparameter,
+    NormalIntegerHyperparameter,
+    OrdinalHyperparameter,
+    UniformIntegerHyperparameter,
+)
 from hydra_plugins.hypersweeper import Info
 
 

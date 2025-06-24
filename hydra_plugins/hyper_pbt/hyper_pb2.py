@@ -9,12 +9,10 @@ from copy import deepcopy
 
 import GPy
 import numpy as np
-from ConfigSpace.hyperparameters import (NormalIntegerHyperparameter,
-                                         UniformIntegerHyperparameter)
+from ConfigSpace.hyperparameters import NormalIntegerHyperparameter, UniformIntegerHyperparameter
 
 from .hyper_pbt import PBT
-from .pb2_utils import (TVMixtureViaSumAndProduct, TVSquaredExp, exp3_get_cat,
-                        normalize, optimize_acq, standardize, ucb)
+from .pb2_utils import TVMixtureViaSumAndProduct, TVSquaredExp, exp3_get_cat, normalize, optimize_acq, standardize, ucb
 
 log = logging.getLogger(__name__)
 

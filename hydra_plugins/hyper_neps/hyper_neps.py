@@ -17,12 +17,13 @@ if (spec := importlib.util.find_spec("neps")) is not None:
 
 from typing import TYPE_CHECKING
 
-from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
-                                         NormalFloatHyperparameter,
-                                         NormalIntegerHyperparameter,
-                                         UniformFloatHyperparameter,
-                                         UniformIntegerHyperparameter)
-
+from ConfigSpace.hyperparameters import (
+    CategoricalHyperparameter,
+    NormalFloatHyperparameter,
+    NormalIntegerHyperparameter,
+    UniformFloatHyperparameter,
+    UniformIntegerHyperparameter,
+)
 from hydra_plugins.hypersweeper import Info
 
 if TYPE_CHECKING:

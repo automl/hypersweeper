@@ -8,10 +8,14 @@ from collections import abc
 import numpy as np
 import pandas as pd
 from ConfigSpace import Configuration, ConfigurationSpace
-from ConfigSpace.hyperparameters import (CategoricalHyperparameter, Constant,
-                                         FloatHyperparameter, Hyperparameter,
-                                         IntegerHyperparameter,
-                                         OrdinalHyperparameter)
+from ConfigSpace.hyperparameters import (
+    CategoricalHyperparameter,
+    Constant,
+    FloatHyperparameter,
+    Hyperparameter,
+    IntegerHyperparameter,
+    OrdinalHyperparameter,
+)
 
 if (spec := importlib.util.find_spec("hebo")) is not None:
     from hebo.design_space.design_space import DesignSpace

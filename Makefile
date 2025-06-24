@@ -53,8 +53,6 @@ ruff: ## run ruff as a formatter
 	uv run ruff format hydra_plugins tests
 	uv run ruff check --silent --exit-zero --no-cache --fix hydra_plugins
 	uv run ruff check --exit-zero hydra_plugins
-isort:
-	uv run isort hydra_plugins tests
 
 test: ## run tests quickly with the default Python
 	uv run pytest tests
@@ -108,4 +106,3 @@ check:
 
 format:
 	make ruff
-	make isort

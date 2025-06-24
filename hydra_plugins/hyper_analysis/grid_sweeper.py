@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import numpy as np
 from ConfigSpace.hyperparameters import CategoricalHyperparameter
-
 from hydra_plugins.hypersweeper import Info
 
 

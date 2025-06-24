@@ -7,12 +7,13 @@ import importlib
 if (spec := importlib.util.find_spec("nevergrad")) is not None:
     import nevergrad as ng
 
-from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
-                                         NormalFloatHyperparameter,
-                                         NormalIntegerHyperparameter,
-                                         UniformFloatHyperparameter,
-                                         UniformIntegerHyperparameter)
-
+from ConfigSpace.hyperparameters import (
+    CategoricalHyperparameter,
+    NormalFloatHyperparameter,
+    NormalIntegerHyperparameter,
+    UniformFloatHyperparameter,
+    UniformIntegerHyperparameter,
+)
 from hydra_plugins.hypersweeper import Info
 
 

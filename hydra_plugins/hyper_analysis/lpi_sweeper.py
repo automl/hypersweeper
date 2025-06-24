@@ -8,13 +8,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from ConfigSpace import Configuration, ForbiddenValueError
-from ConfigSpace.hyperparameters import (CategoricalHyperparameter,
-                                         NumericalHyperparameter)
+from ConfigSpace.hyperparameters import CategoricalHyperparameter, NumericalHyperparameter
 from ConfigSpace.util import change_hp_value
-
-from hydra_plugins.hyper_analysis.utils import (df_to_config, dict_to_config,
-                                                get_overall_best_config,
-                                                load_data)
+from hydra_plugins.hyper_analysis.utils import df_to_config, dict_to_config, get_overall_best_config, load_data
 from hydra_plugins.hypersweeper import Info
 
 

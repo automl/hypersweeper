@@ -13,9 +13,8 @@ import numpy as np
 import pandas as pd
 import wandb
 from hydra.utils import to_absolute_path
-from omegaconf import DictConfig, OmegaConf
-
 from hydra_plugins.hypersweeper.utils import Info, Result, read_warmstart_data
+from omegaconf import DictConfig, OmegaConf
 
 if TYPE_CHECKING:
     from ConfigSpace import Configuration, ConfigurationSpace

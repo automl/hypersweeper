@@ -99,6 +99,7 @@ target-version = "py310"
 line-length = 120
 src = ["src", "tests", "examples"]
 lint.extend-safe-fixes = ["ALL"]
+lint.extend-select = ["I"]
 
 # Allow unused variables when underscore-prefixed.
 lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
@@ -164,7 +165,7 @@ lint.ignore = [
   "S101",    # Use of assert detected.
   "W292",    # No newline at end of file
   "PLC1901", # "" can be simplified to be falsey
-  "TCH003",  # Move stdlib import into TYPE_CHECKING
+  "TC003",  # Move stdlib import into TYPE_CHECKING
   "B010",    # Do not use `setattr`
   "COM812",
   # These tend to be lighweight and confuse pyright

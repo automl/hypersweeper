@@ -8,11 +8,13 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
-from hydra_plugins.hyper_analysis.utils import (df_to_config,
-                                                get_best_config_per_variation,
-                                                get_overall_best_config,
-                                                load_data, to_json_types)
+from hydra_plugins.hyper_analysis.utils import (
+    df_to_config,
+    get_best_config_per_variation,
+    get_overall_best_config,
+    load_data,
+    to_json_types,
+)
 from hydra_plugins.hypersweeper import Info
 
 
