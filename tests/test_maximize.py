@@ -15,29 +15,29 @@ from hydra_plugins.hypersweeper.utils import read_warmstart_data
 
 
 def test_non_max_incumbent():
-    if Path("./tmp/branin_rs").exists():
-        shutil.rmtree(Path("./tmp/branin_rs"))
+    if Path("branin_rs").exists():
+        shutil.rmtree(Path("branin_rs"))
     subprocess.call(["python", "examples/branin.py", "--config-name=branin_rs", "-m"])
-    assert Path("./tmp/branin_rs").exists(), "Run directory not created"
-    runhistory = pd.read_csv("./tmp/branin_rs/runhistory.csv")
-    incumbent = pd.read_csv("./tmp/branin_rs/incumbent.csv")
+    assert Path("branin_rs").exists(), "Run directory not created"
+    runhistory = pd.read_csv("branin_rs/runhistory.csv")
+    incumbent = pd.read_csv("branin_rs/incumbent.csv")
     incumbent = incumbent.iloc[-1]
 
     assert np.round(incumbent["performance"], decimals=3) == np.round(runhistory["performance"].min(), decimals=3), (
         "Incumbent is not the minimum performance in the runhistory"
     )
-    shutil.rmtree(Path("./tmp/branin_rs"))
+    shutil.rmtree(Path("branin_rs"))
 
 
 def test_max_incumbent():
-    if Path("./tmp/branin_rs").exists():
-        shutil.rmtree(Path("./tmp/branin_rs"))
+    if Path("branin_rs").exists():
+        shutil.rmtree(Path("branin_rs"))
     subprocess.call(
         ["python", "examples/branin.py", "--config-name=branin_rs", "-m", "+hydra.sweeper.sweeper_kwargs.maximize=True"]
     )
-    assert Path("./tmp/branin_rs").exists(), "Run directory not created"
-    runhistory = pd.read_csv("./tmp/branin_rs/runhistory.csv")
-    incumbent = pd.read_csv("./tmp/branin_rs/incumbent.csv")
+    assert Path("branin_rs").exists(), "Run directory not created"
+    runhistory = pd.read_csv("branin_rs/runhistory.csv")
+    incumbent = pd.read_csv("branin_rs/incumbent.csv")
     incumbent = incumbent.iloc[-1]
 
     print(incumbent["performance"], runhistory["performance"].max(), runhistory.performance.min())
@@ -45,7 +45,7 @@ def test_max_incumbent():
     assert np.round(incumbent["performance"], decimals=3) == np.round(runhistory["performance"].max(), decimals=3), (
         "Incumbent is not the maximum score in the runhistory even though maximize is enabled"
     )
-    shutil.rmtree(Path("./tmp/branin_rs"))
+    shutil.rmtree(Path("branin_rs"))
 
 
 def test_max_warmstarting():

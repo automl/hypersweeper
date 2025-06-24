@@ -6,8 +6,8 @@ import pandas as pd
 
 
 def test_pbt_sac_example():
-    if Path("./tmp/sac_pbt").exists():
-        shutil.rmtree(Path("./tmp/sac_pbt"))
+    if Path("sac_pbt").exists():
+        shutil.rmtree(Path("sac_pbt"))
     subprocess.call(
         [
             "python",
@@ -18,17 +18,17 @@ def test_pbt_sac_example():
             "hydra.sweeper.sweeper_kwargs.optimizer_kwargs.config_interval=500",
         ]
     )
-    assert Path("./tmp/sac_pbt").exists(), "Run directory not created"
-    assert Path("./tmp/sac_pbt/runhistory.csv").exists(), "Run history file not created"
-    runhistory = pd.read_csv("./tmp/sac_pbt/runhistory.csv")
+    assert Path("sac_pbt").exists(), "Run directory not created"
+    assert Path("sac_pbt/runhistory.csv").exists(), "Run history file not created"
+    runhistory = pd.read_csv("sac_pbt/runhistory.csv")
     assert not runhistory.empty, "Run history is empty"
     assert len(runhistory) == 4, "Run history should contain 4 entries"
-    shutil.rmtree(Path("./tmp/sac_pbt"))
+    shutil.rmtree(Path("sac_pbt"))
 
 
 def test_pb2_sac_example():
-    if Path("./tmp/sac_pb2").exists():
-        shutil.rmtree(Path("./tmp/sac_pb2"))
+    if Path("sac_pb2").exists():
+        shutil.rmtree(Path("sac_pb2"))
     subprocess.call(
         [
             "python",
@@ -39,9 +39,9 @@ def test_pb2_sac_example():
             "hydra.sweeper.sweeper_kwargs.optimizer_kwargs.config_interval=500",
         ]
     )
-    assert Path("./tmp/sac_pb2").exists(), "Run directory not created"
-    assert Path("./tmp/sac_pb2/runhistory.csv").exists(), "Run history file not created"
-    runhistory = pd.read_csv("./tmp/sac_pb2/runhistory.csv")
+    assert Path("sac_pb2").exists(), "Run directory not created"
+    assert Path("sac_pb2/runhistory.csv").exists(), "Run history file not created"
+    runhistory = pd.read_csv("sac_pb2/runhistory.csv")
     assert not runhistory.empty, "Run history is empty"
     assert len(runhistory) == 4, "Run history should contain 4 entries"
-    shutil.rmtree(Path("./tmp/sac_pb2"))
+    shutil.rmtree(Path("sac_pb2"))

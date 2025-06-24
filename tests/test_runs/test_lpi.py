@@ -6,8 +6,8 @@ import pandas as pd
 
 
 def test_lpi_branin_example():
-    if Path("./tmp/branin_lpi").exists():
-        shutil.rmtree(Path("./tmp/branin_lpi"))
+    if Path("branin_lpi").exists():
+        shutil.rmtree(Path("branin_lpi"))
     subprocess.call(
         [
             "python",
@@ -18,10 +18,10 @@ def test_lpi_branin_example():
             "hydra.sweeper.sweeper_kwargs.optimizer_kwargs.configs_per_hp=2",
         ]
     )
-    assert Path("./tmp/branin_lpi").exists(), "Run directory not created"
-    assert Path("./tmp/branin_lpi/runhistory.csv").exists(), "Run history file not created"
-    assert Path("./tmp/branin_lpi/lpi_plot.png").exists(), "Plot not created"
-    runhistory = pd.read_csv("./tmp/branin_lpi/runhistory.csv")
+    assert Path("branin_lpi").exists(), "Run directory not created"
+    assert Path("branin_lpi/runhistory.csv").exists(), "Run history file not created"
+    assert Path("branin_lpi/lpi_plot.png").exists(), "Plot not created"
+    runhistory = pd.read_csv("branin_lpi/runhistory.csv")
     assert not runhistory.empty, "Run history is empty"
     assert len(runhistory) == 3, f"Run history should contain 3 entries, was {len(runhistory)}"
-    shutil.rmtree(Path("./tmp/branin_lpi"))
+    shutil.rmtree(Path("branin_lpi"))
