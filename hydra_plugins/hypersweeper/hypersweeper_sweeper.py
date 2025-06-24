@@ -456,13 +456,12 @@ class HypersweeperSweeper:
             infos = []
             t = 0
             terminate = False
-            while (
-                t < self.max_parallel
-                and not terminate
-                and not trial_termination
-                and not budget_termination
-                and not optimizer_termination
-            ):
+            while t < self.max_parallel and not terminate and not trial_termination and not optimizer_termination:
+                if not any(b is None for b in self.history["budget"]) and self.budget is not None:
+                    budget_termination = sum(self.history["budget"]) >= self.budget
+                    if budget_termination:
+                        break
+
                 try:
                     info, terminate, optimizer_termination = self.optimizer.ask()
                 except Exception as e:  # noqa: BLE001
@@ -484,8 +483,7 @@ class HypersweeperSweeper:
                 if info.load_path is not None:
                     loading_paths.append(info.load_path)
                 infos.append(info)
-                if not any(b is None for b in self.history["budget"]) and self.budget is not None:
-                    budget_termination = sum(self.history["budget"]) >= self.budget
+
                 if self.n_trials is not None:
                     trial_termination = self.trials_run + len(configs) >= self.n_trials
 

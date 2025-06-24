@@ -70,7 +70,6 @@ log_level = "DEBUG"
 xfail_strict = true
 addopts = "--durations=10 -vv"
 markers = ["example: An example"]
-adopts = "--ignore=tests/test_runs/test_neps.py"  
 
 [tool.coverage.run]
 branch = true

@@ -187,9 +187,8 @@ class TVMixtureViaSumAndProduct(GPy.kern.Kern):
     def K(self, x, x2):
         """Compute the kernel."""
         # clip epsilons
-        self.epsilon_1 = min(self.epsilon_1, 0.5)
-
-        self.epsilon_2 = min(self.epsilon_2, 0.5)
+        self.epsilon_1 = GPy.core.Param("epsilon_1", min(self.epsilon_1, 0.5))
+        self.epsilon_2 = GPy.core.Param("epsilon_1", min(self.epsilon_2, 0.5))
 
         # format data
         if x2 is None:

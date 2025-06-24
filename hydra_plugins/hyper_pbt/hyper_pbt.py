@@ -87,7 +87,7 @@ class PBT:
             self.population_id += 1
             if iteration_end:
                 self.iteration += 1
-            return Info(config=config, budget=self.budget_per_run, load_path=None, seed=None), iteration_end
+            return Info(config=config, budget=self.budget_per_run, load_path=None, seed=None), iteration_end, False
         config, load_path = self.perturb_config(self.population_id)
         self.population_id += 1
         if iteration_end:
@@ -172,8 +172,8 @@ class PBT:
             # Now that we have finished the iteration,
             # we can safely remove all checkpoints from the previous iteration
             print(f"Finished iteration {self.iteration}")
-            print("Remove checkpoints")
             if self.self_destruct and self.iteration > 1:
+                print("Remove checkpoints")
                 self.remove_checkpoints(self.iteration - 2)
 
     def finish_run(self, output_path):

@@ -9,6 +9,8 @@ from omegaconf import DictConfig, OmegaConf
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.monitor import Monitor
 
+OmegaConf.register_new_resolver("multiply", lambda x, y: x * y, replace=True)
+
 __copyright__ = "Copyright 2022, Theresa Eimer"
 __license__ = "3-clause BSD"
 
