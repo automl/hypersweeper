@@ -127,6 +127,7 @@ def test_init(config):
     )
     assert sweeper.optimizer.seeds == sweeper.seeds, "Optimizer seeds do not match sweeper seeds"
     shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
+    shutil.rmtree("checkpoints", ignore_errors=True)
 
 
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
@@ -144,6 +145,7 @@ def test_init_with_warmstart(config):
         "Warmstart performances do not match the expected values"
     )
     shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
+    shutil.rmtree("checkpoints", ignore_errors=True)
 
 
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
@@ -160,6 +162,7 @@ def test_init_with_seeds(config):
             "Global overrides should not contain 'seed' after initialization"
         )
     shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
+    shutil.rmtree("checkpoints", ignore_errors=True)
 
 
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
@@ -175,6 +178,7 @@ def test_init_non_deterministic(config):
             "Global overrides should not contain 'seed' after initialization"
         )
     shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
+    shutil.rmtree("checkpoints", ignore_errors=True)
 
 
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
@@ -186,6 +190,7 @@ def test_init_without_n_trials(config):
         "Max parallelization should match job array size limit without n_trials"
     )
     shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
+    shutil.rmtree("checkpoints", ignore_errors=True)
 
 
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
@@ -197,3 +202,4 @@ def test_init_with_wandb(config):
     HypersweeperSweeper(**config)
     shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
     shutil.rmtree("wandb", ignore_errors=True)
+    shutil.rmtree("checkpoints", ignore_errors=True)
