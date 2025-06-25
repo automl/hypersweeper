@@ -56,7 +56,7 @@ jobs:
         echo "::set-output name=BEFORE::$(git status --porcelain -b)"
 
     - name: Tests
-      run: python -m pytest tests -v --disable-pytest-warnings
+      run: pytest tests -v --disable-pytest-warnings
 
     - name: Check for files left behind by test
       run: |
