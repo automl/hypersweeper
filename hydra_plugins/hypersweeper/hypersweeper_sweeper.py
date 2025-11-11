@@ -523,4 +523,4 @@ class HypersweeperSweeper:
                     incumbent had a performance of {np.round(inc_performance, decimals=2)}"
             )
             log.info(f"The incumbent configuration is {inc_config}")
-        return self.incumbents[-1]
+        return self.incumbents["config"][-1]
