@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import shutil
 from collections import defaultdict
 from pathlib import Path
@@ -6,19 +8,20 @@ import numpy as np
 import pandas as pd
 from ConfigSpace import ConfigurationSpace, Float
 from hydra.utils import to_absolute_path
-from omegaconf import DictConfig
-from pytest import mark
-
 from hydra_plugins.hypersweeper import HypersweeperSweeper
+from omegaconf import DictConfig
+from pytest import mark  # noqa: PT013
 
 
 class DummyOptimizer:
-    checkpoint_dir = None
-    checkpoint_path_typing = None
-    seeds = []
+    """A dummy optimizer class for testing purposes."""
+
+    checkpoint_dir: str | None = None
+    checkpoint_path_typing: str | None = None
+    seeds: list = []  # noqa: RUF012
 
 
-def dummy_func(cs, kwargs):
+def dummy_func(cs, kwargs):  # noqa: ARG001
     """Dummy function to simulate a task function."""
     return DummyOptimizer()
 
@@ -156,7 +159,7 @@ def test_init_with_seeds(config):
     assert sweeper.optimizer.seeds == config["seeds"], "Optimizer seeds do not match the expected values"
     if any("seed" in o for o in config["global_overrides"]):
         assert len(sweeper.global_overrides) == len(config["global_overrides"]) - 1, (
-            f"Global overrides length does not match the config - 1. Likely the seed key was not removed: {sweeper.global_overrides}"
+            f"Global overrides length does not match config-1. 'seed' was not removed: {sweeper.global_overrides}"
         )
         assert not any("seed" in o for o in sweeper.global_overrides), (
             "Global overrides should not contain 'seed' after initialization"
@@ -172,7 +175,7 @@ def test_init_non_deterministic(config):
     assert not sweeper.deterministic, "Deterministic flag should be set to False"
     if any("seed" in o for o in config["global_overrides"]):
         assert len(sweeper.global_overrides) == len(config["global_overrides"]) - 1, (
-            f"Global overrides length does not match the config - 1. Likely the seed key was not removed: {sweeper.global_overrides}"
+            f"Global overrides length does not match config-1. 'seed' was not removed: {sweeper.global_overrides}"
         )
         assert not any("seed" in o for o in sweeper.global_overrides), (
             "Global overrides should not contain 'seed' after initialization"

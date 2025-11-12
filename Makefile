@@ -51,8 +51,11 @@ clean-docs: ## remove docs artifacts
 
 ruff: ## run ruff as a formatter
 	uv run ruff format hydra_plugins tests
-	uv run ruff check --silent --exit-zero --no-cache --fix hydra_plugins
-	uv run ruff check --exit-zero hydra_plugins
+	uv run ruff check --silent --exit-zero --no-cache --fix hydra_plugins tests
+	uv run ruff check --exit-zero hydra_plugins tests
+
+ruff-check: ## run ruff as a linter
+	uv run ruff check hydra_plugins tests
 
 test: ## run tests quickly with the default Python
 	uv run pytest tests 

@@ -4,6 +4,6 @@ repos:
     -   id: formatting
         name: formatting
         entry: make
-        args: ["format"]
+        args: ["ruff-check"]
         language: system
         pass_filenames: false

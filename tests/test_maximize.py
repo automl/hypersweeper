@@ -10,7 +10,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from ConfigSpace import ConfigurationSpace, Float
-
 from hydra_plugins.hypersweeper.utils import read_warmstart_data
 
 
