@@ -17,6 +17,7 @@ env:
   package-name: "hypersweeper"
   test-dir: tests
   UV_SYSTEM_PYTHON: 1
+  CI: false
 
 jobs:
   run-all-files:
@@ -42,7 +43,7 @@ jobs:
       run: |
         pip install pre-commit
         pre-commit install
-        
+
     - name: Run pre-commit
       run: |
         pre-commit run --all-files
