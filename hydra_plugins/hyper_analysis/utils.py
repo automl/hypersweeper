@@ -37,7 +37,7 @@ def get_overall_best_config(df):
 
 def get_best_config_per_variation(df, var, variation_key="env"):
     """Get the best config for a specific variation."""
-    df = df[df[variation_key] == var] # noqa: PD901
+    df = df[df[variation_key] == var]
     return df.loc[df["mean_performance"].idxmax()]
 
 

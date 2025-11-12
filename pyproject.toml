@@ -191,6 +191,7 @@ lint.ignore = [
   "B023",
   "B904",
   "PLC1802",
+  "PD901"
 ]
 
 exclude = [

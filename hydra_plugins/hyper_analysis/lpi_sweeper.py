@@ -38,7 +38,7 @@ class LPI:
         if config:
             self.config = dict_to_config(configspace, config)
         else:
-            df = load_data(data_path, performance_key, config_key, variation_key) # noqa: PD901
+            df = load_data(data_path, performance_key, config_key, variation_key)
             self.config = df_to_config(configspace, get_overall_best_config(df))
 
         neighbors = self._get_neighborhood()
@@ -68,7 +68,7 @@ class LPI:
 
     def finish_run(self, output_path):
         """Finish the run and calculate LPI scores."""
-        df = pd.read_csv(pathlib.PurePath(output_path, "runhistory.csv")) # noqa: PD901
+        df = pd.read_csv(pathlib.PurePath(output_path, "runhistory.csv"))
         if "seed" not in df.columns:
             df["seed"] = 0
         seeds = df["seed"].unique()
