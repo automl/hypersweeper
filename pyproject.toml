@@ -7,7 +7,7 @@ dependencies = [
   "pre-commit", 
   "pytest",
   "coverage",
-  "ruff~0.12.0",
+  "ruff~=0.12.0",
   "hydra-core~=1.3.2",
   "hydra-submitit-launcher",
   "hydra_colorlog",
