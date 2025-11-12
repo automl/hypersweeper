@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import logging
-import operator
 from collections.abc import Callable
-from functools import reduce
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import numpy as np
 from hydra.core.plugins import Plugins
 from hydra.plugins.sweeper import Sweeper
 from hydra.utils import get_class, get_method
@@ -163,23 +162,13 @@ class HypersweeperBackend(Sweeper):
         final_config = self.config
         with open_dict(final_config):
             del final_config["hydra"]
-        for a in arguments:
-            try:
-                n, v = a.split("=")
-                key_parts = n.split(".")
-                reduce(operator.getitem, key_parts[:-1], final_config)[key_parts[-1]] = v
-            except:  # noqa: E722
-                print(f"Could not parse argument {a}, skipping.")
-        schedules = {}
-        for i in range(len(incumbent)):
-            for k, v in incumbent[i].items():
-                if k not in schedules:
-                    schedules[k] = []
-                schedules[k].append(v)
-        for k in schedules:
-            key_parts = k.split(".")
-            reduce(operator.getitem, key_parts[:-1], final_config)[key_parts[-1]] = schedules[k]
+
+        for k, v in incumbent.items():
+            if isinstance(v, np.integer | np.floating):
+                v = v.item()  # noqa: PLW2901
+            OmegaConf.update(final_config, k, v, force_add=True)
+
         with open(Path(optimizer.output_dir) / "final_config.yaml", "w+") as fp:
-            OmegaConf.save(config=final_config, f=fp)
+            OmegaConf.save(config=final_config, f=fp, resolve=True)
 
         return incumbent
