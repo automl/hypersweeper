@@ -60,9 +60,41 @@ jobs:
         echo "$BEFORE" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
-    - name: Tests
-      run: python -m pytest -v --disable-pytest-warnings tests --durations=20
+    - name: Tests (with crash diagnostics)
+      shell: bash
+      env:
+        PYTHONFAULTHANDLER: "1"
+      run: |
+        set -o pipefail
+        echo "Running pytest with faulthandler; output saved to pytest.log"
+        python -X faulthandler -m pytest -vv -s --disable-pytest-warnings tests --durations=20 2>&1 | tee pytest.log
+        rc=${PIPESTATUS[0]}
+        echo "pytest exit code: $rc"
+        if [ "$rc" -ne 0 ]; then
+          echo "===== Last 500 lines of pytest.log ====="
+          tail -n 500 pytest.log || true
+          echo "===== Python faulthandler / thread info ====="
+          python - <<'PY'
+        import faulthandler, threading
+        print('faulthandler enabled:', faulthandler.is_enabled())
+        print('thread count:', len(threading.enumerate()))
+        PY
+              if command -v dmesg >/dev/null 2>&1; then
+                echo "===== dmesg tail (possible OOM/kernel kills) ====="
+                sudo dmesg | tail -n 200 || true
+              fi
+              mkdir -p artifacts
+              cp pytest.log artifacts/
+              exit $rc
+            fi
 
+    - name: Upload pytest log
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: pytest-log
+        path: artifacts/pytest.log
+          
     - name: Diagnostics and cleanup check
       if: always()
       shell: bash
