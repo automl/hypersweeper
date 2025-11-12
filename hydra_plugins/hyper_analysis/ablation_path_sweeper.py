@@ -47,7 +47,7 @@ class AblationPath:
                 if not np.isnan(target_config[k]):
                     self.target_config[k] = target_config[k]
         else:
-            df = load_data(data_path, performance_key, config_key, variation_key)
+            df = load_data(data_path, performance_key, config_key, variation_key) # noqa: PD901
             self.source_config = df_to_config(configspace, get_overall_best_config(df))
             self.target_config = df_to_config(configspace, get_best_config_per_variation(df, variation))
 
