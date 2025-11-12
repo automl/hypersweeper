@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
-import wandb
 from hydra.utils import to_absolute_path
 from hydra_plugins.hypersweeper.utils import Info, Result, read_warmstart_data
 from omegaconf import DictConfig, OmegaConf
@@ -179,6 +178,8 @@ class HypersweeperSweeper:
 
         self.wandb_project = wandb_project
         if self.wandb_project is not None:
+            import wandb  # noqa: PLC0415
+
             wandb_config = OmegaConf.to_container(global_config, resolve=False, throw_on_missing=False)
             assert wandb_entity, "Please provide an entity to log to W&B."
             wandb.init(
@@ -418,7 +419,7 @@ class HypersweeperSweeper:
             best_config = self.incumbents["config"][-1]
             for n in best_config:
                 stats[f"incumbent_{n}"] = best_config.get(n)
-            wandb.log(stats)
+            wandb.log(stats)  # noqa: F821
 
     def run(self, verbose=False):
         """Actual optimization loop.
