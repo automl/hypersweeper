@@ -178,7 +178,7 @@ class HypersweeperSweeper:
             )
 
         self.wandb_project = wandb_project
-        if self.wandb_project:
+        if self.wandb_project is not None:
             wandb_config = OmegaConf.to_container(global_config, resolve=False, throw_on_missing=False)
             assert wandb_entity, "Please provide an entity to log to W&B."
             wandb.init(
