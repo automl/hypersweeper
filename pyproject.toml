@@ -22,7 +22,7 @@ dependencies = [
   "matplotlib"
 ]
 
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.12"
 authors = [{ name = "AutoML Hannover", email =  "automl@ai.uni-hannover.de" }]
 readme = "README.md"
 description = "Hydra sweeper integration of our favorite optimization packages, utilizing ask-and-tell interfaces."
