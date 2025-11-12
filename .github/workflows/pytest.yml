@@ -21,6 +21,7 @@ env:
   package-name: "hypersweeper"
   test-dir: tests
   UV_SYSTEM_PYTHON: 1
+  CI: false
 
 jobs:
   # General unit tests
