@@ -54,18 +54,47 @@ jobs:
       id: status-before
       shell: bash
       run: |
-        echo "::set-output name=BEFORE::$(git status --porcelain -b)"
+        BEFORE="$(git status --porcelain -b)"
+        # save multi-line output correctly to GITHUB_OUTPUT
+        echo "BEFORE<<EOF" >> $GITHUB_OUTPUT
+        echo "$BEFORE" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Tests
       run: python -m pytest -v --disable-pytest-warnings tests --durations=20
 
-    - name: Check for files left behind by test
+    - name: Diagnostics and cleanup check
+      if: always()
+      shell: bash
       run: |
+        echo "=== GIT status before tests ==="
+        echo "${{ steps.status-before.outputs.BEFORE }}"
+
+        echo "=== GIT status after tests ==="
+        git status --porcelain -b
+
+        echo "=== Running processes (ps) ==="
+        ps auxf || true
+
+        echo "=== Open files in repo (lsof) ==="
+        lsof +D . || true
+
+        echo "=== disk usage (du) at repo root ==="
+        du -sh . || true
+
         before="${{ steps.status-before.outputs.BEFORE }}"
         after="$(git status --porcelain -b)"
         if [[ "$before" != "$after" ]]; then
-            echo "git status from before: $before"
-            echo "git status from after: $after"
-            echo "Not all generated files have been deleted!"
-            exit 1
+          echo "git status from before: $before"
+          echo "git status from after: $after"
+          echo "Not all generated files have been deleted!"
+          exit 1
         fi
+    - name: Kill leftover test processes (best-effort)
+      if: always()
+      shell: bash
+      run: |
+        pkill -f uv || true
+        pkill -f pytest || true
+        sleep 1
+        ps auxf || true
