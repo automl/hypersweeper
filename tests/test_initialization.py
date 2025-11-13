@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 from collections import defaultdict
 from pathlib import Path
@@ -11,6 +12,8 @@ from hydra.utils import to_absolute_path
 from hydra_plugins.hypersweeper import HypersweeperSweeper
 from omegaconf import DictConfig
 from pytest import mark  # noqa: PT013
+
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 
 
 class DummyOptimizer:
@@ -195,7 +198,7 @@ def test_init_without_n_trials(config):
     shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
     shutil.rmtree("checkpoints", ignore_errors=True)
 
-
+@mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work in Github Actions due to wandb logging.")
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])
 def test_init_with_wandb(config):
     config["wandb_project"] = "test"
