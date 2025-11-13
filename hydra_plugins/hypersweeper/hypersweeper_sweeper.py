@@ -150,6 +150,11 @@ class HypersweeperSweeper:
         else:
             self.max_parallel = job_array_size_limit
 
+        # Make sure we don't exceed max parallelization when using seeds
+        if self.seeds:
+            n_seeds = len(self.seeds)
+            self.max_parallel = max(1, self.max_parallel // n_seeds)
+
         self.budget = budget
         self.min_budget = min_budget
         self.trials_run = 0

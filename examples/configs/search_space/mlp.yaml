@@ -12,11 +12,11 @@ hyperparameters:
     default_value: ${n_neurons}
   activation:
     type: categorical
-    choices: [ logistic, tanh, relu ]
+    choices: ["logistic", "tanh", "relu"]
     default_value: ${activation}
   solver:
     type: categorical
-    choices: [ lbfgs, sgd, adam ]
+    choices: ["lbfgs", "sgd", "adam"]
     default_value: ${solver}
   batch_size:
     type: uniform_int
@@ -25,7 +25,7 @@ hyperparameters:
     default_value: ${batch_size}
   learning_rate:
     type: categorical
-    choices: [ constant, invscaling, adaptive ]
+    choices: ["constant", "invscaling", "adaptive"]
     default_value: ${learning_rate}
   learning_rate_init:
     type: uniform_float
@@ -37,12 +37,12 @@ conditions:
   - child: batch_size
     parent: solver
     type: IN
-    values: [ sgd, adam ]
+    values: ["sgd", "adam"]
   - child: learning_rate
     parent: solver
     type: EQ
-    value: sgd
+    value: "sgd"
   - child: learning_rate_init
     parent: solver
     type: IN
-    values: [ sgd, adam ]
+    values: ["sgd", "adam"]
