@@ -42,7 +42,7 @@ def test_smac_hyperband_termination():
             "hydra.run.dir=mlp_smac_hyperband",
             "hydra.sweep.dir=mlp_smac_hyperband",
             "hydra.sweeper.n_trials=20",
-            "+hydra.sweeper.sweeper_kwargs.max_parallelization=1",
+            "hydra.sweeper.sweeper_kwargs.max_parallelization=1",
         ]
     ).decode("utf-8")
     assert Path("mlp_smac_hyperband").exists(), "Run directory not created"
@@ -81,7 +81,7 @@ def test_smac_hyperband_optimizer_termination():
             "hydra.run.dir=mlp_smac_hyperband",
             "hydra.sweep.dir=mlp_smac_hyperband",
             "hydra.sweeper.n_trials=24",
-            "+hydra.sweeper.sweeper_kwargs.max_parallelization=1",
+            "hydra.sweeper.sweeper_kwargs.max_parallelization=1",
         ]
     ).decode("utf-8")
     assert Path("mlp_smac_hyperband").exists(), "Run directory not created"
