@@ -57,7 +57,7 @@ def test_max_parallel_with_seeds(max_parallel, job_limit, seeds):
             "-m",
             "hydra.run.dir=mlp_max_parallel_with_seeds",
             "hydra.sweep.dir=mlp_max_parallel_with_seeds",
-            f"+hydra.sweeper.sweeper_kwargs.max_parallelization={max_parallel}",
+            f"hydra.sweeper.sweeper_kwargs.max_parallelization={max_parallel}",
             f"hydra.sweeper.n_trials={job_limit}",
             f"+hydra.sweeper.sweeper_kwargs.seeds={seeds}",
         ]
