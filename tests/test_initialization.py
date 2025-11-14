@@ -192,11 +192,15 @@ def test_init_without_n_trials(config):
     config["n_trials"] = None
     sweeper = HypersweeperSweeper(**config)
     assert sweeper.n_trials is None, "Number of trials should be set to None"
-    assert sweeper.max_parallel == config.get("job_array_size_limit", 100), (
-        "Max parallelization should match job array size limit without n_trials"
+    job_array_limit = config.get("job_array_size_limit", 100)
+    if "seeds" in config and config["seeds"] is not None:
+        job_array_limit = max(job_array_limit // len(config["seeds"]), 1)
+    assert sweeper.max_parallel == job_array_limit, (
+        f"Max parallelization should match job array size limit without n_trials (is {sweeper.max_parallel})"
     )
     shutil.rmtree("some_dir", ignore_errors=True)  # Clean up the base directory if it was created
     shutil.rmtree("checkpoints", ignore_errors=True)
+
 
 @mark.skipif(IN_GITHUB_ACTIONS, reason="Test doesn't work in Github Actions due to wandb logging.")
 @mark.parametrize("config", [TEST_CONFIG1, TEST_CONFIG2])

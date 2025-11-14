@@ -462,6 +462,7 @@ class HypersweeperSweeper:
             infos = []
             t = 0
             terminate = False
+            print(t < self.max_parallel, terminate, trial_termination, optimizer_termination)
             while t < self.max_parallel and not terminate and not trial_termination and not optimizer_termination:
                 if not any(b is None for b in self.history["budget"]) and self.budget is not None:
                     budget_termination = sum(self.history["budget"]) >= self.budget

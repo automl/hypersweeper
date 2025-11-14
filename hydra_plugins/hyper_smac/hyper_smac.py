@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from pathlib import Path
 
 import pandas as pd
@@ -10,6 +11,7 @@ from hydra_plugins.hypersweeper.utils import Info, convert_to_configuration
 from omegaconf import OmegaConf
 from smac import Scenario
 from smac.facade import HyperparameterOptimizationFacade
+from smac.intensifier.hyperband import Hyperband
 from smac.runhistory.dataclasses import TrialInfo, TrialValue
 
 
@@ -43,12 +45,27 @@ class HyperSMACAdapter:
     def __init__(self, smac):
         """Initialize the adapter."""
         self.smac = smac
+        if isinstance(self.smac._intensifier, Hyperband):
+            self.hyperband = True
+            self.total_configs = 0
+            self.smac._intensifier.__post_init__()
+            self.n_configs_per_stage = deepcopy(self.smac._intensifier._n_configs_in_stage)
+            self.current_bracket = 0
+            self.total_stages = len(self.n_configs_per_stage.keys())
 
     def ask(self):
         """Ask for the next configuration."""
         smac_info = self.smac.ask()
         info = Info(config=smac_info.config, budget=smac_info.budget, load_path=None, seed=smac_info.seed)
-        return info, False, False
+        terminate = False
+        if self.hyperband:
+            self.total_configs += 1
+            if self.total_configs >= sum(self.n_configs_per_stage[self.current_bracket]):
+                self.current_bracket += 1
+                self.total_configs = 0
+                terminate = True
+        print(info, terminate)
+        return info, terminate, False
 
     def tell(self, info, value):
         """Tell the result of the configuration."""

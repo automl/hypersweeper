@@ -5,6 +5,7 @@ from __future__ import annotations
 import shutil
 import subprocess
 from pathlib import Path
+
 import pandas as pd
 
 
@@ -45,7 +46,8 @@ def test_logfiles():
     assert "budget" in incumbent.columns, "Incumbent file missing expected column 'budget'."
     assert "config_id" in incumbent.columns, "Incumbent file missing expected column 'config_id'."
     assert "total_wallclock_time" in incumbent.columns, "Incumbent file missing expected column 'wall_clock_time'."
-    assert "total_optimization_time" in incumbent.columns, "Incumbent file missing expected column 'total_optimization_time'."
-
+    assert "total_optimization_time" in incumbent.columns, (
+        "Incumbent file missing expected column 'total_optimization_time'."
+    )
 
     shutil.rmtree(Path("branin_logging"))
