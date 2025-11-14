@@ -45,27 +45,33 @@ class HyperSMACAdapter:
     def __init__(self, smac):
         """Initialize the adapter."""
         self.smac = smac
+        self.hyperband = False
         if isinstance(self.smac._intensifier, Hyperband):
             self.hyperband = True
             self.total_configs = 0
-            self.smac._intensifier.__post_init__()
-            self.n_configs_per_stage = deepcopy(self.smac._intensifier._n_configs_in_stage)
             self.current_bracket = 0
-            self.total_stages = len(self.n_configs_per_stage.keys())
+            self.brackets_finished = False
 
     def ask(self):
         """Ask for the next configuration."""
         smac_info = self.smac.ask()
         info = Info(config=smac_info.config, budget=smac_info.budget, load_path=None, seed=smac_info.seed)
         terminate = False
+        optimizer_termination = False
         if self.hyperband:
             self.total_configs += 1
-            if self.total_configs >= sum(self.n_configs_per_stage[self.current_bracket]):
-                self.current_bracket += 1
-                self.total_configs = 0
-                terminate = True
-        print(info, terminate)
-        return info, terminate, False
+            if self.current_bracket >= len(self.smac._intensifier._n_configs_in_stage):
+                self.brackets_finished = True
+                optimizer_termination = True
+                print("All brackets finished. Optimization will terminate.")
+
+            if not self.brackets_finished:
+                if self.total_configs >= sum(self.smac._intensifier._n_configs_in_stage[self.current_bracket]):
+                    self.current_bracket += 1
+                    self.total_configs = 0
+                    terminate = True
+
+        return info, terminate, optimizer_termination
 
     def tell(self, info, value):
         """Tell the result of the configuration."""

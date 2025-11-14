@@ -464,13 +464,15 @@ class HypersweeperSweeper:
             terminate = False
             print(t < self.max_parallel, terminate, trial_termination, optimizer_termination)
             while t < self.max_parallel and not terminate and not trial_termination and not optimizer_termination:
+                info, terminate, optimizer_termination = self.optimizer.ask()
                 if not any(b is None for b in self.history["budget"]) and self.budget is not None:
                     budget_termination = sum(self.history["budget"]) >= self.budget
                     if budget_termination:
                         break
 
                 try:
-                    info, terminate, optimizer_termination = self.optimizer.ask()
+                    pass
+                    #info, terminate, optimizer_termination = self.optimizer.ask()
                 except Exception as e:  # noqa: BLE001
                     if len(infos) > 0:
                         print("Optimizer failed on ask - running remaining configs.")
