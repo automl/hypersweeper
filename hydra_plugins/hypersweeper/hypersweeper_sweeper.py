@@ -472,7 +472,7 @@ class HypersweeperSweeper:
 
                 try:
                     pass
-                    #info, terminate, optimizer_termination = self.optimizer.ask()
+                    # info, terminate, optimizer_termination = self.optimizer.ask()
                 except Exception as e:  # noqa: BLE001
                     if len(infos) > 0:
                         print("Optimizer failed on ask - running remaining configs.")

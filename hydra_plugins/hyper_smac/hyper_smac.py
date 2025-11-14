@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 from pathlib import Path
 
 import pandas as pd
@@ -65,11 +64,12 @@ class HyperSMACAdapter:
                 optimizer_termination = True
                 print("All brackets finished. Optimization will terminate.")
 
-            if not self.brackets_finished:
-                if self.total_configs >= sum(self.smac._intensifier._n_configs_in_stage[self.current_bracket]):
-                    self.current_bracket += 1
-                    self.total_configs = 0
-                    terminate = True
+            if not self.brackets_finished and self.total_configs >= sum(
+                self.smac._intensifier._n_configs_in_stage[self.current_bracket]
+            ):
+                self.current_bracket += 1
+                self.total_configs = 0
+                terminate = True
 
         return info, terminate, optimizer_termination
 
